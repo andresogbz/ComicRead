@@ -1,6 +1,7 @@
 import React from 'react';
 import { Sun, Moon, FolderSearch, Plus, Check } from 'lucide-react';
 import { useThemeStore, PRIMARY_COLORS } from '../../../core/theme/useThemeStore';
+import { BrandLogo } from '../../../shared/components/BrandLogo';
 
 interface SettingsViewProps {
   onPickFiles: () => void;
@@ -164,11 +165,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       </section>
 
       {/* Sección 4: Información de la Aplicación */}
-      <section className="text-xs text-zinc-500 dark:text-zinc-400 flex flex-col gap-1">
-        <span className="font-bold text-lg text-zinc-900 dark:text-white">
-          OGMIC
-        </span>
-        <span>Versión 1.0.6 • Lector de cómics minimalista de alto rendimiento</span>
+      <section className="text-xs text-zinc-500 dark:text-zinc-400 flex flex-col gap-1.5">
+        <BrandLogo size="md" />
+        <span>Versión 1.0.10 • Lector de cómics minimalista de alto rendimiento</span>
         <span>Soporte para archivos .cbz, .cbr y formato Webtoon continuo</span>
       </section>
     </div>

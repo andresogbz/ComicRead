@@ -1,6 +1,7 @@
 import React from 'react';
 import { Plus } from 'lucide-react';
 import { useThemeStore } from '../../core/theme/useThemeStore';
+import { BrandLogo } from './BrandLogo';
 import type { AppTab } from './FloatingBubbleMenu';
 
 export type { AppTab };
@@ -23,16 +24,14 @@ export const AppNavigation: React.FC<AppNavigationProps> = ({
   return (
     <header className="sticky top-0 z-30 w-full max-w-full bg-gradient-to-b from-black/60 via-black/20 to-transparent transition-colors">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8 py-3.5 sm:py-4">
-        {/* Logo OGMIC con fuente normal en bold */}
+        {/* Logotipo de marca OGMIC distintivo */}
         <button
           type="button"
           onClick={() => onTabChange('home')}
-          className="flex items-center text-left focus:outline-none group cursor-pointer shrink-0"
+          className="flex items-center text-left focus:outline-none cursor-pointer shrink-0"
           aria-label="Ir a Inicio - OGMIC"
         >
-          <span className="font-bold text-xl sm:text-2xl tracking-tight text-white transition-opacity group-hover:opacity-80">
-            OGMIC
-          </span>
+          <BrandLogo size="md" />
         </button>
 
         {/* Acción superior: Botón plano de Agregar Cómic */}
