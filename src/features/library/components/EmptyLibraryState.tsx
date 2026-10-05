@@ -40,10 +40,10 @@ export const EmptyLibraryState: React.FC<EmptyLibraryStateProps> = ({
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      className={`relative mt-6 flex min-h-[400px] flex-col items-center justify-center rounded-3xl p-8 sm:p-14 text-center transition-colors border border-zinc-200/80 dark:border-zinc-800/80 ${
+      className={`relative mt-4 flex min-h-[340px] flex-col items-center justify-center p-6 sm:p-12 text-center transition-colors ${
         isDragOver
-          ? 'bg-zinc-100 dark:bg-zinc-800/60 border-zinc-400 dark:border-zinc-600'
-          : 'bg-zinc-50 dark:bg-zinc-900/40'
+          ? 'bg-black/[0.03] dark:bg-white/[0.03] rounded-3xl'
+          : ''
       }`}
     >
       <div

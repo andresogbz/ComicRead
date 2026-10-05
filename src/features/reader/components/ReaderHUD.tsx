@@ -124,7 +124,7 @@ export const ReaderHUD: React.FC<ReaderHUDProps> = ({
         {/* Controles de Modos y Zoom planos */}
         <div className="flex flex-wrap items-center justify-between gap-3 max-w-4xl mx-auto w-full pt-1">
           {/* Selector de modo de lectura */}
-          <div className="flex items-center gap-1 rounded-full bg-zinc-900 p-1 border border-zinc-800">
+          <div className="flex items-center gap-1 rounded-full bg-zinc-900 p-1">
             <button
               type="button"
               onClick={() => onReadingModeChange('ltr')}
@@ -165,7 +165,7 @@ export const ReaderHUD: React.FC<ReaderHUDProps> = ({
 
           {/* Ajuste de escala / Fit sin sombras */}
           {readingMode !== 'webtoon' && (
-            <div className="hidden sm:flex items-center gap-1 rounded-full bg-zinc-900 p-1 border border-zinc-800">
+            <div className="hidden sm:flex items-center gap-1 rounded-full bg-zinc-900 p-1">
               <button
                 type="button"
                 onClick={() => onFitModeChange('contain')}
@@ -203,7 +203,7 @@ export const ReaderHUD: React.FC<ReaderHUDProps> = ({
           )}
 
           {/* Controles de Zoom planos sin sombras */}
-          <div className="flex items-center gap-1 rounded-full bg-zinc-900 px-2 py-1 border border-zinc-800">
+          <div className="flex items-center gap-1 rounded-full bg-zinc-900 px-2 py-1">
             <button
               type="button"
               onClick={onZoomOut}

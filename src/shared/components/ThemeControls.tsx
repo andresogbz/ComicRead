@@ -23,7 +23,7 @@ export const ThemeControls: React.FC = () => {
       <button
         type="button"
         onClick={toggleMode}
-        className="flex h-9 w-9 items-center justify-center rounded-full bg-black/5 dark:bg-white/5 text-zinc-700 dark:text-zinc-200 hover:bg-black/10 dark:hover:bg-white/10 active:scale-95 transition-all"
+        className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 active:scale-95 transition-all cursor-pointer shrink-0"
         aria-label={mode === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
       >
         {mode === 'dark' ? (
@@ -38,7 +38,7 @@ export const ThemeControls: React.FC = () => {
         <button
           type="button"
           onClick={() => setIsPaletteOpen((prev) => !prev)}
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-black/5 dark:bg-white/5 text-zinc-700 dark:text-zinc-200 hover:bg-black/10 dark:hover:bg-white/10 active:scale-95 transition-all"
+          className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 active:scale-95 transition-all cursor-pointer shrink-0"
           aria-label="Elegir color primario"
         >
           <Palette

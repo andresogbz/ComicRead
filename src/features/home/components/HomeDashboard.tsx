@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { ArrowRight, Sparkles, Heart } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import type { StoredComic } from '../../../infrastructure/database/ComicDatabase';
 import { HomeHero } from './HomeHero';
 import { DashboardStats } from './DashboardStats';
@@ -79,24 +79,26 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
 
       {/* Recientemente Añadidos */}
       {recentlyAdded.length > 0 && (
-        <section className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Sparkles
-                className="h-4 w-4 stroke-[2]"
+        <section className="flex flex-col pb-8 sm:pb-10 border-b border-zinc-200/80 dark:border-zinc-800/80 transition-colors">
+          <div className="flex items-end justify-between mb-5">
+            <div>
+              <span
+                className="text-xs font-semibold tracking-wide"
                 style={{ color: primaryColor.hex }}
-              />
-              <h2 className="text-base sm:text-lg font-bold tracking-tight text-zinc-900 dark:text-white m-0">
+              >
+                Catálogo Reciente
+              </span>
+              <h2 className="text-xl sm:text-2xl font-black tracking-tight text-zinc-900 dark:text-white m-0 mt-1">
                 Recién agregados
               </h2>
             </div>
             <button
               type="button"
               onClick={onGoToLibrary}
-              className="flex items-center gap-1 text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
+              className="flex items-center gap-1 text-xs font-semibold text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
             >
-              <span>Ver todos</span>
-              <ArrowRight className="h-3.5 w-3.5" />
+              <span>Ver catálogo</span>
+              <ArrowRight className="h-3.5 w-3.5 stroke-[2]" />
             </button>
           </div>
 
@@ -116,24 +118,26 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
 
       {/* Favoritos si existen */}
       {favoriteComics.length > 0 && (
-        <section className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Heart
-                className="h-4 w-4 stroke-[2]"
+        <section className="flex flex-col pb-8 sm:pb-10 border-b border-zinc-200/80 dark:border-zinc-800/80 transition-colors">
+          <div className="flex items-end justify-between mb-5">
+            <div>
+              <span
+                className="text-xs font-semibold tracking-wide"
                 style={{ color: primaryColor.hex }}
-              />
-              <h2 className="text-base sm:text-lg font-bold tracking-tight text-zinc-900 dark:text-white m-0">
+              >
+                Colección Destacada
+              </span>
+              <h2 className="text-xl sm:text-2xl font-black tracking-tight text-zinc-900 dark:text-white m-0 mt-1">
                 Tus favoritos
               </h2>
             </div>
             <button
               type="button"
               onClick={onGoToLibrary}
-              className="flex items-center gap-1 text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
+              className="flex items-center gap-1 text-xs font-semibold text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
             >
               <span>Ver todos</span>
-              <ArrowRight className="h-3.5 w-3.5" />
+              <ArrowRight className="h-3.5 w-3.5 stroke-[2]" />
             </button>
           </div>
 

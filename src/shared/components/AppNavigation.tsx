@@ -25,31 +25,31 @@ export const AppNavigation: React.FC<AppNavigationProps> = ({
   const { primaryColor } = useThemeStore();
 
   return (
-    <header className="sticky top-0 z-30 w-full bg-[var(--bg-main)] border-b border-zinc-200/80 dark:border-zinc-800/80 transition-colors">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 py-3.5">
+    <header className="sticky top-0 z-30 w-full max-w-full bg-[var(--bg-main)] border-b border-zinc-200/80 dark:border-zinc-800/80 transition-colors">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 sm:gap-4 px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3.5">
         {/* Marca y Navegación Principal */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-2 sm:gap-5 min-w-0">
           <button
             type="button"
             onClick={() => onTabChange('home')}
-            className="flex items-center gap-2 text-left focus:outline-none group cursor-pointer"
+            className="flex items-center gap-1.5 sm:gap-2 text-left focus:outline-none group cursor-pointer shrink-0"
             aria-label="Ir a Inicio"
           >
             <BookOpen
               className="h-5 w-5 stroke-[2] transition-transform duration-150 group-hover:scale-105"
               style={{ color: primaryColor.hex }}
             />
-            <span className="text-base font-bold tracking-tight text-zinc-900 dark:text-white">
+            <span className="text-sm sm:text-base font-bold tracking-tight text-zinc-900 dark:text-white hidden min-[380px]:inline">
               ComicRead
             </span>
           </button>
 
-          {/* Pestañas de Navegación planas sin sombras */}
-          <nav className="flex items-center gap-1 rounded-full bg-zinc-100 dark:bg-zinc-900 p-1 transition-colors">
+          {/* Pestañas de Navegación planas sin sombras ni recuadros pesados */}
+          <nav className="flex items-center gap-0.5 sm:gap-1 p-0.5 transition-colors">
             <button
               type="button"
               onClick={() => onTabChange('home')}
-              className={`flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs transition-all duration-150 active:scale-95 cursor-pointer ${
+              className={`flex items-center gap-1 sm:gap-1.5 rounded-full px-2.5 sm:px-3.5 py-1 text-xs transition-all duration-150 active:scale-95 cursor-pointer ${
                 activeTab === 'home'
                   ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-semibold'
                   : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium'
@@ -62,7 +62,7 @@ export const AppNavigation: React.FC<AppNavigationProps> = ({
             <button
               type="button"
               onClick={() => onTabChange('library')}
-              className={`flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs transition-all duration-150 active:scale-95 cursor-pointer ${
+              className={`flex items-center gap-1 sm:gap-1.5 rounded-full px-2.5 sm:px-3.5 py-1 text-xs transition-all duration-150 active:scale-95 cursor-pointer ${
                 activeTab === 'library'
                   ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-semibold'
                   : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium'
@@ -83,7 +83,7 @@ export const AppNavigation: React.FC<AppNavigationProps> = ({
         </div>
 
         {/* Acciones y Controles de Tema */}
-        <div className="flex items-center gap-2 sm:gap-2.5">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           <ThemeControls />
 
           {/* Botón de Escanear Carpeta plano sin sombras */}
@@ -91,24 +91,26 @@ export const AppNavigation: React.FC<AppNavigationProps> = ({
             type="button"
             onClick={onScanDirectory}
             disabled={isScanning}
-            className="hidden sm:flex h-9 items-center gap-1.5 rounded-full bg-zinc-100 dark:bg-zinc-900 px-3.5 text-xs font-medium text-zinc-800 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-800 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
+            className="hidden md:flex h-9 items-center gap-1.5 rounded-full bg-zinc-100 dark:bg-zinc-900 px-3.5 text-xs font-medium text-zinc-800 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-800 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
             title="Escanear carpeta local"
           >
             <FolderSearch className="h-4 w-4 stroke-[1.75]" />
             <span>{isScanning ? 'Escaneando...' : 'Escanear'}</span>
           </button>
 
-          {/* Botón de Importar Cómics plano sin sombras */}
+          {/* Botón de Importar Cómics responsivo que no desborda en móvil */}
           <button
             type="button"
             onClick={onPickFiles}
-            className="flex h-9 items-center gap-1.5 rounded-full px-3.5 sm:px-4 text-xs font-semibold text-white active:scale-95 transition-all cursor-pointer"
+            className="flex h-8 sm:h-9 items-center justify-center gap-1 sm:gap-1.5 rounded-full px-2.5 sm:px-3.5 text-xs font-semibold text-white active:scale-95 transition-all cursor-pointer shrink-0"
             style={{
               backgroundColor: primaryColor.hex,
             }}
+            title="Abrir cómic"
+            aria-label="Abrir cómic"
           >
             <Plus className="h-4 w-4 stroke-[2.5]" />
-            <span>Abrir cómic(s)</span>
+            <span className="hidden sm:inline">Abrir cómic</span>
           </button>
         </div>
       </div>

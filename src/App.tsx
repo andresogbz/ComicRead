@@ -37,12 +37,12 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] transition-colors duration-150">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-[var(--bg-main)] text-[var(--text-main)] transition-colors duration-150">
       {activeComic ? (
         <ReaderViewport comic={activeComic} onClose={handleCloseReader} />
       ) : (
-        <div className="flex flex-col min-h-screen">
-          {/* Barra de navegación superior sin bordes */}
+        <div className="flex flex-col min-h-screen w-full max-w-full overflow-x-hidden">
+          {/* Barra de navegación superior adaptativa */}
           <AppNavigation
             activeTab={activeTab}
             onTabChange={setActiveTab}
@@ -53,9 +53,9 @@ export function App() {
           />
 
           {/* Vistas Principales: Inicio (Dashboard) y Biblioteca */}
-          <main className="w-full flex-1">
+          <main className="w-full max-w-full overflow-x-hidden flex-1">
             {activeTab === 'home' ? (
-              <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+              <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 py-5 sm:py-6">
                 <HomeDashboard
                   comics={rawComics}
                   stats={stats}

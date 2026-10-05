@@ -41,7 +41,7 @@ export const LibraryFilterBar: React.FC<LibraryFilterBarProps> = ({
   const { primaryColor } = useThemeStore();
 
   return (
-    <div className="flex flex-col gap-3 py-2">
+    <div className="flex flex-col gap-3 py-2 pb-5 border-b border-zinc-200/80 dark:border-zinc-800/80 mb-6">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
         {/* Chips de filtro sin ningún scroll horizontal */}
         <div className="flex flex-wrap items-center gap-1.5">
@@ -86,7 +86,7 @@ export const LibraryFilterBar: React.FC<LibraryFilterBarProps> = ({
 
         {/* Buscador y Selector de Ordenación planos */}
         <div className="flex items-center gap-2.5">
-          {/* Barra de búsqueda */}
+          {/* Barra de búsqueda sin bordes pesados */}
           <div className="relative flex-1 md:w-64">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" />
             <input
@@ -94,7 +94,7 @@ export const LibraryFilterBar: React.FC<LibraryFilterBarProps> = ({
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Buscar cómic o serie..."
-              className="h-8 w-full rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 pl-9 pr-8 text-xs text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none transition-all"
+              className="h-8 w-full rounded-full bg-zinc-100 dark:bg-zinc-900 pl-9 pr-8 text-xs text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none transition-all"
             />
             {searchQuery && (
               <button
@@ -108,9 +108,9 @@ export const LibraryFilterBar: React.FC<LibraryFilterBarProps> = ({
             )}
           </div>
 
-          {/* Selector de ordenación plano */}
+          {/* Selector de ordenación plano sin bordes pesados */}
           <div className="relative flex items-center">
-            <div className="flex h-8 items-center gap-1.5 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 px-3 text-xs text-zinc-700 dark:text-zinc-300 transition-colors">
+            <div className="flex h-8 items-center gap-1.5 rounded-full bg-zinc-100 dark:bg-zinc-900 px-3 text-xs text-zinc-700 dark:text-zinc-300 transition-colors">
               <ArrowUpDown className="h-3.5 w-3.5 text-zinc-400 dark:text-zinc-500" />
               <select
                 value={sortBy}

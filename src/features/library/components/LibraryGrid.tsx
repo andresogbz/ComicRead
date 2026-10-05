@@ -62,7 +62,7 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+    <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 py-5 sm:py-6 w-full max-w-full overflow-x-hidden">
       {/* Encabezado */}
       <LibraryHeader
         totalComics={allComicsCount}

@@ -18,29 +18,35 @@ export const HomeHero: React.FC<HomeHeroProps> = ({
 
   if (!comic) {
     return (
-      <div className="relative rounded-3xl p-8 sm:p-14 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 transition-colors">
+      <div className="relative pt-2 pb-8 sm:pb-10 border-b border-zinc-200/80 dark:border-zinc-800/80 transition-colors">
         <div className="max-w-2xl">
-          <span
-            className="text-xs font-semibold"
-            style={{ color: primaryColor.hex }}
-          >
-            Lector de cómics minimalista
-          </span>
-          <h1 className="mt-3 text-3xl sm:text-5xl font-black tracking-tight text-zinc-900 dark:text-white leading-[1.1]">
+          <div className="flex items-center gap-2 mb-2">
+            <BookOpen
+              className="h-4 w-4 stroke-[2]"
+              style={{ color: primaryColor.hex }}
+            />
+            <span
+              className="text-xs font-semibold tracking-wide"
+              style={{ color: primaryColor.hex }}
+            >
+              Lector Minimalista
+            </span>
+          </div>
+          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-zinc-900 dark:text-white leading-[1.1] m-0">
             Tu biblioteca personal de cómics
           </h1>
-          <p className="mt-4 text-sm sm:text-base text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal">
-            Lectura rápida, sin distracciones y con soporte para archivos .cbz, .cbr y cómics verticales Webtoon. Comienza importando historias desde tu dispositivo.
+          <p className="mt-3 text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal m-0 max-w-xl">
+            Lectura fluida, sin distracciones y con soporte para archivos .cbz, .cbr y cómics verticales Webtoon. Comienza importando historias desde tu dispositivo.
           </p>
-          <div className="mt-8 flex items-center gap-3">
+          <div className="mt-6 flex items-center gap-3">
             <button
               type="button"
               onClick={onPickFiles}
-              className="flex h-11 items-center gap-2 rounded-full px-6 text-xs sm:text-sm font-semibold text-white active:scale-95 transition-all cursor-pointer"
+              className="flex h-10 items-center gap-2 rounded-full px-5 text-xs font-semibold text-white active:scale-95 transition-all cursor-pointer"
               style={{ backgroundColor: primaryColor.hex }}
             >
               <BookOpen className="h-4 w-4 stroke-[2]" />
-              <span>Importar cómics</span>
+              <span>Importar cómic</span>
             </button>
           </div>
         </div>
@@ -52,12 +58,12 @@ export const HomeHero: React.FC<HomeHeroProps> = ({
   const isStarted = comic.progressPercentage > 0 && !isCompleted;
 
   return (
-    <div className="relative rounded-3xl p-6 sm:p-10 bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/80 transition-colors">
-      <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-        {/* Portada Flotante Plana, sin sombras */}
+    <div className="relative pt-2 pb-8 sm:pb-10 border-b border-zinc-200/80 dark:border-zinc-800/80 transition-colors">
+      <div className="flex flex-col md:flex-row items-center md:items-start gap-6 sm:gap-10">
+        {/* Portada Flotante Plana, sin bordes ni cajas exteriores */}
         <div
           onClick={() => onOpenComic(comic)}
-          className="relative aspect-[2/3] w-40 sm:w-52 shrink-0 overflow-hidden rounded-2xl bg-zinc-200 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 transition-transform duration-200 hover:scale-[1.02] cursor-pointer"
+          className="relative aspect-[2/3] w-40 sm:w-52 shrink-0 overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-900 transition-transform duration-200 hover:scale-[1.02] cursor-pointer"
         >
           {comic.coverDataUrl ? (
             <img
@@ -70,16 +76,16 @@ export const HomeHero: React.FC<HomeHeroProps> = ({
               <BookOpen className="h-10 w-10 stroke-[1.5]" />
             </div>
           )}
-          {/* Badge de formato plano sin blur ni uppercase */}
+          {/* Badge de formato plano */}
           <span className="absolute top-2.5 left-2.5 rounded-full bg-zinc-900/90 text-white px-2.5 py-0.5 text-[10px] font-semibold">
             {comic.format.toUpperCase()}
           </span>
         </div>
 
-        {/* Detalles y Titular Hero Impactante */}
+        {/* Detalles y Titular Hero Impactante sobre el lienzo */}
         <div className="flex flex-1 flex-col justify-between self-stretch text-center md:text-left">
           <div>
-            <div className="flex items-center justify-center md:justify-start gap-2 text-xs font-semibold">
+            <div className="flex items-center justify-center md:justify-start gap-2 text-xs font-semibold mb-2">
               <span style={{ color: primaryColor.hex }}>
                 {isCompleted ? 'Lectura completada' : isStarted ? 'En curso' : 'Recientemente agregado'}
               </span>
@@ -92,14 +98,14 @@ export const HomeHero: React.FC<HomeHeroProps> = ({
 
             <h1
               onClick={() => onOpenComic(comic)}
-              className="mt-3 text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-zinc-900 dark:text-white line-clamp-2 hover:opacity-85 transition-opacity cursor-pointer leading-[1.15]"
+              className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-zinc-900 dark:text-white line-clamp-2 hover:opacity-85 transition-opacity cursor-pointer leading-[1.15] m-0"
             >
               {comic.title}
             </h1>
 
             {/* Barra de progreso plana */}
-            <div className="mt-6 max-w-lg mx-auto md:mx-0">
-              <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 mb-2 font-medium">
+            <div className="mt-5 max-w-lg mx-auto md:mx-0">
+              <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 mb-1.5 font-medium">
                 <span>
                   {isStarted
                     ? `Página ${comic.lastReadPageIndex + 1} de ${comic.totalPages}`
@@ -109,7 +115,7 @@ export const HomeHero: React.FC<HomeHeroProps> = ({
                   {comic.progressPercentage}%
                 </span>
               </div>
-              <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
                 <div
                   className="h-full transition-all duration-200 ease-out"
                   style={{
@@ -121,12 +127,12 @@ export const HomeHero: React.FC<HomeHeroProps> = ({
             </div>
           </div>
 
-          {/* Botón para continuar lectura plano sin sombras */}
-          <div className="mt-8 flex items-center justify-center md:justify-start gap-3">
+          {/* Botón para continuar lectura plano */}
+          <div className="mt-6 flex items-center justify-center md:justify-start gap-3">
             <button
               type="button"
               onClick={() => onOpenComic(comic)}
-              className="flex h-11 items-center gap-2 rounded-full px-7 text-xs sm:text-sm font-semibold text-white active:scale-95 transition-all cursor-pointer"
+              className="flex h-10 items-center gap-2 rounded-full px-6 text-xs sm:text-sm font-semibold text-white active:scale-95 transition-all cursor-pointer"
               style={{ backgroundColor: primaryColor.hex }}
             >
               <Play className="h-4 w-4 fill-white stroke-[2]" />

@@ -31,8 +31,8 @@ export const ComicCard: React.FC<ComicCardProps> = ({
       tabIndex={0}
       aria-label={`Abrir ${comic.title}`}
     >
-      {/* Contenedor plano de la Portada sin sombras */}
-      <div className="relative aspect-[2/3] w-full overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 transition-transform duration-200 group-hover:scale-[1.02]">
+      {/* Contenedor plano de la Portada sin sombras ni bordes */}
+      <div className="relative aspect-[2/3] w-full overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-900 transition-transform duration-200 group-hover:scale-[1.02]">
         {comic.coverDataUrl ? (
           <img
             src={comic.coverDataUrl}
@@ -47,10 +47,10 @@ export const ComicCard: React.FC<ComicCardProps> = ({
           </div>
         )}
 
-        {/* Gradiente superior sutil para botones */}
+        {/* Gradiente superior sutil para legibilidad de botones */}
         <div className="pointer-events-none absolute inset-x-0 top-0 h-14 bg-gradient-to-b from-black/60 to-transparent" />
 
-        {/* Badges de formato planos (sin uppercase con tracking) */}
+        {/* Badges de formato planos */}
         <div className="absolute top-2 left-2 flex items-center gap-1.5">
           <span className="rounded-md bg-zinc-900/90 px-2 py-0.5 text-[10px] font-semibold text-white">
             {comic.format.toUpperCase()}
@@ -63,28 +63,28 @@ export const ComicCard: React.FC<ComicCardProps> = ({
           )}
         </div>
 
-        {/* Botón de Favorito plano sin sombra */}
+        {/* Botón de Favorito plano sin círculos de fondo */}
         <button
           type="button"
           onClick={(e) => onToggleFavorite(comic.id, e)}
-          className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-zinc-900/80 text-white transition-transform hover:scale-105 active:scale-95"
+          className="absolute top-2 right-2 p-1 text-white transition-transform hover:scale-110 active:scale-95 cursor-pointer z-10"
           aria-label={comic.isFavorite ? 'Quitar de favoritos' : 'Marcar como favorito'}
         >
           <Heart
-            className={`h-3.5 w-3.5 stroke-[2] transition-colors ${
-              comic.isFavorite ? 'fill-white text-white' : 'text-zinc-300 hover:text-white'
+            className={`h-4 w-4 stroke-[2] transition-colors ${
+              comic.isFavorite ? 'fill-rose-500 text-rose-500' : 'text-white/80 hover:text-white'
             }`}
           />
         </button>
 
-        {/* Botón de Eliminar plano */}
+        {/* Botón de Eliminar plano sin fondo */}
         <button
           type="button"
           onClick={(e) => onDelete(comic.id, e)}
-          className="absolute bottom-2.5 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-zinc-900/80 text-zinc-300 opacity-0 group-hover:opacity-100 transition-all hover:text-rose-400 hover:scale-105 active:scale-95"
+          className="absolute bottom-2.5 right-2 p-1 text-white/80 opacity-0 group-hover:opacity-100 transition-all hover:text-rose-400 hover:scale-110 active:scale-95 cursor-pointer z-10"
           aria-label="Eliminar cómic"
         >
-          <Trash2 className="h-3.5 w-3.5 stroke-[1.75]" />
+          <Trash2 className="h-4 w-4 stroke-[2]" />
         </button>
 
         {/* Barra de progreso plana */}
