@@ -18,7 +18,7 @@ export const HomeHero: React.FC<HomeHeroProps> = ({
 
   if (!comic) {
     return (
-      <div className="relative w-full pt-2 pb-8 sm:pb-10 border-b border-zinc-200/80 dark:border-zinc-800/80 transition-colors">
+      <div className="relative w-full pt-4 pb-10 border-b border-zinc-200/40 dark:border-zinc-800/40 transition-colors">
         <div className="max-w-2xl">
           <div className="flex items-center gap-2 mb-2">
             <span
@@ -28,17 +28,17 @@ export const HomeHero: React.FC<HomeHeroProps> = ({
               Lector multiformato
             </span>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-zinc-900 dark:text-white leading-[1.1] m-0">
+          <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-zinc-900 dark:text-white leading-[1.1] m-0">
             Tu biblioteca personal de cómics
           </h1>
-          <p className="mt-3 text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal m-0 max-w-xl">
+          <p className="mt-3 text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed font-normal m-0 max-w-xl">
             Lectura fluida, sin distracciones y con soporte para archivos .cbz, .cbr y cómics verticales Webtoon. Comienza importando historias desde tu dispositivo.
           </p>
           <div className="mt-6 flex items-center gap-3">
             <button
               type="button"
               onClick={onPickFiles}
-              className="flex h-11 items-center gap-2 rounded-full px-6 text-xs sm:text-sm font-semibold text-white active:scale-95 transition-all cursor-pointer"
+              className="flex h-11 items-center gap-2 rounded-full px-6 text-xs sm:text-sm font-bold text-white active:scale-95 transition-all cursor-pointer"
               style={{ backgroundColor: primaryColor.hex }}
             >
               <span>Agregar cómics</span>
@@ -53,55 +53,38 @@ export const HomeHero: React.FC<HomeHeroProps> = ({
   const isStarted = comic.progressPercentage > 0 && !isCompleted;
 
   return (
-    <div className="relative w-full min-h-[360px] sm:min-h-[420px] rounded-3xl overflow-hidden transition-colors flex flex-col justify-end p-6 sm:p-10 lg:p-12 pb-8 sm:pb-12">
-      {/* Portada en Fondo con atmósfera inmersiva */}
-      {comic.coverDataUrl ? (
-        <div className="absolute inset-0 z-0 overflow-hidden">
-          <img
-            src={comic.coverDataUrl}
-            alt=""
-            aria-hidden="true"
-            className="h-full w-full object-cover object-center scale-105 filter blur-xs sm:blur-none"
-          />
-          {/* Capas de gradiente para garantizar legibilidad de alto contraste */}
-          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-zinc-950/30" />
-          <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/95 via-zinc-950/60 to-transparent" />
-        </div>
-      ) : (
-        <div className="absolute inset-0 z-0 bg-zinc-900" />
-      )}
-
-      {/* Contenido dentro de la portada */}
-      <div className="relative z-10 flex flex-col md:flex-row items-start md:items-end justify-between gap-6 sm:gap-10">
+    <div className="relative w-full pt-2 pb-10 border-b border-zinc-200/40 dark:border-zinc-800/40 transition-colors flex flex-col justify-end">
+      {/* Contenido directamente sobre el lienzo de la app, sin cajas contenedoras */}
+      <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 sm:gap-10">
         <div className="max-w-2xl flex-1">
           {/* Badges de estado y formato */}
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <span
-              className="rounded-full px-3 py-0.5 text-[11px] font-semibold text-white"
+              className="rounded-full px-3 py-0.5 text-[11px] font-bold text-white"
               style={{ backgroundColor: primaryColor.hex }}
             >
               .{comic.format}
             </span>
-            <span className="rounded-full bg-white/15 backdrop-blur-md px-3 py-0.5 text-[11px] font-medium text-white/90">
+            <span className="rounded-full bg-white/20 backdrop-blur-sm px-3 py-0.5 text-[11px] font-medium text-white">
               {isCompleted ? 'Lectura completada' : isStarted ? 'En lectura activa' : 'Recientemente agregado'}
             </span>
-            <span className="text-white/70 text-xs flex items-center gap-1 font-normal ml-1">
+            <span className="text-zinc-300 text-xs flex items-center gap-1 font-normal ml-1">
               <Clock className="h-3.5 w-3.5 stroke-[2]" />
               {comic.totalPages} páginas
             </span>
           </div>
 
-          {/* Título de la historia */}
+          {/* Título de la historia con fuente estándar en bold */}
           <h1
             onClick={() => onOpenComic(comic)}
-            className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white line-clamp-2 hover:opacity-90 transition-opacity cursor-pointer leading-[1.1] m-0"
+            className="text-3xl sm:text-5xl font-bold tracking-tight text-white line-clamp-2 hover:opacity-90 transition-opacity cursor-pointer leading-[1.1] m-0"
           >
             {comic.title}
           </h1>
 
           {/* Barra de progreso integrada */}
           <div className="mt-5 max-w-md">
-            <div className="flex items-center justify-between text-xs text-white/80 mb-1.5 font-medium">
+            <div className="flex items-center justify-between text-xs text-zinc-300 mb-1.5 font-medium">
               <span>
                 {isStarted
                   ? `Página ${comic.lastReadPageIndex + 1} de ${comic.totalPages}`
@@ -111,7 +94,7 @@ export const HomeHero: React.FC<HomeHeroProps> = ({
                 {comic.progressPercentage}%
               </span>
             </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-white/20 backdrop-blur-sm">
+            <div className="h-2 w-full overflow-hidden rounded-full bg-white/20 backdrop-blur-xs">
               <div
                 className="h-full transition-all duration-200 ease-out"
                 style={{

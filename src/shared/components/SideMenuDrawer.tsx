@@ -64,26 +64,26 @@ export const SideMenuDrawer: React.FC<SideMenuDrawerProps> = ({
       {/* Telón de fondo */}
       <div
         onClick={onClose}
-        className="absolute inset-0 bg-black/70 backdrop-blur-xs transition-opacity cursor-pointer"
+        className="absolute inset-0 bg-black/75 backdrop-blur-xs transition-opacity cursor-pointer"
         aria-hidden="true"
       />
 
       {/* Panel lateral deslizante (diseño idéntico a la segunda imagen de referencia) */}
       <aside
-        className="relative z-10 h-full w-72 sm:w-84 max-w-[85vw] bg-[var(--bg-main)] text-[var(--text-main)] p-6 sm:p-8 flex flex-col justify-between overflow-y-auto animate-in slide-in-from-left duration-250 border-r border-zinc-200/80 dark:border-zinc-800/80 shadow-none"
+        className="relative z-10 h-full w-72 sm:w-84 max-w-[85vw] bg-zinc-950/95 text-white p-6 sm:p-8 flex flex-col justify-between overflow-y-auto animate-in slide-in-from-left duration-250 border-r border-zinc-800/80 shadow-none backdrop-blur-md"
         aria-label="Menú de navegación"
       >
         <div>
           {/* Fila superior: Logo y Botón de Cierre plano sin fondos */}
           <div className="flex items-center justify-between pb-6">
-            <span className="font-logo font-black text-2xl tracking-tight text-zinc-900 dark:text-white">
+            <span className="font-bold text-2xl tracking-tight text-white">
               OGMIC
             </span>
 
             <button
               type="button"
               onClick={onClose}
-              className="flex h-9 w-9 items-center justify-center text-zinc-900 dark:text-white hover:opacity-60 active:scale-90 transition-transform cursor-pointer"
+              className="flex h-9 w-9 items-center justify-center text-white hover:opacity-60 active:scale-90 transition-transform cursor-pointer"
               aria-label="Cerrar menú"
             >
               <X className="h-6 w-6 stroke-[2]" />
@@ -92,13 +92,13 @@ export const SideMenuDrawer: React.FC<SideMenuDrawerProps> = ({
 
           {/* Divisor con etiqueta: — Menú */}
           <div className="flex items-center gap-2.5 my-4">
-            <div className="w-5 h-[1.5px] bg-zinc-300 dark:bg-zinc-700" />
-            <span className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">
+            <div className="w-5 h-[1.5px] bg-zinc-700" />
+            <span className="text-xs text-zinc-400 font-medium">
               Menú
             </span>
           </div>
 
-          {/* Enlaces Principales en Tipografía Grande y Audaz (Sentence case) */}
+          {/* Enlaces Principales en Tipografía Normal en Negrita (Sentence case) */}
           <nav className="flex flex-col gap-2 py-1">
             {NAV_ITEMS.map((item) => {
               const isActive = activeTab === item.id;
@@ -110,13 +110,13 @@ export const SideMenuDrawer: React.FC<SideMenuDrawerProps> = ({
                     onTabChange(item.id);
                     onClose();
                   }}
-                  className="flex items-center justify-between text-left py-2 text-2xl sm:text-3xl font-black tracking-tight transition-all duration-150 cursor-pointer group"
+                  className="flex items-center justify-between text-left py-2 text-2xl sm:text-3xl font-bold tracking-tight transition-all duration-150 cursor-pointer group"
                 >
                   <span
                     className={
                       isActive
-                        ? 'text-zinc-900 dark:text-white underline underline-offset-8 decoration-2'
-                        : 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-white'
+                        ? 'text-white underline underline-offset-8 decoration-2'
+                        : 'text-zinc-500 hover:text-white'
                     }
                     style={isActive ? { textDecorationColor: primaryColor.hex } : undefined}
                   >
@@ -138,8 +138,8 @@ export const SideMenuDrawer: React.FC<SideMenuDrawerProps> = ({
 
           {/* Divisor con etiqueta: — Ajustes rápidos */}
           <div className="flex items-center gap-2.5 my-5">
-            <div className="w-5 h-[1.5px] bg-zinc-300 dark:bg-zinc-700" />
-            <span className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">
+            <div className="w-5 h-[1.5px] bg-zinc-700" />
+            <span className="text-xs text-zinc-400 font-medium">
               Ajustes rápidos
             </span>
           </div>
@@ -149,7 +149,7 @@ export const SideMenuDrawer: React.FC<SideMenuDrawerProps> = ({
             <button
               type="button"
               onClick={toggleMode}
-              className="flex items-center gap-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white py-1 transition-colors cursor-pointer"
+              className="flex items-center gap-2 text-xs font-semibold text-zinc-300 hover:text-white py-1 transition-colors cursor-pointer"
             >
               {mode === 'dark' ? (
                 <>
@@ -187,8 +187,8 @@ export const SideMenuDrawer: React.FC<SideMenuDrawerProps> = ({
 
           {/* Divisor con etiqueta: — Acciones */}
           <div className="flex items-center gap-2.5 my-5">
-            <div className="w-5 h-[1.5px] bg-zinc-300 dark:bg-zinc-700" />
-            <span className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">
+            <div className="w-5 h-[1.5px] bg-zinc-700" />
+            <span className="text-xs text-zinc-400 font-medium">
               Acciones
             </span>
           </div>
@@ -200,7 +200,7 @@ export const SideMenuDrawer: React.FC<SideMenuDrawerProps> = ({
                 onPickFiles();
                 onClose();
               }}
-              className="flex items-center gap-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer text-left"
+              className="flex items-center gap-2 text-xs font-semibold text-zinc-300 hover:text-white transition-colors cursor-pointer text-left"
             >
               <Plus className="h-4 w-4 stroke-[2.5]" />
               <span>Agregar cómics</span>
@@ -213,7 +213,7 @@ export const SideMenuDrawer: React.FC<SideMenuDrawerProps> = ({
                 onClose();
               }}
               disabled={isScanning}
-              className="flex items-center gap-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer text-left disabled:opacity-50"
+              className="flex items-center gap-2 text-xs font-semibold text-zinc-300 hover:text-white transition-colors cursor-pointer text-left disabled:opacity-50"
             >
               <FolderSearch className="h-4 w-4 stroke-[2]" />
               <span>{isScanning ? 'Escaneando...' : 'Escanear carpeta'}</span>
@@ -222,7 +222,7 @@ export const SideMenuDrawer: React.FC<SideMenuDrawerProps> = ({
         </div>
 
         {/* Pie de Drawer */}
-        <div className="pt-6 border-t border-zinc-200/80 dark:border-zinc-800/80 text-[11px] text-zinc-400 dark:text-zinc-500">
+        <div className="pt-6 border-t border-zinc-800/80 text-[11px] text-zinc-500">
           <span>OGMIC v1.0.6</span>
         </div>
       </aside>

@@ -28,7 +28,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             Configuración
           </span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-900 dark:text-white m-0">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-white m-0">
           Ajustes generales
         </h1>
         <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal m-0 mt-1">
@@ -165,7 +165,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
       {/* Sección 4: Información de la Aplicación */}
       <section className="text-xs text-zinc-500 dark:text-zinc-400 flex flex-col gap-1">
-        <span className="font-logo font-black text-lg text-zinc-900 dark:text-white">
+        <span className="font-bold text-lg text-zinc-900 dark:text-white">
           OGMIC
         </span>
         <span>Versión 1.0.6 • Lector de cómics minimalista de alto rendimiento</span>

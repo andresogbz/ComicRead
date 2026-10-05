@@ -85,7 +85,7 @@ export const QuickTasksMenu: React.FC<QuickTasksMenuProps> = ({
         >
           Flujo de trabajo
         </span>
-        <h2 className="text-xl sm:text-2xl font-black tracking-tight text-zinc-900 dark:text-white m-0 mt-1">
+        <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white m-0 mt-1">
           Acciones rápidas
         </h2>
         <p className="text-xs text-zinc-500 dark:text-zinc-400 m-0 mt-0.5 font-normal">

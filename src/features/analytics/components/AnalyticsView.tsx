@@ -88,7 +88,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ stats, comics }) =
             Análisis
           </span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-900 dark:text-white m-0">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-white m-0">
           Métricas de lectura
         </h1>
         <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal m-0 mt-1">
@@ -109,7 +109,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ stats, comics }) =
               <div className="flex items-center gap-1.5 text-xs font-medium text-zinc-500 dark:text-zinc-400">
                 <span>{item.label}</span>
               </div>
-              <span className="mt-1 text-2xl sm:text-4xl font-black tracking-tight text-zinc-900 dark:text-white">
+              <span className="mt-1 text-2xl sm:text-4xl font-bold tracking-tight text-zinc-900 dark:text-white">
                 {item.value}
               </span>
               <span className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5 font-normal">

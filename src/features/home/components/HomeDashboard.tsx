@@ -82,7 +82,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               >
                 En curso
               </span>
-              <h2 className="text-xl sm:text-2xl font-black tracking-tight text-zinc-900 dark:text-white m-0 mt-1">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white m-0 mt-1">
                 Continuar leyendo
               </h2>
             </div>
@@ -130,7 +130,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               >
                 Catálogo reciente
               </span>
-              <h2 className="text-xl sm:text-2xl font-black tracking-tight text-zinc-900 dark:text-white m-0 mt-1">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white m-0 mt-1">
                 Recién agregados
               </h2>
             </div>
@@ -169,7 +169,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               >
                 Colección destacada
               </span>
-              <h2 className="text-xl sm:text-2xl font-black tracking-tight text-zinc-900 dark:text-white m-0 mt-1">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white m-0 mt-1">
                 Tus favoritos
               </h2>
             </div>

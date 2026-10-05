@@ -33,7 +33,7 @@ export const LibraryHeader: React.FC<LibraryHeaderProps> = ({
             Colección local
           </span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-900 dark:text-white transition-colors m-0">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-white transition-colors m-0">
           Biblioteca
         </h1>
         <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal transition-colors m-0 mt-1">
