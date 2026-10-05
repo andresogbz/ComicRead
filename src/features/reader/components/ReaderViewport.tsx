@@ -39,11 +39,19 @@ export const ReaderViewport: React.FC<ReaderViewportProps> = ({
   } = useReader({ comic, onClose });
 
   const handleSwipeLeft = () => {
-    readingMode === 'rtl' ? prevPage() : nextPage();
+    if (readingMode === 'rtl') {
+      prevPage();
+    } else {
+      nextPage();
+    }
   };
 
   const handleSwipeRight = () => {
-    readingMode === 'rtl' ? nextPage() : prevPage();
+    if (readingMode === 'rtl') {
+      nextPage();
+    } else {
+      prevPage();
+    }
   };
 
   const handleDoubleTap = () => {

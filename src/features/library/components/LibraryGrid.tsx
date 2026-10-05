@@ -9,6 +9,7 @@ import { LibraryFilterBar } from './LibraryFilterBar';
 import { ImportProgressModal } from './ImportProgressModal';
 import { useLibrary } from '../hooks/useLibrary';
 import { useDirectoryScanner } from '../hooks/useDirectoryScanner';
+import { useThemeStore } from '../../../core/theme/useThemeStore';
 
 interface LibraryGridProps {
   onOpenComic: (comic: StoredComic) => void;
@@ -37,6 +38,8 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({ onOpenComic }) => {
   const { isScanning, scanDirectory, pickFiles } =
     useDirectoryScanner(importFiles);
 
+  const { primaryColor } = useThemeStore();
+
   const handleToggleFavorite = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     toggleFavorite(id);
@@ -59,9 +62,9 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({ onOpenComic }) => {
         isScanning={isScanning}
       />
 
-      {/* Banner de error visible si falla una importación */}
+      {/* Banner de error visible si falla una importación sin bordes */}
       {errorMessage && (
-        <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl bg-rose-500/10 px-4 py-3 border border-rose-500/20 text-rose-300 animate-in fade-in duration-200">
+        <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl bg-rose-500/10 px-4 py-3 text-rose-300 animate-in fade-in duration-200">
           <div className="flex items-center gap-2.5">
             <AlertCircle className="h-5 w-5 shrink-0 text-rose-400" />
             <span className="text-xs font-medium">{errorMessage}</span>
@@ -101,7 +104,7 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({ onOpenComic }) => {
         />
       ) : comics.length === 0 ? (
         <div className="flex min-h-[300px] flex-col items-center justify-center text-center">
-          <p className="text-sm text-zinc-400">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
             No se encontraron cómics que coincidan con la búsqueda o filtro.
           </p>
           <button
@@ -110,7 +113,8 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({ onOpenComic }) => {
               setSearchQuery('');
               setFilterStatus('all');
             }}
-            className="mt-3 text-xs text-purple-400 hover:text-purple-300 underline underline-offset-4"
+            className="mt-3 text-xs underline underline-offset-4 font-medium transition-colors"
+            style={{ color: primaryColor.hex }}
           >
             Limpiar filtros
           </button>

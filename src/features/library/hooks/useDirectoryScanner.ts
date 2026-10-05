@@ -33,6 +33,29 @@ export function useDirectoryScanner(onFilesFound: (files: File[]) => void) {
   );
 
   /**
+   * Fallback con elemento input HTML estándar
+   */
+  const triggerInputDirectoryScan = useCallback(() => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    (input as any).webkitdirectory = true;
+    (input as any).directory = true;
+    input.multiple = true;
+
+    input.onchange = (e: Event) => {
+      const target = e.target as HTMLInputElement;
+      if (target.files) {
+        const files = Array.from(target.files).filter((f) => isComicFile(f.name));
+        if (files.length > 0) {
+          onFilesFound(files);
+        }
+      }
+    };
+
+    input.click();
+  }, [onFilesFound]);
+
+  /**
    * Abre el diálogo de selección de directorio del sistema operativo.
    */
   const scanDirectory = useCallback(async () => {
@@ -60,30 +83,7 @@ export function useDirectoryScanner(onFilesFound: (files: File[]) => void) {
     } finally {
       setIsScanning(false);
     }
-  }, [scanDirectoryHandle, onFilesFound]);
-
-  /**
-   * Fallback con elemento input HTML estándar
-   */
-  const triggerInputDirectoryScan = useCallback(() => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    (input as any).webkitdirectory = true;
-    (input as any).directory = true;
-    input.multiple = true;
-
-    input.onchange = (e: Event) => {
-      const target = e.target as HTMLInputElement;
-      if (target.files) {
-        const files = Array.from(target.files).filter((f) => isComicFile(f.name));
-        if (files.length > 0) {
-          onFilesFound(files);
-        }
-      }
-    };
-
-    input.click();
-  }, [onFilesFound]);
+  }, [scanDirectoryHandle, onFilesFound, triggerInputDirectoryScan]);
 
   /**
    * Selector directo para uno o múltiples archivos de cómics (.cbz, .cbr).

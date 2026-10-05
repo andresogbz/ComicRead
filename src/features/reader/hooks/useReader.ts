@@ -146,12 +146,24 @@ export function useReader({ comic, onClose }: UseReaderProps) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight' || e.key === 'PageDown') {
-        readingMode === 'rtl' ? prevPage() : nextPage();
+        if (readingMode === 'rtl') {
+          prevPage();
+        } else {
+          nextPage();
+        }
       } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
-        readingMode === 'rtl' ? nextPage() : prevPage();
+        if (readingMode === 'rtl') {
+          nextPage();
+        } else {
+          prevPage();
+        }
       } else if (e.key === ' ' && readingMode !== 'webtoon') {
         e.preventDefault();
-        readingMode === 'rtl' ? prevPage() : nextPage();
+        if (readingMode === 'rtl') {
+          prevPage();
+        } else {
+          nextPage();
+        }
       } else if (e.key === 'f' || e.key === 'F') {
         toggleFullscreen();
       } else if (e.key === 'Escape') {

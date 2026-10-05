@@ -8,6 +8,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import type { ReadingMode, FitMode } from '../types/readerTypes';
+import { useThemeStore } from '../../../core/theme/useThemeStore';
 
 interface ReaderHUDProps {
   title: string;
@@ -46,13 +47,15 @@ export const ReaderHUD: React.FC<ReaderHUDProps> = ({
   onZoomOut,
   onResetZoom,
 }) => {
+  const { primaryColor } = useThemeStore();
+
   return (
     <div
       className={`pointer-events-none fixed inset-0 z-40 flex flex-col justify-between transition-opacity duration-300 ${
         isHudVisible ? 'opacity-100' : 'opacity-0'
       }`}
     >
-      {/* Barra Superior */}
+      {/* Barra Superior sin bordes */}
       <div className={`pointer-events-auto flex items-center justify-between px-4 sm:px-6 py-3 bg-gradient-to-b from-black/90 via-black/60 to-transparent backdrop-blur-md transition-transform duration-300 ${
         isHudVisible ? 'translate-y-0' : '-translate-y-full'
       }`}>
@@ -92,11 +95,11 @@ export const ReaderHUD: React.FC<ReaderHUDProps> = ({
         </div>
       </div>
 
-      {/* Barra Inferior */}
+      {/* Barra Inferior sin bordes */}
       <div className={`pointer-events-auto flex flex-col gap-3 px-4 sm:px-8 py-4 bg-gradient-to-t from-black/95 via-black/80 to-transparent backdrop-blur-md transition-transform duration-300 ${
         isHudVisible ? 'translate-y-0' : 'translate-y-full'
       }`}>
-        {/* Slider de navegación de páginas (Scrubber) */}
+        {/* Slider de navegación de páginas (Scrubber) con acento primario dinámico */}
         <div className="flex items-center gap-3 w-full max-w-2xl mx-auto">
           <span className="text-xs font-mono text-zinc-400 w-8 text-right">
             {currentPageIndex + 1}
@@ -107,7 +110,10 @@ export const ReaderHUD: React.FC<ReaderHUDProps> = ({
             max={Math.max(0, totalPages - 1)}
             value={currentPageIndex}
             onChange={(e) => onPageChange(Number(e.target.value))}
-            className="h-1.5 flex-1 cursor-pointer appearance-none rounded-full bg-zinc-700 accent-purple-500 focus:outline-none"
+            className="h-1.5 flex-1 cursor-pointer appearance-none rounded-full bg-zinc-700/80 focus:outline-none transition-all"
+            style={{
+              accentColor: primaryColor.hex,
+            }}
             aria-label="Deslizador de páginas"
           />
           <span className="text-xs font-mono text-zinc-400 w-8">
@@ -115,18 +121,19 @@ export const ReaderHUD: React.FC<ReaderHUDProps> = ({
           </span>
         </div>
 
-        {/* Controles de Modos y Zoom */}
-        <div className="flex flex-wrap items-center justify-between gap-3 max-w-4xl mx-auto w-full pt-1 border-t border-white/[0.08]">
+        {/* Controles de Modos y Zoom sin bordes */}
+        <div className="flex flex-wrap items-center justify-between gap-3 max-w-4xl mx-auto w-full pt-1">
           {/* Selector de modo de lectura */}
-          <div className="flex items-center gap-1 rounded-full bg-zinc-900/90 p-1 border border-white/10">
+          <div className="flex items-center gap-1 rounded-full bg-zinc-900/90 p-1 backdrop-blur-md shadow-md">
             <button
               type="button"
               onClick={() => onReadingModeChange('ltr')}
               className={`rounded-full px-3 py-1 text-[11px] font-medium transition-all ${
                 readingMode === 'ltr'
-                  ? 'bg-purple-600 text-white shadow-sm'
+                  ? 'text-white shadow-sm'
                   : 'text-zinc-400 hover:text-white'
               }`}
+              style={readingMode === 'ltr' ? { backgroundColor: primaryColor.hex } : undefined}
             >
               Occidental (LTR)
             </button>
@@ -135,9 +142,10 @@ export const ReaderHUD: React.FC<ReaderHUDProps> = ({
               onClick={() => onReadingModeChange('rtl')}
               className={`rounded-full px-3 py-1 text-[11px] font-medium transition-all ${
                 readingMode === 'rtl'
-                  ? 'bg-purple-600 text-white shadow-sm'
+                  ? 'text-white shadow-sm'
                   : 'text-zinc-400 hover:text-white'
               }`}
+              style={readingMode === 'rtl' ? { backgroundColor: primaryColor.hex } : undefined}
             >
               Manga (RTL)
             </button>
@@ -146,17 +154,18 @@ export const ReaderHUD: React.FC<ReaderHUDProps> = ({
               onClick={() => onReadingModeChange('webtoon')}
               className={`rounded-full px-3 py-1 text-[11px] font-medium transition-all ${
                 readingMode === 'webtoon'
-                  ? 'bg-purple-600 text-white shadow-sm'
+                  ? 'text-white shadow-sm'
                   : 'text-zinc-400 hover:text-white'
               }`}
+              style={readingMode === 'webtoon' ? { backgroundColor: primaryColor.hex } : undefined}
             >
               Webtoon
             </button>
           </div>
 
-          {/* Ajuste de escala / Fit */}
+          {/* Ajuste de escala / Fit sin bordes */}
           {readingMode !== 'webtoon' && (
-            <div className="hidden sm:flex items-center gap-1 rounded-full bg-zinc-900/90 p-1 border border-white/10">
+            <div className="hidden sm:flex items-center gap-1 rounded-full bg-zinc-900/90 p-1 backdrop-blur-md shadow-md">
               <button
                 type="button"
                 onClick={() => onFitModeChange('contain')}
@@ -193,8 +202,8 @@ export const ReaderHUD: React.FC<ReaderHUDProps> = ({
             </div>
           )}
 
-          {/* Controles de Zoom */}
-          <div className="flex items-center gap-1 rounded-full bg-zinc-900/90 px-2 py-1 border border-white/10">
+          {/* Controles de Zoom sin bordes */}
+          <div className="flex items-center gap-1 rounded-full bg-zinc-900/90 px-2 py-1 backdrop-blur-md shadow-md">
             <button
               type="button"
               onClick={onZoomOut}
@@ -232,3 +241,4 @@ export const ReaderHUD: React.FC<ReaderHUDProps> = ({
     </div>
   );
 };
+

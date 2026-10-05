@@ -4,6 +4,7 @@ import type {
   FilterStatus,
   SortOption,
 } from '../stores/useLibraryStore';
+import { useThemeStore } from '../../../core/theme/useThemeStore';
 
 interface LibraryFilterBarProps {
   searchQuery: string;
@@ -37,11 +38,13 @@ export const LibraryFilterBar: React.FC<LibraryFilterBarProps> = ({
   onSortChange,
   stats,
 }) => {
+  const { primaryColor } = useThemeStore();
+
   return (
     <div className="flex flex-col gap-3 py-2">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-        {/* Chips de filtro horizontal */}
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
+        {/* Chips de filtro horizontal sin bordes */}
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
           {FILTER_ITEMS.map((item) => {
             const isActive = filterStatus === item.id;
             const count = item.countKey ? stats[item.countKey] : undefined;
@@ -51,19 +54,27 @@ export const LibraryFilterBar: React.FC<LibraryFilterBarProps> = ({
                 key={item.id}
                 type="button"
                 onClick={() => onFilterChange(item.id)}
-                className={`flex shrink-0 items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium transition-all duration-200 ${
+                className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs transition-all duration-200 active:scale-95 ${
                   isActive
-                    ? 'bg-zinc-100 text-zinc-950 shadow-sm'
-                    : 'bg-zinc-900/80 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 border border-white/[0.06]'
+                    ? 'font-semibold text-white shadow-sm'
+                    : 'bg-black/5 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 hover:bg-black/10 dark:hover:bg-white/10 hover:text-zinc-900 dark:hover:text-zinc-200'
                 }`}
+                style={
+                  isActive
+                    ? {
+                        backgroundColor: primaryColor.hex,
+                        boxShadow: `0 2px 10px ${primaryColor.glow}`,
+                      }
+                    : undefined
+                }
               >
                 <span>{item.label}</span>
                 {typeof count === 'number' && (
                   <span
-                    className={`rounded-full px-1.5 py-0.2 text-[10px] ${
+                    className={`rounded-full px-1.5 py-0.2 text-[10px] font-medium transition-colors ${
                       isActive
-                        ? 'bg-zinc-300 text-zinc-950'
-                        : 'bg-zinc-800 text-zinc-400'
+                        ? 'bg-white/20 text-white'
+                        : 'bg-black/10 dark:bg-white/10 text-zinc-500 dark:text-zinc-400'
                     }`}
                   >
                     {count}
@@ -74,23 +85,26 @@ export const LibraryFilterBar: React.FC<LibraryFilterBarProps> = ({
           })}
         </div>
 
-        {/* Buscador y Selector de Ordenación */}
+        {/* Buscador y Selector de Ordenación sin bordes */}
         <div className="flex items-center gap-2.5">
           {/* Barra de búsqueda */}
           <div className="relative flex-1 md:w-64">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-500" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Buscar cómic o serie..."
-              className="h-8 w-full rounded-full bg-zinc-900/90 pl-9 pr-8 text-xs text-zinc-200 placeholder-zinc-500 border border-white/[0.08] focus:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500/50 transition-colors"
+              className="h-8 w-full rounded-full bg-black/5 dark:bg-white/5 pl-9 pr-8 text-xs text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none transition-all"
+              style={{
+                outlineColor: primaryColor.hex,
+              }}
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => onSearchChange('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
                 aria-label="Limpiar búsqueda"
               >
                 <X className="h-3.5 w-3.5" />
@@ -100,21 +114,21 @@ export const LibraryFilterBar: React.FC<LibraryFilterBarProps> = ({
 
           {/* Selector de ordenación */}
           <div className="relative flex items-center">
-            <div className="flex h-8 items-center gap-1.5 rounded-full bg-zinc-900/90 px-3 text-xs text-zinc-300 border border-white/[0.08]">
-              <ArrowUpDown className="h-3.5 w-3.5 text-zinc-500" />
+            <div className="flex h-8 items-center gap-1.5 rounded-full bg-black/5 dark:bg-white/5 px-3 text-xs text-zinc-700 dark:text-zinc-300 transition-colors">
+              <ArrowUpDown className="h-3.5 w-3.5 text-zinc-400 dark:text-zinc-500" />
               <select
                 value={sortBy}
                 onChange={(e) => onSortChange(e.target.value as SortOption)}
-                className="bg-transparent text-xs text-zinc-300 focus:outline-none cursor-pointer pr-1"
+                className="bg-transparent text-xs text-zinc-700 dark:text-zinc-300 focus:outline-none cursor-pointer pr-1"
                 aria-label="Ordenar cómics"
               >
-                <option value="recent" className="bg-zinc-900 text-zinc-200">
+                <option value="recent" className="bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">
                   Recientes
                 </option>
-                <option value="title" className="bg-zinc-900 text-zinc-200">
+                <option value="title" className="bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">
                   Título
                 </option>
-                <option value="progress" className="bg-zinc-900 text-zinc-200">
+                <option value="progress" className="bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">
                   Progreso
                 </option>
               </select>
@@ -125,3 +139,4 @@ export const LibraryFilterBar: React.FC<LibraryFilterBarProps> = ({
     </div>
   );
 };
+

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { BookPlus, FolderSearch, UploadCloud } from 'lucide-react';
+import { useThemeStore } from '../../../core/theme/useThemeStore';
 
 interface EmptyLibraryStateProps {
   onPickFiles: () => void;
@@ -12,6 +13,7 @@ export const EmptyLibraryState: React.FC<EmptyLibraryStateProps> = ({
   onScanDirectory,
   onFilesDropped,
 }) => {
+  const { primaryColor } = useThemeStore();
   const [isDragOver, setIsDragOver] = useState(false);
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -38,50 +40,60 @@ export const EmptyLibraryState: React.FC<EmptyLibraryStateProps> = ({
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      className={`relative mt-6 flex min-h-[420px] flex-col items-center justify-center rounded-3xl border-2 border-dashed p-8 text-center transition-all duration-300 ${
+      className={`relative mt-6 flex min-h-[420px] flex-col items-center justify-center rounded-3xl p-8 sm:p-12 text-center transition-all duration-300 ${
         isDragOver
-          ? 'border-purple-500 bg-purple-500/[0.04]'
-          : 'border-white/[0.08] bg-zinc-950/40 hover:border-white/[0.15]'
+          ? 'bg-black/[0.06] dark:bg-white/[0.08] scale-[1.01]'
+          : 'bg-black/[0.02] dark:bg-white/[0.02]'
       }`}
     >
-      {/* Resplandor ambiental de fondo */}
-      <div className="pointer-events-none absolute h-64 w-64 rounded-full bg-purple-600/10 blur-3xl -z-10" />
+      {/* Resplandor ambiental dinámico de fondo */}
+      <div
+        className="pointer-events-none absolute h-72 w-72 rounded-full blur-3xl -z-10 transition-colors duration-500"
+        style={{ backgroundColor: primaryColor.glow }}
+      />
 
-      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-900 border border-white/10 text-zinc-400 mb-4">
+      <div
+        className="flex h-16 w-16 items-center justify-center rounded-2xl bg-black/5 dark:bg-white/5 mb-4 transition-transform duration-300 hover:scale-105"
+        style={{ color: primaryColor.hex }}
+      >
         {isDragOver ? (
-          <UploadCloud className="h-8 w-8 text-purple-400 animate-bounce stroke-[1.5]" />
+          <UploadCloud className="h-8 w-8 animate-bounce stroke-[1.75]" />
         ) : (
-          <BookPlus className="h-8 w-8 stroke-[1.5] text-purple-400" />
+          <BookPlus className="h-8 w-8 stroke-[1.75]" />
         )}
       </div>
 
-      <h2 className="text-lg font-semibold text-white tracking-tight m-0">
+      <h2 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight m-0 transition-colors">
         Tu estantería está vacía
       </h2>
-      <p className="mt-1.5 max-w-sm text-xs text-zinc-400 leading-relaxed m-0">
+      <p className="mt-1.5 max-w-sm text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed m-0 transition-colors">
         Arrastra y suelta tus cómics aquí, o utiliza los botones para importar
         archivos locales o carpetas completas.
       </p>
 
-      {/* Badges de formatos admitidos */}
-      <div className="mt-4 flex items-center gap-1.5 text-[11px] text-zinc-500">
-        <span className="rounded-full bg-zinc-900/90 px-2.5 py-0.5 border border-white/[0.06]">
+      {/* Badges de formatos admitidos sin bordes */}
+      <div className="mt-4 flex flex-wrap items-center justify-center gap-1.5 text-[11px] text-zinc-500 dark:text-zinc-400">
+        <span className="rounded-full bg-black/5 dark:bg-white/5 px-2.5 py-0.5">
           .CBZ (ZIP)
         </span>
-        <span className="rounded-full bg-zinc-900/90 px-2.5 py-0.5 border border-white/[0.06]">
+        <span className="rounded-full bg-black/5 dark:bg-white/5 px-2.5 py-0.5">
           .CBR (RAR)
         </span>
-        <span className="rounded-full bg-zinc-900/90 px-2.5 py-0.5 border border-white/[0.06]">
+        <span className="rounded-full bg-black/5 dark:bg-white/5 px-2.5 py-0.5">
           Extracción en background
         </span>
       </div>
 
-      {/* CTAs */}
+      {/* CTAs sin bordes */}
       <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
         <button
           type="button"
           onClick={onPickFiles}
-          className="flex h-9 items-center gap-2 rounded-full bg-purple-600 px-5 text-xs font-semibold text-white shadow-lg shadow-purple-600/25 hover:bg-purple-500 active:scale-95 transition-all"
+          className="flex h-9 items-center gap-2 rounded-full px-5 text-xs font-semibold text-white shadow-md active:scale-95 transition-all"
+          style={{
+            backgroundColor: primaryColor.hex,
+            boxShadow: `0 4px 16px ${primaryColor.glow}`,
+          }}
         >
           <BookPlus className="h-4 w-4 stroke-[2]" />
           <span>Seleccionar cómics</span>
@@ -90,12 +102,13 @@ export const EmptyLibraryState: React.FC<EmptyLibraryStateProps> = ({
         <button
           type="button"
           onClick={onScanDirectory}
-          className="flex h-9 items-center gap-2 rounded-full bg-zinc-900 px-4 text-xs font-medium text-zinc-300 border border-white/[0.08] hover:bg-zinc-800 hover:text-white active:scale-95 transition-all"
+          className="flex h-9 items-center gap-2 rounded-full bg-black/5 dark:bg-white/10 px-4 text-xs font-medium text-zinc-800 dark:text-zinc-200 hover:bg-black/10 dark:hover:bg-white/15 active:scale-95 transition-all"
         >
-          <FolderSearch className="h-4 w-4 stroke-[1.75] text-zinc-400" />
+          <FolderSearch className="h-4 w-4 stroke-[1.75] text-zinc-500 dark:text-zinc-400" />
           <span>Escanear carpeta local</span>
         </button>
       </div>
     </div>
   );
 };
+

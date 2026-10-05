@@ -32,13 +32,21 @@ export const PagedView: React.FC<PagedViewProps> = ({
   const handleLeftTap = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (zoom > 1) return;
-    isRtl ? onNextPage() : onPrevPage();
+    if (isRtl) {
+      onNextPage();
+    } else {
+      onPrevPage();
+    }
   };
 
   const handleRightTap = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (zoom > 1) return;
-    isRtl ? onPrevPage() : onNextPage();
+    if (isRtl) {
+      onPrevPage();
+    } else {
+      onNextPage();
+    }
   };
 
   const handleCenterTap = (e: React.MouseEvent) => {
