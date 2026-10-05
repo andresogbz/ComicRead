@@ -27,8 +27,9 @@ jobs:
           distribution: 'zulu'
           java-version: '21'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Accept Android SDK Licenses
+        run: |
+          yes | sdkmanager --licenses 2>/dev/null || true
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v3
@@ -54,9 +55,9 @@ jobs:
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug --stacktrace --no-daemon
 
-      - name: Rename and Prepare APK
+      - name: Prepare APK file
         run: |
           cp android/app/build/outputs/apk/debug/app-debug.apk ComicRead.apk
           ls -lh ComicRead.apk
@@ -68,31 +69,31 @@ jobs:
           path: ComicRead.apk
           retention-days: 30
 
-      - name: Create / Update GitHub Release
+      - name: Create or Update GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Determinar nombre del tag
-          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
-            RELEASE_TAG="${GITHUB_REF_NAME}"
-          else
+          RELEASE_TAG="${GITHUB_REF_NAME:-v1.0.0}"
+          if [[ "$RELEASE_TAG" == "main" || "$RELEASE_TAG" == "master" ]]; then
             RELEASE_TAG="v1.0.0"
           fi
 
-          echo "Publicando release con tag: $RELEASE_TAG"
+          echo "Gestionando Release para tag: $RELEASE_TAG"
 
-          # Intentar borrar el release previo si existe para sobreescribir el APK
-          gh release delete "$RELEASE_TAG" --yes --cleanup-tag 2>/dev/null || true
-
-          # Crear release con el APK adjunto
-          gh release create "$RELEASE_TAG" ComicRead.apk \
-            --title "ComicRead ${RELEASE_TAG}" \
-            --notes "### ComicRead - Lector de Cómics de Alto Rendimiento
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "Release existente encontrado. Actualizando archivo APK..."
+            gh release upload "$RELEASE_TAG" ComicRead.apk --clobber
+          else
+            echo "Creando nuevo Release $RELEASE_TAG..."
+            gh release create "$RELEASE_TAG" ComicRead.apk \
+              --title "ComicRead ${RELEASE_TAG}" \
+              --notes "### ComicRead - Lector de Cómics de Alto Rendimiento
 
           Descarga e instala **ComicRead.apk** en tu teléfono Android.
 
-          #### Novedades:
+          #### Funcionalidades:
           - Soporte de archivos locales **.cbz** y **.cbr** con descompresión en background thread.
           - Modos de lectura: **Occidental (LTR)**, **Manga (RTL)** y **Webtoon (Scroll Vertical)**.
           - Gestos táctiles: Pinch-to-zoom (1x a 4x), swipe horizontal y doble toque.
           - Almacenamiento y progreso de lectura 100% offline."
+          fi
