@@ -60,19 +60,17 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
   }, [comics]);
 
   return (
-    <div className="flex flex-col gap-6 sm:gap-8 pb-24">
-      {/* Sección Hero con fondo de tarjeta distintivo sobre el fondo global */}
-      <div className="rounded-3xl bg-black/60 dark:bg-black/70 backdrop-blur-md p-6 sm:p-8 border border-white/10 shadow-xl transition-all">
-        <HomeHero
-          comic={heroComic}
-          onOpenComic={onOpenComic}
-          onPickFiles={onPickFiles}
-        />
-      </div>
+    <div className="flex flex-col gap-10 sm:gap-12 pb-24">
+      {/* Sección Hero: Continuar Lectura sobre Lienzo Integrado */}
+      <HomeHero
+        comic={heroComic}
+        onOpenComic={onOpenComic}
+        onPickFiles={onPickFiles}
+      />
 
       {/* Cómics en curso (Continuar leyendo) si existen */}
       {inProgressComics.length > 0 && (
-        <section className="flex flex-col p-5 sm:p-7 rounded-3xl bg-black/60 dark:bg-black/70 backdrop-blur-md border border-white/10 shadow-xl transition-all">
+        <section className="flex flex-col pb-8 sm:pb-10 border-b border-zinc-200/40 dark:border-zinc-800/40 transition-colors">
           <div className="flex items-end justify-between mb-5">
             <div>
               <span
@@ -81,14 +79,14 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               >
                 En curso
               </span>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white m-0 mt-1">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white m-0 mt-1">
                 Continuar leyendo
               </h2>
             </div>
             <button
               type="button"
               onClick={onGoToLibrary}
-              className="flex items-center gap-1 text-xs font-semibold text-zinc-300 hover:text-white transition-colors cursor-pointer"
+              className="flex items-center gap-1 text-xs font-semibold text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
             >
               <span>Ver estantería</span>
               <ArrowRight className="h-3.5 w-3.5 stroke-[2]" />
@@ -111,7 +109,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
 
       {/* Recién agregados */}
       {recentlyAdded.length > 0 && (
-        <section className="flex flex-col p-5 sm:p-7 rounded-3xl bg-black/60 dark:bg-black/70 backdrop-blur-md border border-white/10 shadow-xl transition-all">
+        <section className="flex flex-col pb-8 sm:pb-10 border-b border-zinc-200/40 dark:border-zinc-800/40 transition-colors">
           <div className="flex items-end justify-between mb-5">
             <div>
               <span
@@ -120,14 +118,14 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               >
                 Catálogo reciente
               </span>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white m-0 mt-1">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white m-0 mt-1">
                 Recién agregados
               </h2>
             </div>
             <button
               type="button"
               onClick={onGoToLibrary}
-              className="flex items-center gap-1 text-xs font-semibold text-zinc-300 hover:text-white transition-colors cursor-pointer"
+              className="flex items-center gap-1 text-xs font-semibold text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
             >
               <span>Ver catálogo</span>
               <ArrowRight className="h-3.5 w-3.5 stroke-[2]" />
@@ -150,7 +148,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
 
       {/* Favoritos si existen */}
       {favoriteComics.length > 0 && (
-        <section className="flex flex-col p-5 sm:p-7 rounded-3xl bg-black/60 dark:bg-black/70 backdrop-blur-md border border-white/10 shadow-xl transition-all">
+        <section className="flex flex-col pb-8 sm:pb-10 border-b border-zinc-200/40 dark:border-zinc-800/40 transition-colors">
           <div className="flex items-end justify-between mb-5">
             <div>
               <span
@@ -159,14 +157,14 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               >
                 Colección destacada
               </span>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white m-0 mt-1">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white m-0 mt-1">
                 Tus favoritos
               </h2>
             </div>
             <button
               type="button"
               onClick={onGoToLibrary}
-              className="flex items-center gap-1 text-xs font-semibold text-zinc-300 hover:text-white transition-colors cursor-pointer"
+              className="flex items-center gap-1 text-xs font-semibold text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
             >
               <span>Ver todos</span>
               <ArrowRight className="h-3.5 w-3.5 stroke-[2]" />

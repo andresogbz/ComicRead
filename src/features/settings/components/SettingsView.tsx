@@ -16,9 +16,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const { mode, toggleMode, primaryColor, setPrimaryColor } = useThemeStore();
 
   return (
-    <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 py-5 sm:py-6 w-full max-w-full flex flex-col gap-6 sm:gap-8 pb-24">
-      {/* Encabezado con fondo distintivo */}
-      <header className="p-6 sm:p-8 rounded-3xl bg-black/60 dark:bg-black/70 backdrop-blur-md border border-white/10 shadow-xl transition-all">
+    <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 py-5 sm:py-6 w-full max-w-full flex flex-col gap-8 pb-16">
+      {/* Encabezado con divisor estilo menú lateral */}
+      <header className="pb-6 border-b border-zinc-200/80 dark:border-zinc-800/80">
         <div className="flex items-center gap-2.5 mb-2">
           <div className="w-5 h-[1.5px]" style={{ backgroundColor: primaryColor.hex }} />
           <span
@@ -28,21 +28,21 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             Configuración
           </span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white m-0">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-white m-0">
           Ajustes generales
         </h1>
-        <p className="text-xs text-zinc-300 font-normal m-0 mt-1">
+        <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal m-0 mt-1">
           Personaliza la iluminación, el color de acento y el almacenamiento local
         </p>
       </header>
 
-      {/* Sección 1: Modo visual con fondo distintivo */}
-      <section className="p-6 sm:p-8 rounded-3xl bg-black/60 dark:bg-black/70 backdrop-blur-md border border-white/10 shadow-xl transition-all flex flex-col gap-4">
+      {/* Sección 1: Modo visual (Lienzo continuo, sin cajas contenedoras) */}
+      <section className="pb-8 border-b border-zinc-200/80 dark:border-zinc-800/80 flex flex-col gap-4">
         <div>
-          <h2 className="text-base sm:text-lg font-bold text-white m-0">
+          <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white m-0">
             Modo visual
           </h2>
-          <p className="text-xs text-zinc-300 m-0 mt-0.5">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 m-0 mt-0.5">
             Selecciona la iluminación adecuada para tu lectura
           </p>
         </div>
@@ -55,8 +55,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             }}
             className={`flex items-center gap-2 text-sm font-semibold transition-all cursor-pointer py-1 ${
               mode === 'light'
-                ? 'text-white underline underline-offset-8 decoration-2'
-                : 'text-zinc-400 hover:text-white'
+                ? 'text-zinc-900 dark:text-white underline underline-offset-8 decoration-2'
+                : 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
             }`}
             style={mode === 'light' ? { textDecorationColor: primaryColor.hex } : undefined}
           >
@@ -71,8 +71,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             }}
             className={`flex items-center gap-2 text-sm font-semibold transition-all cursor-pointer py-1 ${
               mode === 'dark'
-                ? 'text-white underline underline-offset-8 decoration-2'
-                : 'text-zinc-400 hover:text-white'
+                ? 'text-zinc-900 dark:text-white underline underline-offset-8 decoration-2'
+                : 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
             }`}
             style={mode === 'dark' ? { textDecorationColor: primaryColor.hex } : undefined}
           >
@@ -82,13 +82,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
       </section>
 
-      {/* Sección 2: Color de acento con fondo distintivo */}
-      <section className="p-6 sm:p-8 rounded-3xl bg-black/60 dark:bg-black/70 backdrop-blur-md border border-white/10 shadow-xl transition-all flex flex-col gap-4">
+      {/* Sección 2: Color de acento primario (sin cajas ni fondos adicionales) */}
+      <section className="pb-8 border-b border-zinc-200/80 dark:border-zinc-800/80 flex flex-col gap-4">
         <div>
-          <h2 className="text-base sm:text-lg font-bold text-white m-0">
+          <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white m-0">
             Color de acento
           </h2>
-          <p className="text-xs text-zinc-300 m-0 mt-0.5">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 m-0 mt-0.5">
             Elige el color distintivo que acompañará tus barras de progreso y botones
           </p>
         </div>
@@ -106,7 +106,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               >
                 <div
                   className={`relative flex h-6 w-6 items-center justify-center rounded-full transition-transform active:scale-95 ${
-                    isSelected ? 'ring-2 ring-offset-2 ring-white scale-110' : 'opacity-80 group-hover:opacity-100'
+                    isSelected ? 'ring-2 ring-offset-2 ring-zinc-500 scale-110' : 'opacity-80 group-hover:opacity-100'
                   }`}
                   style={{ backgroundColor: col.hex }}
                 >
@@ -117,8 +117,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 <span
                   className={`text-xs ${
                     isSelected
-                      ? 'font-bold text-white'
-                      : 'font-normal text-zinc-400 group-hover:text-white'
+                      ? 'font-bold text-zinc-900 dark:text-white'
+                      : 'font-normal text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-800 dark:group-hover:text-zinc-200'
                   }`}
                 >
                   {col.name}
@@ -129,13 +129,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
       </section>
 
-      {/* Sección 3: Almacenamiento y Cómics con fondo distintivo */}
-      <section className="p-6 sm:p-8 rounded-3xl bg-black/60 dark:bg-black/70 backdrop-blur-md border border-white/10 shadow-xl transition-all flex flex-col gap-4">
+      {/* Sección 3: Almacenamiento y Cómics */}
+      <section className="pb-8 border-b border-zinc-200/80 dark:border-zinc-800/80 flex flex-col gap-4">
         <div>
-          <h2 className="text-base sm:text-lg font-bold text-white m-0">
+          <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white m-0">
             Almacenamiento y biblioteca
           </h2>
-          <p className="text-xs text-zinc-300 m-0 mt-0.5">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 m-0 mt-0.5">
             Gestiona la indexación de tus archivos locales
           </p>
         </div>
@@ -155,7 +155,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             type="button"
             onClick={onScanDirectory}
             disabled={isScanning}
-            className="flex h-10 items-center gap-2 rounded-full border border-white/20 px-5 text-xs font-medium text-white hover:bg-white/10 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
+            className="flex h-10 items-center gap-2 rounded-full border border-zinc-300 dark:border-zinc-700 px-5 text-xs font-medium text-zinc-800 dark:text-zinc-200 hover:opacity-80 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
           >
             <FolderSearch className="h-4 w-4 stroke-[1.75]" />
             <span>{isScanning ? 'Escaneando almacenamiento...' : 'Escanear carpeta'}</span>
@@ -164,11 +164,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       </section>
 
       {/* Sección 4: Información de la Aplicación */}
-      <section className="p-6 sm:p-8 rounded-3xl bg-black/60 dark:bg-black/70 backdrop-blur-md border border-white/10 shadow-xl transition-all text-xs text-zinc-300 flex flex-col gap-1">
-        <span className="font-bold text-lg text-white">
+      <section className="text-xs text-zinc-500 dark:text-zinc-400 flex flex-col gap-1">
+        <span className="font-bold text-lg text-zinc-900 dark:text-white">
           OGMIC
         </span>
-        <span>Versión 1.0.8 • Lector de cómics minimalista de alto rendimiento</span>
+        <span>Versión 1.0.6 • Lector de cómics minimalista de alto rendimiento</span>
         <span>Soporte para archivos .cbz, .cbr y formato Webtoon continuo</span>
       </section>
     </div>
