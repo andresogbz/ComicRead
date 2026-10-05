@@ -1,4 +1,5 @@
 import React from 'react';
+import { AlertCircle, X } from 'lucide-react';
 import type { StoredComic } from '../../../infrastructure/database/ComicDatabase';
 import { ComicCard } from './ComicCard';
 import { EmptyLibraryState } from './EmptyLibraryState';
@@ -19,6 +20,7 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({ onOpenComic }) => {
     allComicsCount,
     isLoading,
     importProgress,
+    errorMessage,
     searchQuery,
     filterStatus,
     sortBy,
@@ -29,6 +31,7 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({ onOpenComic }) => {
     setSearchQuery,
     setFilterStatus,
     setSortBy,
+    clearError,
   } = useLibrary();
 
   const { isScanning, scanDirectory, pickFiles } =
@@ -55,6 +58,24 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({ onOpenComic }) => {
         onScanDirectory={scanDirectory}
         isScanning={isScanning}
       />
+
+      {/* Banner de error visible si falla una importación */}
+      {errorMessage && (
+        <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl bg-rose-500/10 px-4 py-3 border border-rose-500/20 text-rose-300 animate-in fade-in duration-200">
+          <div className="flex items-center gap-2.5">
+            <AlertCircle className="h-5 w-5 shrink-0 text-rose-400" />
+            <span className="text-xs font-medium">{errorMessage}</span>
+          </div>
+          <button
+            type="button"
+            onClick={clearError}
+            className="flex h-6 w-6 items-center justify-center rounded-full hover:bg-rose-500/20 text-rose-400 transition-colors"
+            aria-label="Cerrar mensaje de error"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
 
       {/* Barra de Filtros y Búsqueda (si hay cómics) */}
       {allComicsCount > 0 && (

@@ -9,6 +9,6 @@ export default defineConfig({
     react(),
   ],
   worker: {
-    format: 'es',
+    format: 'iife',
   },
 })

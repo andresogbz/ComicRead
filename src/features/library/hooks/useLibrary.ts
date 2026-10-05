@@ -6,6 +6,7 @@ export function useLibrary() {
     comics,
     isLoading,
     importProgress,
+    errorMessage,
     searchQuery,
     filterStatus,
     sortBy,
@@ -16,6 +17,7 @@ export function useLibrary() {
     setSearchQuery,
     setFilterStatus,
     setSortBy,
+    clearError,
   } = useLibraryStore();
 
   useEffect(() => {
@@ -92,6 +94,7 @@ export function useLibrary() {
     allComicsCount: comics.length,
     isLoading,
     importProgress,
+    errorMessage,
     searchQuery,
     filterStatus,
     sortBy,
@@ -102,5 +105,6 @@ export function useLibrary() {
     setSearchQuery,
     setFilterStatus,
     setSortBy,
+    clearError,
   };
 }

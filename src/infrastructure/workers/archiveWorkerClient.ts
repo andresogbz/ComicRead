@@ -1,6 +1,7 @@
 import type { IArchiveExtractor } from '../../domain/contracts/IArchiveExtractor';
 import type { ComicArchiveInfo } from '../../domain/entities/Comic';
 import type { ExtractedPageResult } from '../../domain/entities/Page';
+import { archiveCore } from '../extractors/archiveCore';
 import type { WorkerRequest, WorkerResponse } from './workerMessages';
 
 interface PendingRequest<T> {
@@ -9,35 +10,53 @@ interface PendingRequest<T> {
   timeoutId: ReturnType<typeof setTimeout>;
 }
 
-const DEFAULT_TIMEOUT_MS = 30000;
+// Timeout reducido a 4s para conmutar rápido al motor directo si el worker está bloqueado
+const WORKER_TIMEOUT_MS = 4000;
 
 export class ArchiveWorkerClient implements IArchiveExtractor {
   private worker: Worker | null = null;
   private pendingRequests = new Map<string, PendingRequest<any>>();
   private messageCounter = 0;
+  private useFallback = false;
 
   constructor() {
     this.initWorker();
   }
 
   /**
-   * Inicializa o reinicia el worker en segundo plano.
+   * Inicializa el Web Worker con control de errores para fallback directo.
    */
   private initWorker(): void {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || typeof Worker === 'undefined') {
+      this.useFallback = true;
+      return;
+    }
 
-    this.worker = new Worker(
-      new URL('./archive.worker.ts', import.meta.url),
-      { type: 'module' }
-    );
+    try {
+      this.worker = new Worker(
+        new URL('./archive.worker.ts', import.meta.url),
+        { type: 'module' }
+      );
 
-    this.worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
-      this.handleWorkerResponse(event.data);
-    };
+      this.worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
+        this.handleWorkerResponse(event.data);
+      };
 
-    this.worker.onerror = (error) => {
-      console.error('[ArchiveWorkerClient] Error en el hilo del worker:', error);
-    };
+      this.worker.onerror = (error) => {
+        console.warn('[ArchiveWorkerClient] El Web Worker no pudo ejecutarse o falló. Conmutando a modo directo:', error);
+        this.useFallback = true;
+
+        // Rechazar solicitudes pendientes para que conmuten a archiveCore inmediatamente
+        for (const [id, pending] of this.pendingRequests.entries()) {
+          clearTimeout(pending.timeoutId);
+          pending.reject(new Error('Web Worker unavailable'));
+          this.pendingRequests.delete(id);
+        }
+      };
+    } catch (err) {
+      console.warn('[ArchiveWorkerClient] Error al instanciar Worker. Usando motor directo:', err);
+      this.useFallback = true;
+    }
   }
 
   private handleWorkerResponse(response: WorkerResponse): void {
@@ -68,10 +87,10 @@ export class ArchiveWorkerClient implements IArchiveExtractor {
   private sendRequest<T>(
     buildRequest: (id: string) => WorkerRequest,
     transferables: Transferable[] = [],
-    timeoutMs: number = DEFAULT_TIMEOUT_MS
+    timeoutMs: number = WORKER_TIMEOUT_MS
   ): Promise<T> {
-    if (!this.worker) {
-      this.initWorker();
+    if (this.useFallback || !this.worker) {
+      return Promise.reject(new Error('Worker in fallback mode'));
     }
 
     const id = `req_${++this.messageCounter}_${Date.now()}`;
@@ -79,61 +98,86 @@ export class ArchiveWorkerClient implements IArchiveExtractor {
     return new Promise<T>((resolve, reject) => {
       const timeoutId = setTimeout(() => {
         this.pendingRequests.delete(id);
-        reject(
-          new Error(
-            `[ArchiveWorkerClient] Tiempo de espera agotado (${timeoutMs}ms) en la solicitud ${id}`
-          )
-        );
+        this.useFallback = true; // Si el worker no responde a tiempo, conmutar a motor directo
+        reject(new Error(`Timeout en el worker (${timeoutMs}ms)`));
       }, timeoutMs);
 
       this.pendingRequests.set(id, { resolve, reject, timeoutId });
 
-      const request = buildRequest(id);
-      this.worker!.postMessage(request, transferables);
+      try {
+        const request = buildRequest(id);
+        this.worker!.postMessage(request, transferables);
+      } catch (err) {
+        clearTimeout(timeoutId);
+        this.pendingRequests.delete(id);
+        this.useFallback = true;
+        reject(err instanceof Error ? err : new Error(String(err)));
+      }
     });
   }
 
   /**
-   * Abre e indexa un archivo .cbz o .cbr en segundo plano sin congelar la UI.
+   * Abre e indexa un archivo .cbz o .cbr con fallback automático garantizado.
    */
   public async openArchive(
     comicId: string,
     fileName: string,
     fileData: ArrayBuffer
   ): Promise<ComicArchiveInfo> {
-    return this.sendRequest<ComicArchiveInfo>(
-      (id) => ({
-        id,
-        type: 'OPEN_ARCHIVE',
-        payload: {
-          comicId,
-          fileName,
-          fileData,
-        },
-      }),
-      [fileData] // Transferencia Zero-Copy del buffer completo al worker
-    );
+    // Si ya sabemos que el worker no está disponible, ir directo a archiveCore
+    if (this.useFallback) {
+      return archiveCore.openArchive(comicId, fileName, fileData);
+    }
+
+    // Copia ligera de referencia por si se necesita fallback (ya que transferables transfiere el original)
+    const backupBuffer = fileData.slice(0);
+
+    try {
+      return await this.sendRequest<ComicArchiveInfo>(
+        (id) => ({
+          id,
+          type: 'OPEN_ARCHIVE',
+          payload: {
+            comicId,
+            fileName,
+            fileData,
+          },
+        }),
+        [fileData]
+      );
+    } catch {
+      // Fallback transparente al motor directo
+      return archiveCore.openArchive(comicId, fileName, backupBuffer);
+    }
   }
 
   /**
-   * Extrae los bytes en crudo de una página en segundo plano.
+   * Extrae los bytes de una página con fallback garantizado.
    */
   public async extractPage(
     comicId: string,
     pageIndex: number
   ): Promise<ExtractedPageResult> {
-    return this.sendRequest<ExtractedPageResult>((id) => ({
-      id,
-      type: 'EXTRACT_PAGE',
-      payload: {
-        comicId,
-        pageIndex,
-      },
-    }));
+    if (this.useFallback) {
+      return archiveCore.extractPage(comicId, pageIndex);
+    }
+
+    try {
+      return await this.sendRequest<ExtractedPageResult>((id) => ({
+        id,
+        type: 'EXTRACT_PAGE',
+        payload: {
+          comicId,
+          pageIndex,
+        },
+      }));
+    } catch {
+      return archiveCore.extractPage(comicId, pageIndex);
+    }
   }
 
   /**
-   * Método de alto nivel que extrae la página y la convierte en un Blob listo para URL.createObjectURL.
+   * Extrae la página directamente como Blob.
    */
   public async extractPageAsBlob(
     comicId: string,
@@ -144,19 +188,19 @@ export class ArchiveWorkerClient implements IArchiveExtractor {
   }
 
   /**
-   * Libera de la memoria del Worker la sesión del cómic.
+   * Libera la sesión de cómic activa.
    */
   public async closeArchive(comicId: string): Promise<void> {
-    return this.sendRequest<void>((id) => ({
-      id,
-      type: 'CLOSE_ARCHIVE',
-      payload: { comicId },
-    }));
+    archiveCore.closeArchive(comicId);
+    if (!this.useFallback && this.worker) {
+      this.sendRequest<void>((id) => ({
+        id,
+        type: 'CLOSE_ARCHIVE',
+        payload: { comicId },
+      })).catch(() => {});
+    }
   }
 
-  /**
-   * Destruye el worker completamente si es necesario.
-   */
   public terminate(): void {
     if (this.worker) {
       this.worker.terminate();
@@ -170,5 +214,4 @@ export class ArchiveWorkerClient implements IArchiveExtractor {
   }
 }
 
-// Instancia singleton para uso en toda la aplicación
 export const archiveWorkerClient = new ArchiveWorkerClient();

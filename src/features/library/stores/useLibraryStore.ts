@@ -16,6 +16,7 @@ interface LibraryState {
   comics: StoredComic[];
   isLoading: boolean;
   importProgress: ImportProgress | null;
+  errorMessage: string | null;
   searchQuery: string;
   filterStatus: FilterStatus;
   sortBy: SortOption;
@@ -30,6 +31,7 @@ interface LibraryState {
   setFilterStatus: (status: FilterStatus) => void;
   setSortBy: (sort: SortOption) => void;
   setSelectedComic: (comic: StoredComic | null) => void;
+  clearError: () => void;
 }
 
 function blobToDataUrl(blob: Blob): Promise<string> {
@@ -45,6 +47,7 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
   comics: [],
   isLoading: true,
   importProgress: null,
+  errorMessage: null,
   searchQuery: '',
   filterStatus: 'all',
   sortBy: 'recent',
@@ -65,6 +68,7 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
     if (!files.length) return;
 
     set({
+      errorMessage: null,
       importProgress: {
         current: 0,
         total: files.length,
@@ -101,8 +105,11 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
 
         // Guardar tanto metadatos como el Blob del archivo para lectura offline
         await comicRepository.saveComic(storedComic, file);
-      } catch (err) {
+      } catch (err: any) {
         console.error(`Error procesando archivo ${file.name}:`, err);
+        set({
+          errorMessage: `No se pudo importar "${file.name}": ${err?.message || 'Archivo no compatible o formato dañado'}.`,
+        });
       }
     }
 
@@ -131,4 +138,5 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
   setFilterStatus: (filterStatus: FilterStatus) => set({ filterStatus }),
   setSortBy: (sortBy: SortOption) => set({ sortBy }),
   setSelectedComic: (selectedComic: StoredComic | null) => set({ selectedComic }),
+  clearError: () => set({ errorMessage: null }),
 }));
