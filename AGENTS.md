@@ -1,24 +1,34 @@
-# Reglas del Proyecto ComicRead
+# Reglas del Proyecto ComicRead (Modern Minimalist UI)
 
-1. **Diseño Sin Bordes (Borderless UI):**
-   - No utilizar líneas de borde divisorias (`border`, `border-b`, `border-dashed`, etc.) en tarjetas, cabeceras, botones o modales. Usar contrastes suaves, esquinas redondeadas y desenfoques (*backdrop-blur*).
+1. **Estilo y Profundidad (CERO SOMBRAS - Flat Design):**
+   - Prohibido terminantemente el uso de sombras (`box-shadow`, `drop-shadow`, `shadow-sm`, `shadow-md`, `shadow-lg`, etc.).
+   - Prohibidos efectos de resplandor, brillos, neón o elementos futuristas (cero `blur-3xl`, cero ambient glow).
+   - Separar elementos mediante diseño plano, sutiles bordes neutrales o generoso espacio en blanco (*negative space*).
 
-2. **Cero Fondos o Recuadros Detrás de Iconos:**
-   - **Estrictamente Prohibido:** Colocar contenedores, recuadros, cuadrados redondeados o cajas con color o transparencia (`bg-primary/10`, `bg-black/5`, etc.) detrás de logos o iconos.
-   - Los iconos deben aparecer limpios, directos y desnudos, integrados junto al texto o sobre el fondo del lienzo.
+2. **Paleta Restringida (Máximo 3-4 Colores):**
+   - Lienzo base (Blanco puro / Negro mate neutral).
+   - Tipografía principal de alto contraste (Tinta / Blanco suave).
+   - Gris neutro de soporte / bordes sutiles.
+   - Un único color de acento primario armónico. Prohibido usar arcoíris de colores dispersos.
 
-3. **Tarjetas Fusionadas con el Fondo (Seamless Cards):**
-   - Las tarjetas de cómics deben tener `bg-transparent` sin contenedores ni fondos propios que creen cajas aisladas. La carátula y el texto flotan naturalmente sobre el fondo.
+3. **Iconografía Plana y Sin Fondos:**
+   - Estrictamente prohibido colocar contenedores, recuadros, círculos o cajas con color/transparencia detrás de iconos.
+   - Todos los iconos deben tener un color único y uniforme proveniente de la paleta estricta.
 
-4. **Filtros Sin Scroll Horizontal:**
-   - Las píldoras o controles de filtrado deben ajustarse con fluidez y elegancia sin provocar barras de scroll horizontal molestas.
+4. **Tipografía:**
+   - Prohibido el uso de ALL CAPS con espaciado (`uppercase tracking-*`). Usar Sentence case o Title case.
+   - Jerarquía visual construida mediante tamaño de fuente y peso (bold, black, medium), no con artificios.
 
-5. **Modo Claro y Oscuro con Color Primario Dinámico:**
-   - Todo componente debe adaptarse a modo oscuro y claro de forma fluida.
-   - Los elementos de acento (botones principales, chips activos, barras de progreso, etc.) deben responder al color primario dinámico de `useThemeStore`.
+5. **Secciones Hero:**
+   - Titulares de gran impacto con tipografía grande y audaz.
+   - Elementos visuales limpios, destacados y contextuales.
 
-6. **Prohibición Total de Emojis:**
-   - Cero emojis en la interfaz de usuario (botones, títulos, insignias) y en el código.
+6. **Espaciado y Limpieza:**
+   - Padding y márgenes generosos para que el diseño respire.
+   - Cero clutter; eliminar cualquier elemento decorativo no esencial.
 
-7. **Pruebas a Cargo del Usuario:**
+7. **Prohibición Total de Emojis:**
+   - Cero emojis en interfaz y código.
+
+8. **Pruebas a Cargo del Usuario:**
    - No ejecutar `browser_subagent` a menos que sea explícitamente solicitado por el usuario.

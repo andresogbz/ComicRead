@@ -52,14 +52,13 @@ export const LibraryHeader: React.FC<LibraryHeaderProps> = ({
           <span>{isScanning ? 'Escaneando...' : 'Escanear carpeta'}</span>
         </button>
 
-        {/* Botón de Importar Cómics con Color Primario Dinámico */}
+        {/* Botón de Importar Cómics plano sin sombras */}
         <button
           type="button"
           onClick={onPickFiles}
-          className="flex h-9 items-center gap-2 rounded-full px-4 text-xs font-semibold text-white shadow-md active:scale-95 transition-all"
+          className="flex h-9 items-center gap-2 rounded-full px-4 text-xs font-semibold text-white active:scale-95 transition-all cursor-pointer"
           style={{
             backgroundColor: primaryColor.hex,
-            boxShadow: `0 4px 14px ${primaryColor.glow}`,
           }}
         >
           <Plus className="h-4 w-4 stroke-[2.5]" />

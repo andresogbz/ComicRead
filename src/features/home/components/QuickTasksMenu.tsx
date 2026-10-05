@@ -36,7 +36,6 @@ export const QuickTasksMenu: React.FC<QuickTasksMenuProps> = ({
             action: onResumeReading,
             actionLabel: 'Reanudar',
             icon: Play,
-            color: primaryColor.hex,
           },
         ]
       : []),
@@ -47,7 +46,6 @@ export const QuickTasksMenu: React.FC<QuickTasksMenuProps> = ({
       action: onScanDirectory,
       actionLabel: 'Escanear',
       icon: FolderSearch,
-      color: '#0ea5e9',
     },
     {
       id: 'import',
@@ -56,7 +54,6 @@ export const QuickTasksMenu: React.FC<QuickTasksMenuProps> = ({
       action: onPickFiles,
       actionLabel: 'Seleccionar',
       icon: Plus,
-      color: primaryColor.hex,
     },
     {
       id: 'explore',
@@ -65,61 +62,62 @@ export const QuickTasksMenu: React.FC<QuickTasksMenuProps> = ({
       action: onGoToLibrary,
       actionLabel: 'Ver catálogo',
       icon: Compass,
-      color: '#10b981',
     },
     {
       id: 'theme',
       title: 'Ajustar color y modo',
-      description: 'Elige entre 6 tonos primarios vibrantes y alterna entre modo claro u oscuro.',
+      description: 'Elige entre tonos primarios y alterna entre modo claro u oscuro.',
       action: () => {
         const toggleBtn = document.querySelector('button[aria-label="Elegir color primario"]') as HTMLButtonElement | null;
         if (toggleBtn) toggleBtn.click();
       },
       actionLabel: 'Personalizar',
       icon: Palette,
-      color: '#d946ef',
     },
   ];
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3.5">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-base sm:text-lg font-bold tracking-tight text-zinc-900 dark:text-white m-0">
+          <h2 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-white m-0">
             Cosas por hacer
           </h2>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 m-0 mt-0.5">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 m-0 mt-0.5 font-normal">
             Acciones rápidas para gestionar y disfrutar tus lecturas
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {tasks.map((task) => {
           const IconComponent = task.icon;
           return (
             <div
               key={task.id}
               onClick={task.action}
-              className="flex items-start justify-between gap-3 p-4 rounded-2xl bg-black/[0.02] dark:bg-white/[0.02] hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-all duration-200 cursor-pointer group"
+              className="flex items-center justify-between gap-4 p-5 rounded-2xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors cursor-pointer group"
             >
-              <div className="flex items-start gap-3">
-                {/* Icono desnudo sin recuadro detrás */}
+              <div className="flex items-start gap-3.5">
+                {/* Icono con color uniforme de la paleta, sin fondo */}
                 <IconComponent
-                  className="h-5 w-5 stroke-[2] shrink-0 mt-0.5 transition-transform duration-200 group-hover:scale-110"
-                  style={{ color: task.color }}
+                  className="h-5 w-5 stroke-[2] shrink-0 mt-0.5"
+                  style={{ color: primaryColor.hex }}
                 />
                 <div className="flex flex-col">
-                  <h3 className="text-xs sm:text-sm font-semibold text-zinc-900 dark:text-white group-hover:opacity-90 transition-opacity m-0">
+                  <h3 className="text-sm font-semibold text-zinc-900 dark:text-white m-0">
                     {task.title}
                   </h3>
-                  <p className="text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 font-normal m-0 mt-0.5 leading-relaxed">
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal m-0 mt-1 leading-relaxed">
                     {task.description}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-1 text-[11px] font-semibold shrink-0 self-center transition-transform duration-200 group-hover:translate-x-0.5" style={{ color: task.color }}>
+              <div
+                className="flex items-center gap-1 text-xs font-semibold shrink-0"
+                style={{ color: primaryColor.hex }}
+              >
                 <span className="hidden sm:inline">{task.actionLabel}</span>
                 <ArrowRight className="h-3.5 w-3.5 stroke-[2]" />
               </div>

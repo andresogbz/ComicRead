@@ -48,7 +48,7 @@ export const ThemeControls: React.FC = () => {
         </button>
 
         {isPaletteOpen && (
-          <div className="absolute right-0 top-11 z-50 flex flex-col gap-2 rounded-2xl bg-white/90 dark:bg-zinc-900/90 p-3 shadow-xl backdrop-blur-2xl animate-in fade-in zoom-in-95 duration-150 min-w-[190px]">
+          <div className="absolute right-0 top-11 z-50 flex flex-col gap-2 rounded-2xl bg-white dark:bg-zinc-900 p-3 border border-zinc-200 dark:border-zinc-800 animate-in fade-in duration-100 min-w-[190px]">
             <span className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 px-1">
               Color de acento
             </span>
@@ -63,11 +63,11 @@ export const ThemeControls: React.FC = () => {
                       setPrimaryColor(col);
                       setIsPaletteOpen(false);
                     }}
-                    className="flex flex-col items-center gap-1 rounded-xl p-1.5 hover:bg-black/5 dark:hover:bg-white/5 transition-all"
+                    className="flex flex-col items-center gap-1 rounded-xl p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all cursor-pointer"
                     title={col.name}
                   >
                     <div
-                      className="relative flex h-7 w-7 items-center justify-center rounded-full transition-transform hover:scale-110 active:scale-95 shadow-sm"
+                      className="relative flex h-7 w-7 items-center justify-center rounded-full transition-transform hover:scale-105 active:scale-95"
                       style={{ backgroundColor: col.hex }}
                     >
                       {isSelected && (

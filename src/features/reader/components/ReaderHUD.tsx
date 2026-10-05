@@ -55,15 +55,15 @@ export const ReaderHUD: React.FC<ReaderHUDProps> = ({
         isHudVisible ? 'opacity-100' : 'opacity-0'
       }`}
     >
-      {/* Barra Superior sin bordes */}
-      <div className={`pointer-events-auto flex items-center justify-between px-4 sm:px-6 py-3 bg-gradient-to-b from-black/90 via-black/60 to-transparent backdrop-blur-md transition-transform duration-300 ${
+      {/* Barra Superior plana sin sombras */}
+      <div className={`pointer-events-auto flex items-center justify-between px-4 sm:px-6 py-3.5 bg-black/90 transition-transform duration-200 ${
         isHudVisible ? 'translate-y-0' : '-translate-y-full'
       }`}>
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={onClose}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-md hover:bg-white/20 active:scale-95 transition-all"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-zinc-800 text-white hover:bg-zinc-700 active:scale-95 transition-all"
             aria-label="Cerrar lector"
           >
             <ArrowLeft className="h-4 w-4 stroke-[2]" />
@@ -83,7 +83,7 @@ export const ReaderHUD: React.FC<ReaderHUDProps> = ({
           <button
             type="button"
             onClick={onToggleFullscreen}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-md hover:bg-white/20 active:scale-95 transition-all"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-zinc-800 text-white hover:bg-zinc-700 active:scale-95 transition-all"
             aria-label={isFullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'}
           >
             {isFullscreen ? (
@@ -95,8 +95,8 @@ export const ReaderHUD: React.FC<ReaderHUDProps> = ({
         </div>
       </div>
 
-      {/* Barra Inferior sin bordes */}
-      <div className={`pointer-events-auto flex flex-col gap-3 px-4 sm:px-8 py-4 bg-gradient-to-t from-black/95 via-black/80 to-transparent backdrop-blur-md transition-transform duration-300 ${
+      {/* Barra Inferior plana sin sombras */}
+      <div className={`pointer-events-auto flex flex-col gap-3 px-4 sm:px-8 py-4 bg-black/95 transition-transform duration-200 ${
         isHudVisible ? 'translate-y-0' : 'translate-y-full'
       }`}>
         {/* Slider de navegación de páginas (Scrubber) con acento primario dinámico */}
@@ -121,16 +121,16 @@ export const ReaderHUD: React.FC<ReaderHUDProps> = ({
           </span>
         </div>
 
-        {/* Controles de Modos y Zoom sin bordes */}
+        {/* Controles de Modos y Zoom planos */}
         <div className="flex flex-wrap items-center justify-between gap-3 max-w-4xl mx-auto w-full pt-1">
           {/* Selector de modo de lectura */}
-          <div className="flex items-center gap-1 rounded-full bg-zinc-900/90 p-1 backdrop-blur-md shadow-md">
+          <div className="flex items-center gap-1 rounded-full bg-zinc-900 p-1 border border-zinc-800">
             <button
               type="button"
               onClick={() => onReadingModeChange('ltr')}
               className={`rounded-full px-3 py-1 text-[11px] font-medium transition-all ${
                 readingMode === 'ltr'
-                  ? 'text-white shadow-sm'
+                  ? 'text-white font-semibold'
                   : 'text-zinc-400 hover:text-white'
               }`}
               style={readingMode === 'ltr' ? { backgroundColor: primaryColor.hex } : undefined}
@@ -142,7 +142,7 @@ export const ReaderHUD: React.FC<ReaderHUDProps> = ({
               onClick={() => onReadingModeChange('rtl')}
               className={`rounded-full px-3 py-1 text-[11px] font-medium transition-all ${
                 readingMode === 'rtl'
-                  ? 'text-white shadow-sm'
+                  ? 'text-white font-semibold'
                   : 'text-zinc-400 hover:text-white'
               }`}
               style={readingMode === 'rtl' ? { backgroundColor: primaryColor.hex } : undefined}
@@ -154,7 +154,7 @@ export const ReaderHUD: React.FC<ReaderHUDProps> = ({
               onClick={() => onReadingModeChange('webtoon')}
               className={`rounded-full px-3 py-1 text-[11px] font-medium transition-all ${
                 readingMode === 'webtoon'
-                  ? 'text-white shadow-sm'
+                  ? 'text-white font-semibold'
                   : 'text-zinc-400 hover:text-white'
               }`}
               style={readingMode === 'webtoon' ? { backgroundColor: primaryColor.hex } : undefined}
@@ -163,9 +163,9 @@ export const ReaderHUD: React.FC<ReaderHUDProps> = ({
             </button>
           </div>
 
-          {/* Ajuste de escala / Fit sin bordes */}
+          {/* Ajuste de escala / Fit sin sombras */}
           {readingMode !== 'webtoon' && (
-            <div className="hidden sm:flex items-center gap-1 rounded-full bg-zinc-900/90 p-1 backdrop-blur-md shadow-md">
+            <div className="hidden sm:flex items-center gap-1 rounded-full bg-zinc-900 p-1 border border-zinc-800">
               <button
                 type="button"
                 onClick={() => onFitModeChange('contain')}
@@ -202,8 +202,8 @@ export const ReaderHUD: React.FC<ReaderHUDProps> = ({
             </div>
           )}
 
-          {/* Controles de Zoom sin bordes */}
-          <div className="flex items-center gap-1 rounded-full bg-zinc-900/90 px-2 py-1 backdrop-blur-md shadow-md">
+          {/* Controles de Zoom planos sin sombras */}
+          <div className="flex items-center gap-1 rounded-full bg-zinc-900 px-2 py-1 border border-zinc-800">
             <button
               type="button"
               onClick={onZoomOut}

@@ -19,25 +19,21 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({ stats }) => {
       label: 'En estantería',
       value: stats.total,
       icon: BookCopy,
-      color: primaryColor.hex,
     },
     {
       label: 'En lectura',
       value: stats.inProgress,
       icon: BookOpen,
-      color: '#0ea5e9',
     },
     {
       label: 'Completados',
       value: stats.completed,
       icon: CheckCircle2,
-      color: '#10b981',
     },
     {
       label: 'Favoritos',
       value: stats.favorites,
       icon: Heart,
-      color: '#f43f5e',
     },
   ];
 
@@ -48,18 +44,19 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({ stats }) => {
         return (
           <div
             key={index}
-            className="flex flex-col p-4 rounded-2xl bg-black/[0.02] dark:bg-white/[0.02] hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-all duration-200"
+            className="flex flex-col p-5 rounded-2xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/80 transition-colors"
           >
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
                 {item.label}
               </span>
+              {/* Icono en color único y uniforme de la paleta, sin fondo */}
               <IconComponent
                 className="h-4 w-4 stroke-[2]"
-                style={{ color: item.color }}
+                style={{ color: primaryColor.hex }}
               />
             </div>
-            <span className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">
+            <span className="mt-3 text-3xl font-black tracking-tight text-zinc-900 dark:text-white">
               {item.value}
             </span>
           </div>

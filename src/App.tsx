@@ -8,14 +8,12 @@ import { ImportProgressModal } from './features/library/components/ImportProgres
 import { useLibraryStore } from './features/library/stores/useLibraryStore';
 import { useLibrary } from './features/library/hooks/useLibrary';
 import { useDirectoryScanner } from './features/library/hooks/useDirectoryScanner';
-import { useThemeStore } from './core/theme/useThemeStore';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<AppTab>('home');
   const [activeComic, setActiveComic] = useState<StoredComic | null>(null);
   const loadLibrary = useLibraryStore((state) => state.loadLibrary);
   const rawComics = useLibraryStore((state) => state.comics);
-  const { primaryColor } = useThemeStore();
 
   const {
     allComicsCount,
@@ -39,15 +37,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] transition-colors duration-300">
-      {/* Resplandor ambiental de fondo dinámico según el color primario */}
-      <div
-        className="pointer-events-none fixed -top-40 left-1/2 h-96 w-[700px] -translate-x-1/2 rounded-full blur-[130px] -z-10 transition-colors duration-500"
-        style={{
-          backgroundColor: primaryColor.glow,
-        }}
-      />
-
+    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] transition-colors duration-150">
       {activeComic ? (
         <ReaderViewport comic={activeComic} onClose={handleCloseReader} />
       ) : (

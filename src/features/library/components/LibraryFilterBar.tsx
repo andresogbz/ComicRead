@@ -54,16 +54,15 @@ export const LibraryFilterBar: React.FC<LibraryFilterBarProps> = ({
                 key={item.id}
                 type="button"
                 onClick={() => onFilterChange(item.id)}
-                className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs transition-all duration-200 active:scale-95 ${
+                className={`flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs transition-all duration-150 active:scale-95 cursor-pointer ${
                   isActive
-                    ? 'font-semibold text-white shadow-sm'
-                    : 'bg-black/5 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 hover:bg-black/10 dark:hover:bg-white/10 hover:text-zinc-900 dark:hover:text-zinc-200'
+                    ? 'font-semibold text-white'
+                    : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
                 }`}
                 style={
                   isActive
                     ? {
                         backgroundColor: primaryColor.hex,
-                        boxShadow: `0 2px 10px ${primaryColor.glow}`,
                       }
                     : undefined
                 }
@@ -71,10 +70,10 @@ export const LibraryFilterBar: React.FC<LibraryFilterBarProps> = ({
                 <span>{item.label}</span>
                 {typeof count === 'number' && (
                   <span
-                    className={`rounded-full px-1.5 py-0.2 text-[10px] font-medium transition-colors ${
+                    className={`rounded-full px-1.5 py-0.2 text-[10px] font-semibold transition-colors ${
                       isActive
-                        ? 'bg-white/20 text-white'
-                        : 'bg-black/10 dark:bg-white/10 text-zinc-500 dark:text-zinc-400'
+                        ? 'bg-black/20 text-white'
+                        : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
                     }`}
                   >
                     {count}
@@ -85,7 +84,7 @@ export const LibraryFilterBar: React.FC<LibraryFilterBarProps> = ({
           })}
         </div>
 
-        {/* Buscador y Selector de Ordenación sin bordes */}
+        {/* Buscador y Selector de Ordenación planos */}
         <div className="flex items-center gap-2.5">
           {/* Barra de búsqueda */}
           <div className="relative flex-1 md:w-64">
@@ -95,10 +94,7 @@ export const LibraryFilterBar: React.FC<LibraryFilterBarProps> = ({
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Buscar cómic o serie..."
-              className="h-8 w-full rounded-full bg-black/5 dark:bg-white/5 pl-9 pr-8 text-xs text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none transition-all"
-              style={{
-                outlineColor: primaryColor.hex,
-              }}
+              className="h-8 w-full rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 pl-9 pr-8 text-xs text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none transition-all"
             />
             {searchQuery && (
               <button
@@ -112,9 +108,9 @@ export const LibraryFilterBar: React.FC<LibraryFilterBarProps> = ({
             )}
           </div>
 
-          {/* Selector de ordenación */}
+          {/* Selector de ordenación plano */}
           <div className="relative flex items-center">
-            <div className="flex h-8 items-center gap-1.5 rounded-full bg-black/5 dark:bg-white/5 px-3 text-xs text-zinc-700 dark:text-zinc-300 transition-colors">
+            <div className="flex h-8 items-center gap-1.5 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 px-3 text-xs text-zinc-700 dark:text-zinc-300 transition-colors">
               <ArrowUpDown className="h-3.5 w-3.5 text-zinc-400 dark:text-zinc-500" />
               <select
                 value={sortBy}

@@ -4,17 +4,18 @@
 
 @layer base {
   :root {
-    --primary-color: #8b5cf6;
-    --primary-glow: rgba(139, 92, 246, 0.22);
-    --bg-main: #f8f9fa;
-    --text-main: #09090b;
+    --primary-color: #6366f1;
+    --bg-main: #ffffff;
+    --text-main: #111111;
     --text-muted: #71717a;
+    --border-subtle: #e4e4e7;
   }
 
   html.dark {
-    --bg-main: #07070a;
-    --text-main: #fafafa;
+    --bg-main: #0c0c0e;
+    --text-main: #f4f4f5;
     --text-muted: #a1a1aa;
+    --border-subtle: #27272a;
   }
 
   body {

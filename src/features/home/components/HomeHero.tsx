@@ -18,37 +18,29 @@ export const HomeHero: React.FC<HomeHeroProps> = ({
 
   if (!comic) {
     return (
-      <div className="relative overflow-hidden rounded-3xl p-6 sm:p-10 bg-black/[0.02] dark:bg-white/[0.02] transition-colors">
-        <div
-          className="pointer-events-none absolute -right-10 -bottom-10 h-64 w-64 rounded-full blur-3xl opacity-40 transition-colors"
-          style={{ backgroundColor: primaryColor.glow }}
-        />
-        <div className="max-w-xl">
+      <div className="relative rounded-3xl p-8 sm:p-14 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 transition-colors">
+        <div className="max-w-2xl">
           <span
-            className="text-xs font-bold uppercase tracking-wider"
+            className="text-xs font-semibold"
             style={{ color: primaryColor.hex }}
           >
-            Lector de Cómics de Alto Rendimiento
+            Lector de cómics minimalista
           </span>
-          <h2 className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">
-            Bienvenido a tu Espacio de Lectura
-          </h2>
-          <p className="mt-2 text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-            Soporte nativo para archivos .cbz, .cbr y cómics Webtoon verticales.
-            Comienza importando tus historias favoritas desde tu almacenamiento local.
+          <h1 className="mt-3 text-3xl sm:text-5xl font-black tracking-tight text-zinc-900 dark:text-white leading-[1.1]">
+            Tu biblioteca personal de cómics
+          </h1>
+          <p className="mt-4 text-sm sm:text-base text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal">
+            Lectura rápida, sin distracciones y con soporte para archivos .cbz, .cbr y cómics verticales Webtoon. Comienza importando historias desde tu dispositivo.
           </p>
-          <div className="mt-6 flex items-center gap-3">
+          <div className="mt-8 flex items-center gap-3">
             <button
               type="button"
               onClick={onPickFiles}
-              className="flex h-10 items-center gap-2 rounded-full px-5 text-xs font-semibold text-white shadow-md active:scale-95 transition-all cursor-pointer"
-              style={{
-                backgroundColor: primaryColor.hex,
-                boxShadow: `0 4px 16px ${primaryColor.glow}`,
-              }}
+              className="flex h-11 items-center gap-2 rounded-full px-6 text-xs sm:text-sm font-semibold text-white active:scale-95 transition-all cursor-pointer"
+              style={{ backgroundColor: primaryColor.hex }}
             >
               <BookOpen className="h-4 w-4 stroke-[2]" />
-              <span>Importar cómic</span>
+              <span>Importar cómics</span>
             </button>
           </div>
         </div>
@@ -60,18 +52,12 @@ export const HomeHero: React.FC<HomeHeroProps> = ({
   const isStarted = comic.progressPercentage > 0 && !isCompleted;
 
   return (
-    <div className="relative overflow-hidden rounded-3xl p-5 sm:p-8 bg-black/[0.02] dark:bg-white/[0.02] transition-colors group">
-      {/* Resplandor ambiental suave de fondo */}
-      <div
-        className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full blur-3xl opacity-35 transition-colors"
-        style={{ backgroundColor: primaryColor.glow }}
-      />
-
-      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 relative z-10">
-        {/* Portada Flotante sin caja contenedora */}
+    <div className="relative rounded-3xl p-6 sm:p-10 bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/80 transition-colors">
+      <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+        {/* Portada Flotante Plana, sin sombras */}
         <div
           onClick={() => onOpenComic(comic)}
-          className="relative aspect-[2/3] w-36 sm:w-44 shrink-0 overflow-hidden rounded-2xl shadow-lg group-hover:shadow-2xl transition-all duration-300 group-hover:scale-[1.02] cursor-pointer"
+          className="relative aspect-[2/3] w-40 sm:w-52 shrink-0 overflow-hidden rounded-2xl bg-zinc-200 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 transition-transform duration-200 hover:scale-[1.02] cursor-pointer"
         >
           {comic.coverDataUrl ? (
             <img
@@ -80,76 +66,71 @@ export const HomeHero: React.FC<HomeHeroProps> = ({
               className="h-full w-full object-cover"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-black/10 dark:bg-white/10 text-zinc-500">
-              <BookOpen className="h-8 w-8 stroke-[1.5]" />
+            <div className="flex h-full w-full items-center justify-center text-zinc-400">
+              <BookOpen className="h-10 w-10 stroke-[1.5]" />
             </div>
           )}
-          <span className="absolute top-2 left-2 rounded-full bg-black/50 px-2 py-0.5 text-[10px] font-bold text-white uppercase backdrop-blur-md">
-            {comic.format}
+          {/* Badge de formato plano sin blur ni uppercase */}
+          <span className="absolute top-2.5 left-2.5 rounded-full bg-zinc-900/90 text-white px-2.5 py-0.5 text-[10px] font-semibold">
+            {comic.format.toUpperCase()}
           </span>
         </div>
 
-        {/* Detalles y llamada a la acción */}
-        <div className="flex flex-1 flex-col justify-between self-stretch py-1 text-center sm:text-left">
+        {/* Detalles y Titular Hero Impactante */}
+        <div className="flex flex-1 flex-col justify-between self-stretch text-center md:text-left">
           <div>
-            <div className="flex items-center justify-center sm:justify-start gap-2 text-xs font-semibold">
-              <span
-                className="uppercase tracking-wider text-[11px]"
-                style={{ color: primaryColor.hex }}
-              >
-                {isCompleted ? 'Lectura completada' : isStarted ? 'En progreso' : 'Recién agregado'}
+            <div className="flex items-center justify-center md:justify-start gap-2 text-xs font-semibold">
+              <span style={{ color: primaryColor.hex }}>
+                {isCompleted ? 'Lectura completada' : isStarted ? 'En curso' : 'Recientemente agregado'}
               </span>
               <span className="text-zinc-400">•</span>
-              <span className="text-zinc-500 dark:text-zinc-400 font-mono text-[11px] flex items-center gap-1">
-                <Clock className="h-3 w-3 stroke-[2]" />
+              <span className="text-zinc-500 dark:text-zinc-400 text-xs flex items-center gap-1 font-normal">
+                <Clock className="h-3.5 w-3.5 stroke-[1.75]" />
                 {comic.totalPages} páginas
               </span>
             </div>
 
-            <h3
+            <h1
               onClick={() => onOpenComic(comic)}
-              className="mt-2 text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white line-clamp-2 hover:opacity-80 transition-opacity cursor-pointer"
+              className="mt-3 text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-zinc-900 dark:text-white line-clamp-2 hover:opacity-85 transition-opacity cursor-pointer leading-[1.15]"
             >
               {comic.title}
-            </h3>
+            </h1>
 
-            {/* Barra de progreso */}
-            <div className="mt-4 max-w-md mx-auto sm:mx-0">
-              <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 mb-1.5 font-medium">
+            {/* Barra de progreso plana */}
+            <div className="mt-6 max-w-lg mx-auto md:mx-0">
+              <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 mb-2 font-medium">
                 <span>
                   {isStarted
                     ? `Página ${comic.lastReadPageIndex + 1} de ${comic.totalPages}`
-                    : `${comic.totalPages} páginas en total`}
+                    : `${comic.totalPages} páginas`}
                 </span>
                 <span className="font-semibold" style={{ color: primaryColor.hex }}>
                   {comic.progressPercentage}%
                 </span>
               </div>
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/10 dark:bg-white/10">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
                 <div
-                  className="h-full transition-all duration-300 ease-out"
+                  className="h-full transition-all duration-200 ease-out"
                   style={{
-                    width: `${Math.max(4, comic.progressPercentage)}%`,
-                    backgroundColor: isCompleted ? '#10b981' : primaryColor.hex,
+                    width: `${Math.max(3, comic.progressPercentage)}%`,
+                    backgroundColor: isCompleted ? '#059669' : primaryColor.hex,
                   }}
                 />
               </div>
             </div>
           </div>
 
-          {/* Botón para continuar lectura */}
-          <div className="mt-6 flex items-center justify-center sm:justify-start gap-3">
+          {/* Botón para continuar lectura plano sin sombras */}
+          <div className="mt-8 flex items-center justify-center md:justify-start gap-3">
             <button
               type="button"
               onClick={() => onOpenComic(comic)}
-              className="flex h-10 items-center gap-2 rounded-full px-6 text-xs font-semibold text-white shadow-md active:scale-95 transition-all cursor-pointer"
-              style={{
-                backgroundColor: primaryColor.hex,
-                boxShadow: `0 4px 16px ${primaryColor.glow}`,
-              }}
+              className="flex h-11 items-center gap-2 rounded-full px-7 text-xs sm:text-sm font-semibold text-white active:scale-95 transition-all cursor-pointer"
+              style={{ backgroundColor: primaryColor.hex }}
             >
               <Play className="h-4 w-4 fill-white stroke-[2]" />
-              <span>{isStarted ? 'Continuar leyendo' : 'Empezar a leer'}</span>
+              <span>{isStarted ? 'Continuar lectura' : 'Comenzar a leer'}</span>
             </button>
           </div>
         </div>

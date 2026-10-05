@@ -14,7 +14,7 @@ export const ImportProgressModal: React.FC<ImportProgressModalProps> = ({
   const percentage = Math.round((progress.current / Math.max(1, progress.total)) * 100);
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex w-80 flex-col gap-2 rounded-3xl bg-white/95 dark:bg-zinc-900/95 p-4 text-zinc-900 dark:text-white shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-4 duration-200">
+    <div className="fixed bottom-6 right-6 z-50 flex w-80 flex-col gap-2 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 text-zinc-900 dark:text-white animate-in fade-in slide-in-from-bottom-2 duration-150">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Loader2

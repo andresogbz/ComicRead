@@ -57,7 +57,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
   }, [comics]);
 
   return (
-    <div className="flex flex-col gap-8 pb-12">
+    <div className="flex flex-col gap-10 sm:gap-12 pb-16">
       {/* Sección Hero: Continuar Lectura */}
       <HomeHero
         comic={heroComic}
@@ -79,7 +79,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
 
       {/* Recientemente Añadidos */}
       {recentlyAdded.length > 0 && (
-        <section className="flex flex-col gap-3">
+        <section className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Sparkles
@@ -116,10 +116,13 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
 
       {/* Favoritos si existen */}
       {favoriteComics.length > 0 && (
-        <section className="flex flex-col gap-3">
+        <section className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Heart className="h-4 w-4 stroke-[2] fill-rose-500 text-rose-500" />
+              <Heart
+                className="h-4 w-4 stroke-[2]"
+                style={{ color: primaryColor.hex }}
+              />
               <h2 className="text-base sm:text-lg font-bold tracking-tight text-zinc-900 dark:text-white m-0">
                 Tus favoritos
               </h2>

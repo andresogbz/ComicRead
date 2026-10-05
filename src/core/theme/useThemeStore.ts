@@ -10,12 +10,12 @@ export interface PrimaryColorOption {
 }
 
 export const PRIMARY_COLORS: PrimaryColorOption[] = [
-  { id: 'violet', name: 'Violeta', hex: '#8b5cf6', glow: 'rgba(139, 92, 246, 0.25)' },
-  { id: 'blue', name: 'Azul Eléctrico', hex: '#0ea5e9', glow: 'rgba(14, 165, 233, 0.25)' },
-  { id: 'emerald', name: 'Esmeralda', hex: '#10b981', glow: 'rgba(16, 185, 129, 0.25)' },
-  { id: 'rose', name: 'Carmesí', hex: '#f43f5e', glow: 'rgba(244, 63, 94, 0.25)' },
-  { id: 'amber', name: 'Ámbar', hex: '#f59e0b', glow: 'rgba(245, 158, 11, 0.25)' },
-  { id: 'fuchsia', name: 'Fucsia', hex: '#d946ef', glow: 'rgba(217, 70, 239, 0.25)' },
+  { id: 'violet', name: 'Índigo', hex: '#6366f1', glow: 'transparent' },
+  { id: 'blue', name: 'Azul Marino', hex: '#2563eb', glow: 'transparent' },
+  { id: 'emerald', name: 'Verde Bosque', hex: '#059669', glow: 'transparent' },
+  { id: 'rose', name: 'Carmesí', hex: '#e11d48', glow: 'transparent' },
+  { id: 'amber', name: 'Terracota', hex: '#d97706', glow: 'transparent' },
+  { id: 'fuchsia', name: 'Púrpura', hex: '#9333ea', glow: 'transparent' },
 ];
 
 interface ThemeState {
