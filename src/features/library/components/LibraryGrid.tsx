@@ -62,18 +62,33 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 py-5 sm:py-6 w-full max-w-full overflow-x-hidden">
-      {/* Encabezado */}
-      <LibraryHeader
-        totalComics={allComicsCount}
-        onPickFiles={pickFiles}
-        onScanDirectory={scanDirectory}
-        isScanning={isScanning}
-      />
+    <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 py-5 sm:py-6 w-full max-w-full overflow-x-hidden pb-24">
+      {/* Panel de control de biblioteca con fondo distintivo */}
+      <div className="p-5 sm:p-7 rounded-3xl bg-black/60 dark:bg-black/70 backdrop-blur-md border border-white/10 shadow-xl transition-all mb-6">
+        <LibraryHeader
+          totalComics={allComicsCount}
+          onPickFiles={pickFiles}
+          onScanDirectory={scanDirectory}
+          isScanning={isScanning}
+        />
 
-      {/* Banner de error visible si falla una importación sin bordes */}
+        {/* Barra de Filtros y Búsqueda */}
+        {allComicsCount > 0 && (
+          <LibraryFilterBar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            filterStatus={filterStatus}
+            onFilterChange={setFilterStatus}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+            stats={stats}
+          />
+        )}
+      </div>
+
+      {/* Banner de error visible si falla una importación */}
       {errorMessage && (
-        <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl bg-rose-500/10 px-4 py-3 text-rose-300 animate-in fade-in duration-200">
+        <div className="mb-6 flex items-center justify-between gap-3 rounded-2xl bg-rose-500/20 backdrop-blur-md border border-rose-500/30 px-4 py-3 text-rose-200 animate-in fade-in duration-200">
           <div className="flex items-center gap-2.5">
             <AlertCircle className="h-5 w-5 shrink-0 text-rose-400" />
             <span className="text-xs font-medium">{errorMessage}</span>
@@ -89,31 +104,20 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({
         </div>
       )}
 
-      {/* Barra de Filtros y Búsqueda (si hay cómics) */}
-      {allComicsCount > 0 && (
-        <LibraryFilterBar
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          filterStatus={filterStatus}
-          onFilterChange={setFilterStatus}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          stats={stats}
-        />
-      )}
-
       {/* Estado de Carga */}
       {isLoading ? (
         <LibrarySkeleton />
       ) : allComicsCount === 0 ? (
-        <EmptyLibraryState
-          onPickFiles={pickFiles}
-          onScanDirectory={scanDirectory}
-          onFilesDropped={importFiles}
-        />
+        <div className="rounded-3xl bg-black/60 dark:bg-black/70 backdrop-blur-md border border-white/10 p-6 sm:p-12">
+          <EmptyLibraryState
+            onPickFiles={pickFiles}
+            onScanDirectory={scanDirectory}
+            onFilesDropped={importFiles}
+          />
+        </div>
       ) : comics.length === 0 ? (
-        <div className="flex min-h-[300px] flex-col items-center justify-center text-center">
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <div className="flex min-h-[300px] flex-col items-center justify-center text-center rounded-3xl bg-black/60 dark:bg-black/70 backdrop-blur-md border border-white/10 p-8">
+          <p className="text-sm text-zinc-300">
             No se encontraron cómics que coincidan con la búsqueda o filtro.
           </p>
           <button
@@ -122,7 +126,7 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({
               setSearchQuery('');
               setFilterStatus('all');
             }}
-            className="mt-3 text-xs underline underline-offset-4 font-medium transition-colors"
+            className="mt-3 text-xs underline underline-offset-4 font-bold transition-colors"
             style={{ color: primaryColor.hex }}
           >
             Limpiar filtros
@@ -130,7 +134,7 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({
         </div>
       ) : (
         /* Cuadrícula de Cómics */
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6 mt-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
           {comics.map((comic) => (
             <ComicCard
               key={comic.id}

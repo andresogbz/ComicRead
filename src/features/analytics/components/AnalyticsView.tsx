@@ -76,29 +76,28 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ stats, comics }) =
   ];
 
   return (
-    <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 py-5 sm:py-6 w-full max-w-full flex flex-col gap-8 pb-16">
-      {/* Encabezado con divisor estilo menú */}
-      <header className="pb-6 border-b border-zinc-200/80 dark:border-zinc-800/80">
-        <div className="flex items-center gap-2.5 mb-2">
-          <div className="w-5 h-[1.5px]" style={{ backgroundColor: primaryColor.hex }} />
-          <span
-            className="text-xs font-semibold"
-            style={{ color: primaryColor.hex }}
-          >
-            Análisis
-          </span>
+    <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 py-5 sm:py-6 w-full max-w-full flex flex-col gap-6 sm:gap-8 pb-24">
+      {/* Encabezado y Métricas clave con fondo distintivo */}
+      <section className="p-6 sm:p-8 rounded-3xl bg-black/60 dark:bg-black/70 backdrop-blur-md border border-white/10 shadow-xl transition-all flex flex-col gap-6">
+        <div>
+          <div className="flex items-center gap-2.5 mb-2">
+            <div className="w-5 h-[1.5px]" style={{ backgroundColor: primaryColor.hex }} />
+            <span
+              className="text-xs font-semibold"
+              style={{ color: primaryColor.hex }}
+            >
+              Análisis
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white m-0">
+            Métricas de lectura
+          </h1>
+          <p className="text-xs text-zinc-300 font-normal m-0 mt-1">
+            Estadísticas detalladas y progreso global de tu colección
+          </p>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-white m-0">
-          Métricas de lectura
-        </h1>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal m-0 mt-1">
-          Estadísticas detalladas y progreso global de tu colección
-        </p>
-      </header>
 
-      {/* Métricas clave numéricas */}
-      <section className="pb-8 border-b border-zinc-200/80 dark:border-zinc-800/80">
-        <div className="grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-zinc-200/80 dark:divide-zinc-800/80">
+        <div className="grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-white/10 pt-2">
           {metricItems.map((item, index) => (
             <div
               key={index}
@@ -106,13 +105,13 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ stats, comics }) =
                 index % 2 === 0 ? 'pr-3 sm:pr-6' : 'pl-3 sm:pl-6'
               } ${index < 2 ? 'pb-4 md:pb-0' : 'pt-4 md:pt-0'}`}
             >
-              <div className="flex items-center gap-1.5 text-xs font-medium text-zinc-500 dark:text-zinc-400">
+              <div className="flex items-center gap-1.5 text-xs font-medium text-zinc-300">
                 <span>{item.label}</span>
               </div>
-              <span className="mt-1 text-2xl sm:text-4xl font-bold tracking-tight text-zinc-900 dark:text-white">
+              <span className="mt-1 text-2xl sm:text-4xl font-bold tracking-tight text-white">
                 {item.value}
               </span>
-              <span className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5 font-normal">
+              <span className="text-[11px] text-zinc-400 mt-0.5 font-normal">
                 {item.sublabel}
               </span>
             </div>
@@ -120,10 +119,10 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ stats, comics }) =
         </div>
       </section>
 
-      {/* Gráfico 1: Estado de Lectura de la Colección (Lienzo continuo, sin cajas ni fondos) */}
-      <section className="pb-8 border-b border-zinc-200/80 dark:border-zinc-800/80 flex flex-col gap-4">
+      {/* Gráfico 1: Estado de Lectura de la Colección con fondo distintivo */}
+      <section className="p-6 sm:p-8 rounded-3xl bg-black/60 dark:bg-black/70 backdrop-blur-md border border-white/10 shadow-xl transition-all flex flex-col gap-4">
         <div className="flex items-center justify-between text-xs font-semibold">
-          <span className="text-sm font-bold text-zinc-900 dark:text-white">
+          <span className="text-sm font-bold text-white">
             Distribución de la colección
           </span>
           <span style={{ color: primaryColor.hex }}>
@@ -132,7 +131,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ stats, comics }) =
         </div>
 
         {/* Barra segmentada continua */}
-        <div className="h-3.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800/80 flex gap-0.5">
+        <div className="h-3.5 w-full overflow-hidden rounded-full bg-white/10 flex gap-0.5">
           {completedPct > 0 && (
             <div
               className="h-full bg-emerald-500 transition-all duration-300"
@@ -149,7 +148,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ stats, comics }) =
           )}
           {unreadPct > 0 && (
             <div
-              className="h-full bg-zinc-300 dark:bg-zinc-700 transition-all duration-300"
+              className="h-full bg-zinc-600 transition-all duration-300"
               style={{ width: `${unreadPct}%` }}
               title={`Por leer: ${unreadCount}`}
             />
@@ -157,32 +156,32 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ stats, comics }) =
         </div>
 
         {/* Leyenda con puntos de color y conteos */}
-        <div className="flex flex-wrap items-center gap-5 text-xs text-zinc-600 dark:text-zinc-400 pt-1">
+        <div className="flex flex-wrap items-center gap-5 text-xs text-zinc-300 pt-1">
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-emerald-500" />
-            <span>Leídos: <strong className="text-zinc-900 dark:text-white">{stats.completed}</strong> ({completedPct}%)</span>
+            <span>Leídos: <strong className="text-white">{stats.completed}</strong> ({completedPct}%)</span>
           </div>
           <div className="flex items-center gap-2">
             <span
               className="h-2 w-2 rounded-full"
               style={{ backgroundColor: primaryColor.hex }}
             />
-            <span>En progreso: <strong className="text-zinc-900 dark:text-white">{stats.inProgress}</strong> ({inProgressPct}%)</span>
+            <span>En progreso: <strong className="text-white">{stats.inProgress}</strong> ({inProgressPct}%)</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-zinc-300 dark:bg-zinc-700" />
-            <span>Por leer: <strong className="text-zinc-900 dark:text-white">{unreadCount}</strong> ({unreadPct}%)</span>
+            <span className="h-2 w-2 rounded-full bg-zinc-500" />
+            <span>Por leer: <strong className="text-white">{unreadCount}</strong> ({unreadPct}%)</span>
           </div>
         </div>
       </section>
 
-      {/* Gráfico 2: Formatos de Archivos en Biblioteca */}
-      <section className="pb-8 border-b border-zinc-200/80 dark:border-zinc-800/80 flex flex-col gap-4">
+      {/* Gráfico 2: Formatos de Archivos en Biblioteca con fondo distintivo */}
+      <section className="p-6 sm:p-8 rounded-3xl bg-black/60 dark:bg-black/70 backdrop-blur-md border border-white/10 shadow-xl transition-all flex flex-col gap-4">
         <div className="flex items-center justify-between text-xs font-semibold">
-          <span className="text-sm font-bold text-zinc-900 dark:text-white">
+          <span className="text-sm font-bold text-white">
             Formatos en biblioteca
           </span>
-          <span className="text-zinc-500 dark:text-zinc-400 font-normal">
+          <span className="text-zinc-300 font-normal">
             {stats.total} archivos locales
           </span>
         </div>
@@ -190,11 +189,11 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ stats, comics }) =
         <div className="flex flex-col gap-4 max-w-2xl">
           {/* Barra CBZ */}
           <div>
-            <div className="flex items-center justify-between text-xs text-zinc-600 dark:text-zinc-400 mb-1.5">
-              <span className="font-semibold text-zinc-800 dark:text-zinc-200">.cbz (zip)</span>
+            <div className="flex items-center justify-between text-xs text-zinc-300 mb-1.5">
+              <span className="font-semibold text-white">.cbz (zip)</span>
               <span>{cbzCount} cómics ({stats.total > 0 ? Math.round((cbzCount / stats.total) * 100) : 0}%)</span>
             </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+            <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
               <div
                 className="h-full transition-all duration-300"
                 style={{
@@ -207,11 +206,11 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ stats, comics }) =
 
           {/* Barra CBR */}
           <div>
-            <div className="flex items-center justify-between text-xs text-zinc-600 dark:text-zinc-400 mb-1.5">
-              <span className="font-semibold text-zinc-800 dark:text-zinc-200">.cbr (rar)</span>
+            <div className="flex items-center justify-between text-xs text-zinc-300 mb-1.5">
+              <span className="font-semibold text-white">.cbr (rar)</span>
               <span>{cbrCount} cómics ({stats.total > 0 ? Math.round((cbrCount / stats.total) * 100) : 0}%)</span>
             </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+            <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
               <div
                 className="h-full bg-amber-500 transition-all duration-300"
                 style={{
@@ -223,9 +222,9 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ stats, comics }) =
         </div>
 
         {/* Resumen total de páginas */}
-        <div className="pt-2 text-xs text-zinc-500 dark:text-zinc-400 flex items-center justify-between max-w-2xl">
+        <div className="pt-2 text-xs text-zinc-300 flex items-center justify-between max-w-2xl">
           <span>Páginas totales almacenadas en estantería:</span>
-          <span className="font-bold text-zinc-900 dark:text-white">{totalPages.toLocaleString()} páginas</span>
+          <span className="font-bold text-white">{totalPages.toLocaleString()} páginas</span>
         </div>
       </section>
     </div>

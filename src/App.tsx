@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import type { StoredComic } from './infrastructure/database/ComicDatabase';
 import { AppNavigation, type AppTab } from './shared/components/AppNavigation';
+import { FloatingBubbleMenu } from './shared/components/FloatingBubbleMenu';
 import { HomeDashboard } from './features/home/components/HomeDashboard';
 import { LibraryGrid } from './features/library/components/LibraryGrid';
 import { AnalyticsView } from './features/analytics/components/AnalyticsView';
@@ -77,7 +78,7 @@ export function App() {
           <ReaderViewport comic={activeComic} onClose={handleCloseReader} />
         ) : (
           <div className="flex flex-col min-h-screen w-full max-w-full overflow-x-hidden">
-            {/* Header minimalista y transparente sin bordes pesados */}
+            {/* Header minimalista y transparente */}
             <AppNavigation
               activeTab={activeTab}
               onTabChange={setActiveTab}
@@ -125,6 +126,16 @@ export function App() {
                 />
               )}
             </main>
+
+            {/* Menú flotante inferior de burbujas estilo Speed Dial */}
+            <FloatingBubbleMenu
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              totalComics={allComicsCount}
+              onPickFiles={pickFiles}
+              onScanDirectory={scanDirectory}
+              isScanning={isScanning}
+            />
 
             {/* Modal flotante global de progreso de importación */}
             {importProgress && <ImportProgressModal progress={importProgress} />}
