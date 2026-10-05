@@ -3,6 +3,8 @@ import type { StoredComic } from './infrastructure/database/ComicDatabase';
 import { AppNavigation, type AppTab } from './shared/components/AppNavigation';
 import { HomeDashboard } from './features/home/components/HomeDashboard';
 import { LibraryGrid } from './features/library/components/LibraryGrid';
+import { AnalyticsView } from './features/analytics/components/AnalyticsView';
+import { SettingsView } from './features/settings/components/SettingsView';
 import { ReaderViewport } from './features/reader/components/ReaderViewport';
 import { ImportProgressModal } from './features/library/components/ImportProgressModal';
 import { useLibraryStore } from './features/library/stores/useLibraryStore';
@@ -52,9 +54,9 @@ export function App() {
             isScanning={isScanning}
           />
 
-          {/* Vistas Principales: Inicio (Dashboard) y Biblioteca */}
+          {/* Vistas Principales: Inicio, Biblioteca, Análisis y Configuración */}
           <main className="w-full max-w-full overflow-x-hidden flex-1">
-            {activeTab === 'home' ? (
+            {activeTab === 'home' && (
               <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 py-5 sm:py-6">
                 <HomeDashboard
                   comics={rawComics}
@@ -67,9 +69,23 @@ export function App() {
                   onGoToLibrary={() => setActiveTab('library')}
                 />
               </div>
-            ) : (
+            )}
+
+            {activeTab === 'library' && (
               <LibraryGrid
                 onOpenComic={handleOpenComic}
+                onPickFiles={pickFiles}
+                onScanDirectory={scanDirectory}
+                isScanning={isScanning}
+              />
+            )}
+
+            {activeTab === 'analytics' && (
+              <AnalyticsView stats={stats} comics={rawComics} />
+            )}
+
+            {activeTab === 'settings' && (
+              <SettingsView
                 onPickFiles={pickFiles}
                 onScanDirectory={scanDirectory}
                 isScanning={isScanning}
@@ -86,4 +102,3 @@ export function App() {
 }
 
 export default App;
-

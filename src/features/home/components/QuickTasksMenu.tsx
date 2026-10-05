@@ -80,10 +80,10 @@ export const QuickTasksMenu: React.FC<QuickTasksMenuProps> = ({
     <div className="flex flex-col pb-8 sm:pb-10 border-b border-zinc-200/80 dark:border-zinc-800/80 transition-colors">
       <div className="mb-4">
         <span
-          className="text-xs font-semibold tracking-wide"
+          className="text-xs font-semibold"
           style={{ color: primaryColor.hex }}
         >
-          Flujo de Trabajo
+          Flujo de trabajo
         </span>
         <h2 className="text-xl sm:text-2xl font-black tracking-tight text-zinc-900 dark:text-white m-0 mt-1">
           Acciones rápidas

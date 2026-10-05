@@ -53,7 +53,7 @@ export const ComicCard: React.FC<ComicCardProps> = ({
         {/* Badges de formato planos */}
         <div className="absolute top-2 left-2 flex items-center gap-1.5">
           <span className="rounded-md bg-zinc-900/90 px-2 py-0.5 text-[10px] font-semibold text-white">
-            {comic.format.toUpperCase()}
+            .{comic.format.toLowerCase()}
           </span>
           {isCompleted && (
             <span className="flex items-center gap-1 rounded-md bg-zinc-900/90 px-2 py-0.5 text-[10px] font-medium text-emerald-400">

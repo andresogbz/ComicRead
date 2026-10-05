@@ -2,6 +2,13 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@layer utilities {
+  .font-logo {
+    font-family: 'Syne', 'Space Grotesk', -apple-system, sans-serif;
+    letter-spacing: -0.04em;
+  }
+}
+
 @layer base {
   :root {
     --primary-color: #6366f1;

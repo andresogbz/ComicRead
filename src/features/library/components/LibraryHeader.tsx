@@ -27,10 +27,10 @@ export const LibraryHeader: React.FC<LibraryHeaderProps> = ({
             style={{ color: primaryColor.hex }}
           />
           <span
-            className="text-xs font-semibold tracking-wide"
+            className="text-xs font-semibold"
             style={{ color: primaryColor.hex }}
           >
-            Colección Local
+            Colección local
           </span>
         </div>
         <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-900 dark:text-white transition-colors m-0">

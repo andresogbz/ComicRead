@@ -67,10 +67,10 @@ export const EmptyLibraryState: React.FC<EmptyLibraryStateProps> = ({
       {/* Badges de formatos planos */}
       <div className="mt-5 flex flex-wrap items-center justify-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
         <span className="rounded-full bg-zinc-200/60 dark:bg-zinc-800 px-3 py-1 font-medium">
-          .cbz (ZIP)
+          .cbz (zip)
         </span>
         <span className="rounded-full bg-zinc-200/60 dark:bg-zinc-800 px-3 py-1 font-medium">
-          .cbr (RAR)
+          .cbr (rar)
         </span>
         <span className="rounded-full bg-zinc-200/60 dark:bg-zinc-800 px-3 py-1 font-medium">
           Extracción directa

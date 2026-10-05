@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.comicread.app',
-  appName: 'ComicRead',
+  appName: 'OGMIC',
   webDir: 'dist',
   server: {
     androidScheme: 'https',
