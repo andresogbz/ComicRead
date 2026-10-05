@@ -53,13 +53,13 @@ export const EmptyLibraryState: React.FC<EmptyLibraryStateProps> = ({
       />
 
       <div
-        className="flex h-16 w-16 items-center justify-center rounded-2xl bg-black/5 dark:bg-white/5 mb-4 transition-transform duration-300 hover:scale-105"
+        className="mb-4 transition-transform duration-300 hover:scale-105"
         style={{ color: primaryColor.hex }}
       >
         {isDragOver ? (
-          <UploadCloud className="h-8 w-8 animate-bounce stroke-[1.75]" />
+          <UploadCloud className="h-12 w-12 animate-bounce stroke-[1.5]" />
         ) : (
-          <BookPlus className="h-8 w-8 stroke-[1.75]" />
+          <BookPlus className="h-12 w-12 stroke-[1.5]" />
         )}
       </div>
 

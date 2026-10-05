@@ -6,21 +6,28 @@ import { EmptyLibraryState } from './EmptyLibraryState';
 import { LibrarySkeleton } from './LibrarySkeleton';
 import { LibraryHeader } from './LibraryHeader';
 import { LibraryFilterBar } from './LibraryFilterBar';
-import { ImportProgressModal } from './ImportProgressModal';
 import { useLibrary } from '../hooks/useLibrary';
 import { useDirectoryScanner } from '../hooks/useDirectoryScanner';
 import { useThemeStore } from '../../../core/theme/useThemeStore';
 
 interface LibraryGridProps {
   onOpenComic: (comic: StoredComic) => void;
+  onPickFiles?: () => void;
+  onScanDirectory?: () => void;
+  isScanning?: boolean;
 }
 
-export const LibraryGrid: React.FC<LibraryGridProps> = ({ onOpenComic }) => {
+export const LibraryGrid: React.FC<LibraryGridProps> = ({
+  onOpenComic,
+  onPickFiles: customPickFiles,
+  onScanDirectory: customScanDirectory,
+  isScanning: customIsScanning,
+}) => {
   const {
     comics,
     allComicsCount,
     isLoading,
-    importProgress,
+    importProgress: _importProgress,
     errorMessage,
     searchQuery,
     filterStatus,
@@ -35,8 +42,10 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({ onOpenComic }) => {
     clearError,
   } = useLibrary();
 
-  const { isScanning, scanDirectory, pickFiles } =
-    useDirectoryScanner(importFiles);
+  const internalScanner = useDirectoryScanner(importFiles);
+  const pickFiles = customPickFiles || internalScanner.pickFiles;
+  const scanDirectory = customScanDirectory || internalScanner.scanDirectory;
+  const isScanning = customIsScanning !== undefined ? customIsScanning : internalScanner.isScanning;
 
   const { primaryColor } = useThemeStore();
 
@@ -133,9 +142,6 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({ onOpenComic }) => {
           ))}
         </div>
       )}
-
-      {/* Indicador de importación en background */}
-      {importProgress && <ImportProgressModal progress={importProgress} />}
     </div>
   );
 };

@@ -1,6 +1,5 @@
 import React from 'react';
 import { FolderSearch, Plus, BookCopy } from 'lucide-react';
-import { ThemeControls } from '../../../shared/components/ThemeControls';
 import { useThemeStore } from '../../../core/theme/useThemeStore';
 
 interface LibraryHeaderProps {
@@ -21,16 +20,11 @@ export const LibraryHeader: React.FC<LibraryHeaderProps> = ({
   return (
     <header className="relative flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4">
       {/* Título y resumen */}
-      <div className="flex items-center gap-3">
-        <div
-          className="flex h-11 w-11 items-center justify-center rounded-2xl transition-colors shadow-sm"
-          style={{
-            backgroundColor: `${primaryColor.hex}18`,
-            color: primaryColor.hex,
-          }}
-        >
-          <BookCopy className="h-5 w-5 stroke-[2]" />
-        </div>
+      <div className="flex items-center gap-2.5">
+        <BookCopy
+          className="h-6 w-6 stroke-[2] shrink-0"
+          style={{ color: primaryColor.hex }}
+        />
         <div>
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white transition-colors m-0">
             Biblioteca
@@ -45,11 +39,8 @@ export const LibraryHeader: React.FC<LibraryHeaderProps> = ({
         </div>
       </div>
 
-      {/* Controles de tema y acciones principales */}
+      {/* Acciones principales */}
       <div className="flex items-center flex-wrap gap-2.5">
-        {/* Controles de Modo Claro/Oscuro y Selector de Color Primario */}
-        <ThemeControls />
-
         {/* Botón de Escanear Carpeta (sin bordes) */}
         <button
           type="button"

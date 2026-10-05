@@ -42,9 +42,9 @@ export const LibraryFilterBar: React.FC<LibraryFilterBarProps> = ({
 
   return (
     <div className="flex flex-col gap-3 py-2">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-        {/* Chips de filtro horizontal sin bordes */}
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        {/* Chips de filtro sin ningún scroll horizontal */}
+        <div className="flex flex-wrap items-center gap-1.5">
           {FILTER_ITEMS.map((item) => {
             const isActive = filterStatus === item.id;
             const count = item.countKey ? stats[item.countKey] : undefined;
@@ -54,7 +54,7 @@ export const LibraryFilterBar: React.FC<LibraryFilterBarProps> = ({
                 key={item.id}
                 type="button"
                 onClick={() => onFilterChange(item.id)}
-                className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs transition-all duration-200 active:scale-95 ${
+                className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs transition-all duration-200 active:scale-95 ${
                   isActive
                     ? 'font-semibold text-white shadow-sm'
                     : 'bg-black/5 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 hover:bg-black/10 dark:hover:bg-white/10 hover:text-zinc-900 dark:hover:text-zinc-200'
