@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
+import { App as CapApp } from '@capacitor/app';
 import type { StoredComic } from './infrastructure/database/ComicDatabase';
 import { AppNavigation } from './shared/components/AppNavigation';
 import { FloatingBubbleMenu, type AppTab } from './shared/components/FloatingBubbleMenu';
@@ -34,10 +35,42 @@ export function App() {
     setActiveComic(comic);
   };
 
-  const handleCloseReader = () => {
+  const handleCloseReader = useCallback(() => {
     setActiveComic(null);
     loadLibrary();
-  };
+  }, [loadLibrary]);
+
+  // Manejo del botón de hacia atrás físico / gestual en Android
+  useEffect(() => {
+    let backListener: { remove: () => void } | null = null;
+
+    const setupListener = async () => {
+      backListener = await CapApp.addListener('backButton', () => {
+        // 1. Si el lector de cómics está activo, regresar a la biblioteca sin cerrar la app
+        if (activeComic) {
+          handleCloseReader();
+          return;
+        }
+
+        // 2. Si estamos en otra pestaña que no sea Inicio, volver a Inicio
+        if (activeTab !== 'home') {
+          setActiveTab('home');
+          return;
+        }
+
+        // 3. Si ya estamos en la pantalla raíz de Inicio, permitir salir de la app
+        CapApp.exitApp();
+      });
+    };
+
+    setupListener();
+
+    return () => {
+      if (backListener) {
+        backListener.remove();
+      }
+    };
+  }, [activeComic, activeTab, handleCloseReader]);
 
   // Portada destacada para el fondo global de toda la app
   const activeCoverUrl = useMemo(() => {

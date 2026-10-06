@@ -8,18 +8,21 @@ interface WebtoonViewProps {
   initialPageIndex: number;
   onPageChange: (index: number) => void;
   onToggleHud: () => void;
+  isSnapMode?: boolean;
 }
 
 interface WebtoonPageItemProps {
   comicId: string;
   pageIndex: number;
   onVisible: (index: number) => void;
+  isSnapMode: boolean;
 }
 
 const WebtoonPageItem: React.FC<WebtoonPageItemProps> = ({
   comicId,
   pageIndex,
   onVisible,
+  isSnapMode,
 }) => {
   const [url, setUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,7 +37,7 @@ const WebtoonPageItem: React.FC<WebtoonPageItemProps> = ({
         if (entry.isIntersecting) {
           onVisible(pageIndex);
 
-          // Cargar URL si aún no está cargada
+          // Cargar URL de la página si aún no se ha obtenido
           if (!url) {
             readerCache
               .getPageUrl(comicId, pageIndex)
@@ -51,8 +54,8 @@ const WebtoonPageItem: React.FC<WebtoonPageItemProps> = ({
         }
       },
       {
-        rootMargin: '600px 0px 600px 0px', // Precargar páginas cercanas al viewport
-        threshold: 0.1,
+        rootMargin: '400px 0px 400px 0px',
+        threshold: 0.25,
       }
     );
 
@@ -69,19 +72,27 @@ const WebtoonPageItem: React.FC<WebtoonPageItemProps> = ({
   return (
     <div
       ref={containerRef}
-      className="relative min-h-[500px] w-full max-w-3xl mx-auto flex items-center justify-center bg-black"
+      className={`relative w-full flex items-center justify-center bg-black ${
+        isSnapMode
+          ? 'h-screen snap-start snap-always'
+          : 'min-h-[600px]'
+      }`}
     >
       {url ? (
         <img
           src={url}
           alt={`Página ${pageIndex + 1}`}
           loading="lazy"
-          className="w-full h-auto block select-none"
+          className={
+            isSnapMode
+              ? 'max-h-screen w-auto max-w-full object-contain block select-none pointer-events-none'
+              : 'w-full h-auto max-w-3xl block select-none pointer-events-none'
+          }
           draggable={false}
         />
       ) : isLoading ? (
-        <div className="flex h-96 w-full items-center justify-center bg-zinc-950/60">
-          <Loader2 className="h-6 w-6 animate-spin text-purple-500/50" />
+        <div className="flex h-screen w-full items-center justify-center bg-black">
+          <Loader2 className="h-8 w-8 animate-spin text-purple-400/60" />
         </div>
       ) : null}
     </div>
@@ -94,24 +105,44 @@ export const WebtoonView: React.FC<WebtoonViewProps> = ({
   initialPageIndex,
   onPageChange,
   onToggleHud,
+  isSnapMode = true,
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const lastScrolledIndexRef = useRef<number>(-1);
 
-  // Desplazar a la página guardada en la primera carga si no es 0
+  // Desplazar a la página correspondiente cuando cambia el índice
   useEffect(() => {
-    if (initialPageIndex > 0 && containerRef.current) {
-      const pageElements = containerRef.current.children;
-      if (pageElements[initialPageIndex]) {
-        pageElements[initialPageIndex].scrollIntoView();
-      }
+    if (
+      containerRef.current &&
+      lastScrolledIndexRef.current !== initialPageIndex &&
+      containerRef.current.children[initialPageIndex]
+    ) {
+      lastScrolledIndexRef.current = initialPageIndex;
+      const target = containerRef.current.children[initialPageIndex] as HTMLElement;
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [initialPageIndex]);
+
+  const handleContainerClick = (e: React.MouseEvent) => {
+    // Si el usuario hace clic o toque simple en el área central, alternar el HUD
+    const { clientY } = e;
+    const { innerHeight } = window;
+    // Zona central (25% a 75% vertical)
+    if (clientY >= innerHeight * 0.2 && clientY <= innerHeight * 0.8) {
+      onToggleHud();
+    }
+  };
 
   return (
     <div
       ref={containerRef}
-      onClick={onToggleHud}
-      className="h-screen w-screen overflow-y-auto overflow-x-hidden bg-black select-none"
+      onClick={handleContainerClick}
+      className={`h-screen w-screen overflow-y-auto overflow-x-hidden bg-black select-none ${
+        isSnapMode ? 'snap-y snap-mandatory scroll-smooth overscroll-contain' : ''
+      }`}
+      style={{
+        WebkitOverflowScrolling: 'touch',
+      }}
     >
       {Array.from({ length: totalPages }).map((_, index) => (
         <WebtoonPageItem
@@ -119,6 +150,7 @@ export const WebtoonView: React.FC<WebtoonViewProps> = ({
           comicId={comicId}
           pageIndex={index}
           onVisible={onPageChange}
+          isSnapMode={isSnapMode}
         />
       ))}
     </div>

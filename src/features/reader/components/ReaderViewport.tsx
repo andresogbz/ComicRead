@@ -1,4 +1,5 @@
 import React from 'react';
+import { ArrowLeft, Menu } from 'lucide-react';
 import type { StoredComic } from '../../../infrastructure/database/ComicDatabase';
 import { useReader } from '../hooks/useReader';
 import { useReaderGestures } from '../hooks/useReaderGestures';
@@ -37,6 +38,8 @@ export const ReaderViewport: React.FC<ReaderViewportProps> = ({
     goToPage,
     resetZoom,
   } = useReader({ comic, onClose });
+
+  const isSnapMode = true;
 
   const handleSwipeLeft = () => {
     if (readingMode === 'rtl') {
@@ -89,6 +92,39 @@ export const ReaderViewport: React.FC<ReaderViewportProps> = ({
       ref={containerRef}
       className="fixed inset-0 z-50 flex h-screen w-screen items-center justify-center bg-black overflow-hidden select-none"
     >
+      {/* Botones flotantes de acceso permanente garantizado cuando el HUD está oculto */}
+      {!isHudVisible && (
+        <>
+          {/* Botón flotante superior izquierdo: Salir del lector */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            className="fixed top-4 left-4 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white/90 backdrop-blur-md hover:bg-black/90 hover:text-white active:scale-95 transition-all cursor-pointer border border-white/15"
+            aria-label="Cerrar y volver a la biblioteca"
+            title="Volver"
+          >
+            <ArrowLeft className="h-5 w-5 stroke-[2.5]" />
+          </button>
+
+          {/* Botón flotante superior derecho: Mostrar menú y opciones */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleHud();
+            }}
+            className="fixed top-4 right-4 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white/90 backdrop-blur-md hover:bg-black/90 hover:text-white active:scale-95 transition-all cursor-pointer border border-white/15"
+            aria-label="Mostrar controles y opciones del lector"
+            title="Opciones"
+          >
+            <Menu className="h-5 w-5 stroke-[2]" />
+          </button>
+        </>
+      )}
+
       {/* Vista de Lectura según el Modo */}
       {readingMode === 'webtoon' ? (
         <WebtoonView
@@ -97,6 +133,7 @@ export const ReaderViewport: React.FC<ReaderViewportProps> = ({
           initialPageIndex={currentPageIndex}
           onPageChange={goToPage}
           onToggleHud={toggleHud}
+          isSnapMode={isSnapMode}
         />
       ) : (
         <PagedView

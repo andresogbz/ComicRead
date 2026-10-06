@@ -31,7 +31,8 @@ export const PagedView: React.FC<PagedViewProps> = ({
 
   const handleLeftTap = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (zoom > 1) return;
+    // Si hay zoom activo, no cambiar página para permitir paneo libre
+    if (zoom > 1.1) return;
     if (isRtl) {
       onNextPage();
     } else {
@@ -41,7 +42,8 @@ export const PagedView: React.FC<PagedViewProps> = ({
 
   const handleRightTap = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (zoom > 1) return;
+    // Si hay zoom activo, no cambiar página para permitir paneo libre
+    if (zoom > 1.1) return;
     if (isRtl) {
       onPrevPage();
     } else {
@@ -93,31 +95,29 @@ export const PagedView: React.FC<PagedViewProps> = ({
         )}
       </div>
 
-      {/* Zonas de toque táctil / click (sólo activas cuando zoom === 1 para no interferir con paneo) */}
-      {zoom === 1 && (
-        <div className="absolute inset-0 flex z-30">
-          {/* Zona Izquierda (25%) */}
-          <div
-            onClick={handleLeftTap}
-            className="h-full w-1/4 cursor-pointer hover:bg-white/[0.01]"
-            aria-label={isRtl ? 'Página siguiente (Manga)' : 'Página anterior'}
-          />
+      {/* Zonas de toque táctil bien delimitadas */}
+      <div className="absolute inset-0 flex z-30 pointer-events-auto">
+        {/* Zona Izquierda (30%) - Página anterior (o siguiente en RTL) */}
+        <div
+          onClick={handleLeftTap}
+          className="h-full w-[30%] cursor-pointer hover:bg-white/[0.01]"
+          aria-label={isRtl ? 'Página siguiente (Manga)' : 'Página anterior'}
+        />
 
-          {/* Zona Central (50%) */}
-          <div
-            onClick={handleCenterTap}
-            className="h-full w-1/2 cursor-pointer"
-            aria-label="Alternar controles HUD"
-          />
+        {/* Zona Central (40%) - Alternar HUD garantizado */}
+        <div
+          onClick={handleCenterTap}
+          className="h-full w-[40%] cursor-pointer hover:bg-white/[0.01]"
+          aria-label="Alternar controles HUD"
+        />
 
-          {/* Zona Derecha (25%) */}
-          <div
-            onClick={handleRightTap}
-            className="h-full w-1/4 cursor-pointer hover:bg-white/[0.01]"
-            aria-label={isRtl ? 'Página anterior (Manga)' : 'Página siguiente'}
-          />
-        </div>
-      )}
+        {/* Zona Derecha (30%) - Página siguiente (o anterior en RTL) */}
+        <div
+          onClick={handleRightTap}
+          className="h-full w-[30%] cursor-pointer hover:bg-white/[0.01]"
+          aria-label={isRtl ? 'Página anterior (Manga)' : 'Página siguiente'}
+        />
+      </div>
     </div>
   );
 };
