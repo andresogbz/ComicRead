@@ -99,19 +99,20 @@ class ArchiveCore {
       pages: sortedPages,
     });
 
-    // Extraer portada (página 0)
+    // Extraer portada (buscar primero archivo explícito tipo 'cover', 'portada', 'front', o primera página)
     let coverBuffer: ArrayBuffer | undefined;
     let coverMimeType: string | undefined;
 
-    const firstPage = sortedPages[0];
-    const zipEntry = zip.file(firstPage);
+    const explicitCoverCbz = sortedPages.find((p) => /(?:^|[\\/_-])(?:cover|portada|front)\b/i.test(p));
+    const coverPageCbz = explicitCoverCbz || sortedPages[0];
+    const zipEntry = zip.file(coverPageCbz);
     if (zipEntry) {
       const rawData = await zipEntry.async('uint8array');
       coverBuffer = rawData.buffer.slice(
         rawData.byteOffset,
         rawData.byteOffset + rawData.byteLength
       ) as ArrayBuffer;
-      coverMimeType = getMimeTypeFromFilename(firstPage);
+      coverMimeType = getMimeTypeFromFilename(coverPageCbz);
     }
 
     return {
@@ -155,12 +156,13 @@ class ArchiveCore {
       pages: sortedPages,
     });
 
-    // Extraer portada (página 0)
+    // Extraer portada (priorizar 'cover' o primera página)
     let coverBuffer: ArrayBuffer | undefined;
     let coverMimeType: string | undefined;
 
-    const firstPage = sortedPages[0];
-    const extracted = extractor.extract({ files: [firstPage] });
+    const explicitCoverCbr = sortedPages.find((p) => /(?:^|[\\/_-])(?:cover|portada|front)\b/i.test(p));
+    const coverPageCbr = explicitCoverCbr || sortedPages[0];
+    const extracted = extractor.extract({ files: [coverPageCbr] });
     for (const arcFile of extracted.files) {
       if (arcFile.extraction) {
         const raw = arcFile.extraction;
@@ -168,7 +170,7 @@ class ArchiveCore {
           raw.byteOffset,
           raw.byteOffset + raw.byteLength
         ) as ArrayBuffer;
-        coverMimeType = getMimeTypeFromFilename(firstPage);
+        coverMimeType = getMimeTypeFromFilename(coverPageCbr);
         break;
       }
     }

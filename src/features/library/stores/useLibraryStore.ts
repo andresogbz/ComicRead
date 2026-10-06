@@ -3,6 +3,7 @@ import type { StoredComic } from '../../../infrastructure/database/ComicDatabase
 import { comicRepository } from '../../../infrastructure/database/repositories/DexieComicRepository';
 import { comicFileService } from '../services/comicFileService';
 import { bookFileService } from '../../bookReader/services/bookFileService';
+import { pdfService } from '../../reader/services/pdfService';
 import { backupService } from '../../settings/services/backupService';
 
 export type FilterStatus = 'all' | 'in_progress' | 'unread' | 'completed' | 'favorites' | 'bookmarks';
@@ -101,8 +102,17 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
         const lowerName = file.name.toLowerCase();
         const isBook = lowerName.endsWith('.epub') || lowerName.endsWith('.txt');
 
+        const isPdf = lowerName.endsWith('.pdf');
+
         if (isBook) {
           const { metadata, coverUrl } = await bookFileService.processBookFile(file);
+          const storedComic: StoredComic = {
+            ...metadata,
+            coverDataUrl: coverUrl,
+          };
+          await comicRepository.saveComic(storedComic, file);
+        } else if (isPdf) {
+          const { metadata, coverUrl } = await pdfService.processPdfFile(file);
           const storedComic: StoredComic = {
             ...metadata,
             coverDataUrl: coverUrl,

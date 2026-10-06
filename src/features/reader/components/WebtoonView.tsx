@@ -6,6 +6,7 @@ interface WebtoonViewProps {
   comicId: string;
   totalPages: number;
   initialPageIndex: number;
+  isHudVisible?: boolean;
   onPageChange: (index: number) => void;
   onToggleHud: () => void;
   isSnapMode?: boolean;
@@ -103,6 +104,7 @@ export const WebtoonView: React.FC<WebtoonViewProps> = ({
   comicId,
   totalPages,
   initialPageIndex,
+  isHudVisible = false,
   onPageChange,
   onToggleHud,
   isSnapMode = true,
@@ -124,11 +126,33 @@ export const WebtoonView: React.FC<WebtoonViewProps> = ({
   }, [initialPageIndex]);
 
   const handleContainerClick = (e: React.MouseEvent) => {
-    // Si el usuario hace clic o toque simple en el área central, alternar el HUD
-    const { clientY } = e;
-    const { innerHeight } = window;
-    // Zona central (25% a 75% vertical)
-    if (clientY >= innerHeight * 0.2 && clientY <= innerHeight * 0.8) {
+    // Si el HUD está visible, cerrarlo inmediatamente con cualquier toque
+    if (isHudVisible) {
+      onToggleHud();
+      return;
+    }
+
+    const clientY = e.clientY;
+    const height = window.innerHeight;
+
+    if (clientY < height * 0.3) {
+      // Zona superior (30%): desplazar hacia arriba
+      if (containerRef.current) {
+        containerRef.current.scrollBy({
+          top: -height * 0.75,
+          behavior: 'smooth',
+        });
+      }
+    } else if (clientY > height * 0.7) {
+      // Zona inferior (30%): desplazar hacia abajo
+      if (containerRef.current) {
+        containerRef.current.scrollBy({
+          top: height * 0.75,
+          behavior: 'smooth',
+        });
+      }
+    } else {
+      // Zona central (40%): abrir menú HUD
       onToggleHud();
     }
   };

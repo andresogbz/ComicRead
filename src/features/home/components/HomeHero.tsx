@@ -49,6 +49,7 @@ export const HomeHero: React.FC<HomeHeroProps> = ({
     );
   }
 
+  const isBook = comic.format === 'epub' || comic.format === 'txt' || comic.mediaType === 'book';
   const isCompleted = comic.progressPercentage >= 100;
   const isStarted = comic.progressPercentage > 0 && !isCompleted;
 
@@ -57,20 +58,20 @@ export const HomeHero: React.FC<HomeHeroProps> = ({
       {/* Contenido directamente sobre el lienzo de la app, sin cajas contenedoras */}
       <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 sm:gap-10">
         <div className="max-w-2xl flex-1">
-          {/* Badges de estado y formato */}
+          {/* Badges de estado, medio y formato */}
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <span
               className="rounded-full px-3 py-0.5 text-[11px] font-bold text-white"
               style={{ backgroundColor: primaryColor.hex }}
             >
-              .{comic.format}
+              {isBook ? 'Libro' : 'Cómic'} · .{comic.format}
             </span>
             <span className="rounded-full bg-white/20 backdrop-blur-sm px-3 py-0.5 text-[11px] font-medium text-white">
               {isCompleted ? 'Lectura completada' : isStarted ? 'En lectura activa' : 'Recientemente agregado'}
             </span>
             <span className="text-zinc-300 text-xs flex items-center gap-1 font-normal ml-1">
               <Clock className="h-3.5 w-3.5 stroke-[2]" />
-              {comic.totalPages} páginas
+              {isBook ? `${comic.totalPages} capítulos` : `${comic.totalPages} páginas`}
             </span>
           </div>
 
@@ -87,7 +88,11 @@ export const HomeHero: React.FC<HomeHeroProps> = ({
             <div className="flex items-center justify-between text-xs text-zinc-300 mb-1.5 font-medium">
               <span>
                 {isStarted
-                  ? `Página ${comic.lastReadPageIndex + 1} de ${comic.totalPages}`
+                  ? isBook
+                    ? `Capítulo ${comic.lastReadPageIndex + 1} de ${comic.totalPages}`
+                    : `Página ${comic.lastReadPageIndex + 1} de ${comic.totalPages}`
+                  : isBook
+                  ? `${comic.totalPages} capítulos`
                   : `${comic.totalPages} páginas`}
               </span>
               <span className="font-bold text-white">

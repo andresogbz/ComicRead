@@ -1,7 +1,7 @@
 {
   "name": "comicread",
   "private": true,
-  "version": "1.0.16",
+  "version": "1.0.17",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,6 +13,7 @@
     "@capacitor/app": "^8.1.2",
     "@capacitor/core": "^8.5.2",
     "@capacitor/filesystem": "^8.1.4",
+    "@capacitor/status-bar": "^8.0.4",
     "@tanstack/react-virtual": "^3.14.13",
     "@use-gesture/react": "^10.3.1",
     "clsx": "^2.1.1",
@@ -21,6 +22,7 @@
     "jszip": "^3.10.2",
     "lucide-react": "^1.52.0",
     "node-unrar-js": "^2.0.2",
+    "pdfjs-dist": "^6.4.299",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "tailwind-merge": "^3.7.0",

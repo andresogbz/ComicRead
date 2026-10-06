@@ -26,7 +26,9 @@ export const ComicCard: React.FC<ComicCardProps> = ({
 }) => {
   const { primaryColor } = useThemeStore();
   const [isCollectionModalOpen, setIsCollectionModalOpen] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
+  const isBook = comic.format === 'epub' || comic.format === 'txt' || comic.mediaType === 'book';
   const isCompleted = comic.progressPercentage >= 100;
   const isStarted = comic.progressPercentage > 0 && !isCompleted;
   const bookmarksCount = comic.bookmarks?.length || 0;
@@ -51,11 +53,12 @@ export const ComicCard: React.FC<ComicCardProps> = ({
       >
         {/* Contenedor plano de la Portada sin sombras ni bordes */}
         <div className="relative aspect-[2/3] w-full overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-900 transition-transform duration-200 group-hover:scale-[1.02]">
-          {comic.coverDataUrl ? (
+          {comic.coverDataUrl && !imageError ? (
             <img
               src={comic.coverDataUrl}
               alt={comic.title}
               loading="lazy"
+              onError={() => setImageError(true)}
               className="h-full w-full object-cover"
             />
           ) : (
@@ -68,11 +71,11 @@ export const ComicCard: React.FC<ComicCardProps> = ({
           {/* Gradiente superior sutil para legibilidad de botones */}
           <div className="pointer-events-none absolute inset-x-0 top-0 h-14 bg-gradient-to-b from-black/60 to-transparent" />
 
-          {/* Badges de formato y lectura planos */}
+          {/* Badges de formato y lectura planos con diferenciación Cómic / Libro */}
           <div className="absolute top-2 left-2 flex flex-col gap-1 items-start">
             <div className="flex items-center gap-1.5">
               <span className="rounded-md bg-zinc-900/90 px-2 py-0.5 text-[10px] font-semibold text-white">
-                .{comic.format.toLowerCase()}
+                {isBook ? 'Libro' : comic.format === 'pdf' ? 'PDF' : 'Cómic'} · .{comic.format.toLowerCase()}
               </span>
               {isCompleted && (
                 <span className="flex items-center gap-1 rounded-md bg-zinc-900/90 px-2 py-0.5 text-[10px] font-medium text-emerald-400">

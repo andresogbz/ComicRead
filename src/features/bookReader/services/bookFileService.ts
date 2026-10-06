@@ -66,8 +66,8 @@ export class BookFileService {
     // Directorio base de recursos relativos dentro del zip
     const opfDir = opfPath.includes('/') ? opfPath.substring(0, opfPath.lastIndexOf('/') + 1) : '';
 
-    // Manifest: mapa id -> href
-    const manifestItems = new Map<string, { href: string; mediaType: string }>();
+    // Manifest: mapa id -> href y atributos
+    const manifestItems = new Map<string, { href: string; mediaType: string; properties: string }>();
     const itemElements = opfDoc.querySelectorAll('manifest > item');
     let coverHref: string | null = null;
 
@@ -78,31 +78,115 @@ export class BookFileService {
       const properties = el.getAttribute('properties') || '';
 
       if (id && href) {
-        manifestItems.set(id, { href, mediaType });
-
-        if (
-          properties.includes('cover-image') ||
-          id.toLowerCase().includes('cover') ||
-          href.toLowerCase().includes('cover')
-        ) {
-          if (mediaType.startsWith('image/')) {
-            coverHref = href;
-          }
-        }
+        manifestItems.set(id, { href, mediaType, properties });
       }
     });
 
-    // Extraer imagen de portada si está disponible
+    // 1. Detección EPUB 3 estándar: item con properties="cover-image"
+    for (const [, item] of manifestItems) {
+      if (item.properties.includes('cover-image') && item.mediaType.startsWith('image/')) {
+        coverHref = item.href;
+        break;
+      }
+    }
+
+    // 2. Detección EPUB 2 estándar: meta name="cover" content="id_del_item"
+    if (!coverHref) {
+      const metaCover = opfDoc.querySelector('meta[name="cover"]');
+      if (metaCover) {
+        const coverId = metaCover.getAttribute('content');
+        if (coverId && manifestItems.has(coverId)) {
+          const item = manifestItems.get(coverId)!;
+          if (item.mediaType.startsWith('image/')) {
+            coverHref = item.href;
+          }
+        }
+      }
+    }
+
+    // 3. Detección por Guía (guide > reference type="cover")
+    if (!coverHref) {
+      const guideCover = opfDoc.querySelector('guide > reference[type="cover"]');
+      if (guideCover) {
+        const guideHref = guideCover.getAttribute('href');
+        if (guideHref) {
+          const cleanHref = guideHref.split('#')[0];
+          // Si el href apunta directo a una imagen
+          if (/\.(jpe?g|png|webp|avif)$/i.test(cleanHref)) {
+            coverHref = cleanHref;
+          } else {
+            // Si apunta a un archivo XHTML de portada, parsear la imagen interna
+            const fullGuidePath = this.resolvePath(opfDir, cleanHref);
+            const coverHtmlEntry = this.findZipEntry(zip, fullGuidePath);
+            if (coverHtmlEntry) {
+              try {
+                const coverHtmlText = await coverHtmlEntry.async('text');
+                const htmlDoc = new DOMParser().parseFromString(coverHtmlText, 'text/html');
+                const embeddedImg = htmlDoc.querySelector('img, image');
+                const imgSrc = embeddedImg?.getAttribute('src') || embeddedImg?.getAttribute('xlink:href') || embeddedImg?.getAttribute('href');
+                if (imgSrc) {
+                  const guideDir = cleanHref.includes('/') ? cleanHref.substring(0, cleanHref.lastIndexOf('/') + 1) : '';
+                  coverHref = this.resolvePath(guideDir, imgSrc);
+                }
+              } catch {
+                // Silencioso
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // 4. Detección heurística en manifest por nombre de ID o href
+    if (!coverHref) {
+      for (const [id, item] of manifestItems) {
+        if (item.mediaType.startsWith('image/')) {
+          const lowerId = id.toLowerCase();
+          const lowerHref = item.href.toLowerCase();
+          if (
+            lowerId.includes('cover') ||
+            lowerHref.includes('cover') ||
+            lowerId.includes('portada') ||
+            lowerHref.includes('portada') ||
+            lowerHref.includes('jacket') ||
+            lowerHref.includes('titlepage')
+          ) {
+            coverHref = item.href;
+            break;
+          }
+        }
+      }
+    }
+
+    // 5. Extraer imagen de portada encontrada
     let coverUrl: string | undefined;
     if (coverHref) {
       const fullCoverPath = this.resolvePath(opfDir, coverHref);
-      const coverEntry = zip.file(fullCoverPath);
+      const coverEntry = this.findZipEntry(zip, fullCoverPath);
       if (coverEntry) {
         const coverBlob = await coverEntry.async('blob');
         coverUrl = await this.blobToDataUrl(coverBlob);
       }
     }
 
+    // 6. Búsqueda directa en los archivos del ZIP si aún no se ha localizado
+    if (!coverUrl) {
+      const zipFiles = Object.keys(zip.files);
+      const coverCandidate = zipFiles.find((fname) =>
+        /(?:^|[\\/])(?:cover|portada|front|jacket|titlepage)\.(?:jpe?g|png|webp)$/i.test(fname) &&
+        !zip.files[fname].dir
+      );
+
+      if (coverCandidate) {
+        const coverEntry = zip.files[coverCandidate];
+        if (coverEntry) {
+          const coverBlob = await coverEntry.async('blob');
+          coverUrl = await this.blobToDataUrl(coverBlob);
+        }
+      }
+    }
+
+    // 7. Fallback vectorial estético si el libro carece de imagen
     if (!coverUrl) {
       coverUrl = this.generateBookCoverSvg(title, author);
     }
@@ -120,13 +204,19 @@ export class BookFileService {
       if (!item) continue;
 
       const fullChapterPath = this.resolvePath(opfDir, item.href);
-      const chapterEntry = zip.file(fullChapterPath);
+      const chapterEntry = this.findZipEntry(zip, fullChapterPath);
       if (!chapterEntry) continue;
 
+      const chapterDir = fullChapterPath.includes('/')
+        ? fullChapterPath.substring(0, fullChapterPath.lastIndexOf('/') + 1)
+        : '';
+
       const rawHtml = await chapterEntry.async('text');
-      const { cleanedHtml, chapterTitle, wordCount } = this.cleanChapterHtml(
+      const { cleanedHtml, chapterTitle, wordCount } = await this.cleanChapterHtml(
         rawHtml,
-        chapterIndex + 1
+        chapterIndex + 1,
+        zip,
+        chapterDir
       );
 
       // Si el capítulo contiene texto relevante
@@ -303,16 +393,19 @@ export class BookFileService {
   }
 
   /**
-   * Sanitiza el HTML del capítulo de EPUB reteniendo formato semántico para máxima personalización.
+   * Sanitiza el HTML del capítulo de EPUB reteniendo formato semántico para máxima personalización
+   * e inserta imágenes resueltas desde el propio archivo ZIP del libro.
    */
-  private cleanChapterHtml(
+  private async cleanChapterHtml(
     rawHtml: string,
-    defaultChapterNum: number
-  ): {
+    defaultChapterNum: number,
+    zip?: any,
+    chapterDir: string = ''
+  ): Promise<{
     cleanedHtml: string;
     chapterTitle: string;
     wordCount: number;
-  } {
+  }> {
     const parser = new DOMParser();
     const doc = parser.parseFromString(rawHtml, 'text/html');
 
@@ -328,12 +421,41 @@ export class BookFileService {
       return { cleanedHtml: '<p></p>', chapterTitle, wordCount: 0 };
     }
 
+    // Resolver imágenes internas si el zip está disponible
+    if (zip) {
+      const imgElements = Array.from(body.querySelectorAll('img, image'));
+      for (const img of imgElements) {
+        const rawSrc = img.getAttribute('src') || img.getAttribute('xlink:href') || img.getAttribute('href');
+        if (rawSrc && !rawSrc.startsWith('data:') && !rawSrc.startsWith('http://') && !rawSrc.startsWith('https://')) {
+          const resolvedImgPath = this.resolvePath(chapterDir, rawSrc);
+          const imgEntry = this.findZipEntry(zip, resolvedImgPath);
+          if (imgEntry) {
+            try {
+              const blob = await imgEntry.async('blob');
+              const dataUrl = await this.blobToDataUrl(blob);
+              img.setAttribute('src', dataUrl);
+              img.removeAttribute('srcset');
+              img.removeAttribute('width');
+              img.removeAttribute('height');
+              img.setAttribute('class', 'max-w-full h-auto mx-auto my-3 block rounded-md object-contain');
+            } catch {
+              // Silencioso
+            }
+          }
+        }
+      }
+    }
+
     // Convertir elementos a estructura semántica limpia
     const textContent = body.textContent || '';
     const wordCount = textContent.split(/\s+/).filter(Boolean).length;
 
     // Normalizar clases e inline styles en los hijos
-    const allowedTags = new Set(['p', 'h1', 'h2', 'h3', 'h4', 'blockquote', 'em', 'strong', 'b', 'i', 'span', 'ul', 'ol', 'li']);
+    const allowedTags = new Set([
+      'p', 'h1', 'h2', 'h3', 'h4', 'blockquote',
+      'em', 'strong', 'b', 'i', 'span', 'ul', 'ol', 'li',
+      'img', 'figure', 'figcaption', 'hr'
+    ]);
     const elements = Array.from(body.getElementsByTagName('*'));
 
     elements.forEach((el) => {
@@ -342,7 +464,7 @@ export class BookFileService {
         // Eliminar tags no estándar conservando texto
         el.removeAttribute('style');
         el.removeAttribute('class');
-      } else {
+      } else if (tag !== 'img') {
         el.removeAttribute('style');
         el.removeAttribute('class');
       }
@@ -443,6 +565,22 @@ export class BookFileService {
       reader.onerror = reject;
       reader.readAsDataURL(blob);
     });
+  }
+
+  /**
+   * Busca un archivo dentro del ZIP de forma insensible a mayúsculas y normalizando separadores.
+   */
+  private findZipEntry(zip: JSZip, targetPath: string): JSZip.JSZipObject | null {
+    const exact = zip.file(targetPath);
+    if (exact) return exact;
+
+    const normalized = targetPath.replace(/\\/g, '/').toLowerCase();
+    for (const filename of Object.keys(zip.files)) {
+      if (filename.replace(/\\/g, '/').toLowerCase() === normalized) {
+        return zip.files[filename];
+      }
+    }
+    return null;
   }
 }
 

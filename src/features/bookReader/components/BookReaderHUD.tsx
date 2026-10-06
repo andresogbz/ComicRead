@@ -16,6 +16,8 @@ interface BookReaderHUDProps {
   chapterTitle: string;
   currentChapterIndex: number;
   totalChapters: number;
+  currentPageInChapter?: number;
+  totalPagesInChapter?: number;
   isBookmarked: boolean;
   activeHighlightColor: string;
   onSelectHighlightColor: (color: string) => void;
@@ -35,6 +37,8 @@ export const BookReaderHUD: React.FC<BookReaderHUDProps> = ({
   chapterTitle,
   currentChapterIndex,
   totalChapters,
+  currentPageInChapter,
+  totalPagesInChapter,
   isBookmarked,
   activeHighlightColor,
   onSelectHighlightColor,
@@ -47,8 +51,6 @@ export const BookReaderHUD: React.FC<BookReaderHUDProps> = ({
   onOpenHighlights,
   onOpenSettings,
 }) => {
-  if (!isVisible) return null;
-
   const progressPercent =
     totalChapters > 0
       ? Math.round(((currentChapterIndex + 1) / totalChapters) * 100)
@@ -56,14 +58,21 @@ export const BookReaderHUD: React.FC<BookReaderHUDProps> = ({
 
   return (
     <>
-      {/* Barra Superior Plana */}
-      <header className="fixed inset-x-0 top-0 z-40 flex items-center justify-between px-3 sm:px-6 py-2.5 bg-black/85 text-zinc-200 backdrop-blur-md border-b border-zinc-800/80 select-none animate-in fade-in duration-150">
+      {/* Barra Superior Flotante Minimalista tipo Huawei Books */}
+      <header
+        className={`fixed inset-x-0 top-0 z-40 flex items-center justify-between px-3 sm:px-6 py-2.5 bg-black/90 text-zinc-200 backdrop-blur-md border-b border-zinc-800/80 select-none transition-all duration-200 ease-out ${
+          isVisible
+            ? 'translate-y-0 opacity-100 pointer-events-auto'
+            : '-translate-y-full opacity-0 pointer-events-none'
+        }`}
+      >
         <div className="flex items-center gap-3 min-w-0">
           <button
             type="button"
             onClick={onClose}
             className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-zinc-800 text-zinc-300 hover:text-white transition-colors cursor-pointer"
             aria-label="Volver a la biblioteca"
+            title="Volver"
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
@@ -78,7 +87,7 @@ export const BookReaderHUD: React.FC<BookReaderHUDProps> = ({
           </div>
         </div>
 
-        {/* Acciones del menú superior */}
+        {/* Acciones superiores Huawei Books */}
         <div className="flex items-center gap-1 sm:gap-2">
           {/* Marcador de lectura */}
           <button
@@ -94,7 +103,7 @@ export const BookReaderHUD: React.FC<BookReaderHUDProps> = ({
             <Bookmark className={`h-4 w-4 ${isBookmarked ? 'fill-current' : ''}`} />
           </button>
 
-          {/* Índice de capítulos */}
+          {/* Índice de capítulos (TOC) */}
           <button
             type="button"
             onClick={onOpenToc}
@@ -126,8 +135,14 @@ export const BookReaderHUD: React.FC<BookReaderHUDProps> = ({
         </div>
       </header>
 
-      {/* Barra Inferior Plana */}
-      <footer className="fixed inset-x-0 bottom-0 z-40 flex flex-col gap-2 px-3 sm:px-6 py-3 bg-black/85 text-zinc-200 backdrop-blur-md border-t border-zinc-800/80 select-none animate-in fade-in duration-150">
+      {/* Barra Inferior Flotante Minimalista tipo Huawei Books */}
+      <footer
+        className={`fixed inset-x-0 bottom-0 z-40 flex flex-col gap-2 px-3 sm:px-6 py-3 bg-black/90 text-zinc-200 backdrop-blur-md border-t border-zinc-800/80 select-none transition-all duration-200 ease-out ${
+          isVisible
+            ? 'translate-y-0 opacity-100 pointer-events-auto'
+            : 'translate-y-full opacity-0 pointer-events-none'
+        }`}
+      >
         {/* Selector rápido de marcatextos */}
         <div className="flex items-center justify-between pb-1 border-b border-zinc-800/50">
           <span className="text-[10px] text-zinc-400 font-medium">
@@ -153,7 +168,7 @@ export const BookReaderHUD: React.FC<BookReaderHUDProps> = ({
           </div>
         </div>
 
-        {/* Controles de capítulo y progreso */}
+        {/* Deslizador de progreso y salto de capítulo */}
         <div className="flex items-center justify-between gap-3 pt-1">
           <button
             type="button"
@@ -172,10 +187,16 @@ export const BookReaderHUD: React.FC<BookReaderHUDProps> = ({
               max={Math.max(0, totalChapters - 1)}
               value={currentChapterIndex}
               onChange={(e) => onSeekChapter(Number(e.target.value))}
-              className="flex-1 h-1 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-amber-400"
+              className="flex-1 h-1 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-white"
             />
             <span className="text-[11px] font-mono text-zinc-400 whitespace-nowrap">
-              {currentChapterIndex + 1} / {totalChapters} ({progressPercent}%)
+              {currentChapterIndex + 1}/{totalChapters}
+              {typeof currentPageInChapter === 'number' && typeof totalPagesInChapter === 'number' && (
+                <span className="ml-1 text-zinc-500">
+                  (Pág. {currentPageInChapter + 1}/{totalPagesInChapter})
+                </span>
+              )}
+              <span className="ml-1.5 text-zinc-400 font-semibold">{progressPercent}%</span>
             </span>
           </div>
 

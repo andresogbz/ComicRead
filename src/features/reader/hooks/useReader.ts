@@ -4,6 +4,7 @@ import { comicRepository } from '../../../infrastructure/database/repositories/D
 import { readerCache } from '../services/readerCacheService';
 import { findNextComic } from '../services/chapterNavigation';
 import type { ReadingMode, FitMode, PageSpread, ColorFilter } from '../types/readerTypes';
+import { statusBarService } from '../../../shared/services/statusBarService';
 
 interface UseReaderProps {
   comic: StoredComic;
@@ -117,30 +118,14 @@ export function useReader({ comic, allComics = [], onClose }: UseReaderProps) {
     [comic.id, currentPageIndex]
   );
 
-  // Inicializar sesión de cómic en caché y Web Worker
+  // Inicializar sesión de cómic en caché y Web Worker (solo al cambiar de cómic)
   useEffect(() => {
-    let isCancelled = false;
-
-    async function init() {
-      setIsLoadingPage(true);
-      await readerCache.initSession(comic.id, comic.fileName);
-      if (isCancelled) return;
-
-      const url = await readerCache.getPageUrl(comic.id, currentPageIndex);
-      if (!isCancelled) {
-        setCurrentPageUrl(url);
-        setIsLoadingPage(false);
-        readerCache.prefetchRange(comic.id, currentPageIndex, comic.totalPages, 4);
-      }
-    }
-
-    init();
+    readerCache.initSession(comic.id, comic.fileName);
 
     return () => {
-      isCancelled = true;
       readerCache.clearAll();
     };
-  }, [comic.id, comic.fileName, currentPageIndex, comic.totalPages]);
+  }, [comic.id, comic.fileName]);
 
   // Cargar página(s) actual(es) y disparar prefetch al cambiar de página o modo doble
   useEffect(() => {
@@ -152,24 +137,29 @@ export function useReader({ comic, allComics = [], onClose }: UseReaderProps) {
     const isDoubleActive = pageSpread === 'double' && readingMode !== 'webtoon';
     const needsSecondPage = isDoubleActive && currentPageIndex > 0 && currentPageIndex + 1 < comic.totalPages;
 
-    const promises: Promise<string | null>[] = [
-      readerCache.getPageUrl(comic.id, currentPageIndex),
-      needsSecondPage ? readerCache.getPageUrl(comic.id, currentPageIndex + 1) : Promise.resolve(null),
-    ];
+    async function loadCurrentPages() {
+      try {
+        await readerCache.initSession(comic.id, comic.fileName);
+        if (isCancelled) return;
 
-    Promise.all(promises)
-      .then(([firstUrl, secondUrl]) => {
+        const [firstUrl, secondUrl] = await Promise.all([
+          readerCache.getPageUrl(comic.id, currentPageIndex),
+          needsSecondPage ? readerCache.getPageUrl(comic.id, currentPageIndex + 1) : Promise.resolve(null),
+        ]);
+
         if (!isCancelled) {
           setCurrentPageUrl(firstUrl);
           setSecondPageUrl(secondUrl);
           setIsLoadingPage(false);
-          readerCache.prefetchRange(comic.id, currentPageIndex, comic.totalPages, isDoubleActive ? 5 : 3);
+          readerCache.prefetchRange(comic.id, currentPageIndex, comic.totalPages, isDoubleActive ? 5 : 4);
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error('Error cargando página:', err);
         if (!isCancelled) setIsLoadingPage(false);
-      });
+      }
+    }
+
+    loadCurrentPages();
 
     // Guardar progreso automáticamente en IndexedDB
     comicRepository.updateProgress(comic.id, currentPageIndex, comic.totalPages);
@@ -177,7 +167,7 @@ export function useReader({ comic, allComics = [], onClose }: UseReaderProps) {
     return () => {
       isCancelled = true;
     };
-  }, [comic.id, comic.totalPages, currentPageIndex, pageSpread, readingMode]);
+  }, [comic.id, comic.fileName, comic.totalPages, currentPageIndex, pageSpread, readingMode]);
 
   // Auto-ocultar HUD tras 4 segundos de inactividad
   const resetHudTimer = useCallback(() => {
@@ -248,7 +238,10 @@ export function useReader({ comic, allComics = [], onClose }: UseReaderProps) {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().then(() => {
         setIsFullscreen(true);
-      }).catch(() => {});
+        statusBarService.enterImmersiveReader();
+      }).catch(() => {
+        statusBarService.enterImmersiveReader();
+      });
     } else {
       document.exitFullscreen().then(() => {
         setIsFullscreen(false);
@@ -258,7 +251,11 @@ export function useReader({ comic, allComics = [], onClose }: UseReaderProps) {
 
   useEffect(() => {
     const handleFsChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
+      const isFs = !!document.fullscreenElement;
+      setIsFullscreen(isFs);
+      if (isFs) {
+        statusBarService.enterImmersiveReader();
+      }
     };
     document.addEventListener('fullscreenchange', handleFsChange);
     return () => document.removeEventListener('fullscreenchange', handleFsChange);

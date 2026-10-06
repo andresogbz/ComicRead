@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { AlertCircle, X } from 'lucide-react';
 import type { StoredComic } from '../../../infrastructure/database/ComicDatabase';
 import { ComicCard } from './ComicCard';
@@ -16,6 +16,10 @@ interface LibraryGridProps {
   onScanDirectory?: () => void;
   isScanning?: boolean;
 }
+
+const isBook = (item: StoredComic) =>
+  item.format === 'epub' || item.format === 'txt' || item.mediaType === 'book';
+const isComic = (item: StoredComic) => !isBook(item);
 
 export const LibraryGrid: React.FC<LibraryGridProps> = ({
   onOpenComic,
@@ -54,6 +58,9 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({
   const isScanning = customIsScanning !== undefined ? customIsScanning : internalScanner.isScanning;
 
   const { primaryColor } = useThemeStore();
+
+  const comicsSection = useMemo(() => comics.filter(isComic), [comics]);
+  const booksSection = useMemo(() => comics.filter(isBook), [comics]);
 
   const handleToggleFavorite = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -95,7 +102,7 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({
         </div>
       )}
 
-      {/* Barra de Filtros, Sagas y Búsqueda (si hay cómics) */}
+      {/* Barra de Filtros y Búsqueda (sin saturación de pills) */}
       {allComicsCount > 0 && (
         <LibraryFilterBar
           searchQuery={searchQuery}
@@ -125,7 +132,7 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({
       ) : comics.length === 0 ? (
         <div className="flex min-h-[300px] flex-col items-center justify-center text-center">
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            No se encontraron cómics que coincidan con la búsqueda o filtro.
+            No se encontraron historias que coincidan con la búsqueda o filtro.
           </p>
           <button
             type="button"
@@ -140,8 +147,57 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({
             Limpiar filtros
           </button>
         </div>
+      ) : mediaFilter === 'all' && comicsSection.length > 0 && booksSection.length > 0 ? (
+        /* Diferenciación en secciones separadas cuando coexisten cómics y libros */
+        <div className="flex flex-col gap-10 mt-2">
+          {/* Sección de Cómics */}
+          <div>
+            <div className="flex items-center gap-2 mb-4 pb-2 border-b border-zinc-200/40 dark:border-zinc-800/40">
+              <h2 className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-white m-0">
+                Cómics
+              </h2>
+              <span className="text-xs text-zinc-500 font-normal">({comicsSection.length})</span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
+              {comicsSection.map((comic) => (
+                <ComicCard
+                  key={comic.id}
+                  comic={comic}
+                  existingCollections={collections}
+                  onOpen={onOpenComic}
+                  onToggleFavorite={handleToggleFavorite}
+                  onDelete={handleDeleteComic}
+                  onUpdateCollection={updateComicCollection}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Sección de Libros */}
+          <div>
+            <div className="flex items-center gap-2 mb-4 pb-2 border-b border-zinc-200/40 dark:border-zinc-800/40">
+              <h2 className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-white m-0">
+                Libros
+              </h2>
+              <span className="text-xs text-zinc-500 font-normal">({booksSection.length})</span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
+              {booksSection.map((book) => (
+                <ComicCard
+                  key={book.id}
+                  comic={book}
+                  existingCollections={collections}
+                  onOpen={onOpenComic}
+                  onToggleFavorite={handleToggleFavorite}
+                  onDelete={handleDeleteComic}
+                  onUpdateCollection={updateComicCollection}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
       ) : (
-        /* Cuadrícula de Cómics */
+        /* Cuadrícula única filtrada */
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6 mt-4">
           {comics.map((comic) => (
             <ComicCard

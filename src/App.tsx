@@ -15,6 +15,7 @@ import { SplashScreen } from './shared/components/SplashScreen';
 import { useLibraryStore } from './features/library/stores/useLibraryStore';
 import { useLibrary } from './features/library/hooks/useLibrary';
 import { useDirectoryScanner } from './features/library/hooks/useDirectoryScanner';
+import { statusBarService } from './shared/services/statusBarService';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<AppTab>('home');
@@ -43,14 +44,24 @@ export function App() {
     loadLibrary();
   }, [loadLibrary]);
 
-  // Recuperación automática en primer arranque tras reinstalación
+  // Recuperación automática e inicialización de la barra de estado (#0C0C0E)
   useEffect(() => {
     const initApp = async () => {
+      await statusBarService.initAppTheme();
       await backupService.checkAndRestoreOnFirstLaunch();
       await loadLibrary();
     };
     initApp();
   }, [loadLibrary]);
+
+  // Pantalla completa inmersiva (ocultar barra de estado al leer, restaurar al salir)
+  useEffect(() => {
+    if (activeComic) {
+      statusBarService.enterImmersiveReader();
+    } else {
+      statusBarService.exitImmersiveReader();
+    }
+  }, [activeComic]);
 
   // Manejo del botón de hacia atrás físico / gestual en Android
   useEffect(() => {

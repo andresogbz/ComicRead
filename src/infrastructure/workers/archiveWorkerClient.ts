@@ -10,12 +10,19 @@ interface PendingRequest<T> {
   timeoutId: ReturnType<typeof setTimeout>;
 }
 
-// Timeout reducido a 4s para conmutar rápido al motor directo si el worker está bloqueado
-const WORKER_TIMEOUT_MS = 4000;
+// Timeout saludable (25s) para permitir descompresión secuencial pesada en móviles sin cortes falsos
+const WORKER_TIMEOUT_MS = 25000;
+
+interface StoredArchive {
+  fileName: string;
+  buffer: ArrayBuffer;
+  openedInDirectCore: boolean;
+}
 
 export class ArchiveWorkerClient implements IArchiveExtractor {
   private worker: Worker | null = null;
   private pendingRequests = new Map<string, PendingRequest<any>>();
+  private activeArchives = new Map<string, StoredArchive>();
   private messageCounter = 0;
   private useFallback = false;
 
@@ -117,6 +124,17 @@ export class ArchiveWorkerClient implements IArchiveExtractor {
   }
 
   /**
+   * Asegura que archiveCore tenga abierta la sesión si el worker falla o conmuta a fallback.
+   */
+  private async ensureCoreSession(comicId: string): Promise<void> {
+    const archive = this.activeArchives.get(comicId);
+    if (archive && !archive.openedInDirectCore) {
+      await archiveCore.openArchive(comicId, archive.fileName, archive.buffer);
+      archive.openedInDirectCore = true;
+    }
+  }
+
+  /**
    * Abre e indexa un archivo .cbz o .cbr con fallback automático garantizado.
    */
   public async openArchive(
@@ -124,13 +142,21 @@ export class ArchiveWorkerClient implements IArchiveExtractor {
     fileName: string,
     fileData: ArrayBuffer
   ): Promise<ComicArchiveInfo> {
+    // Guardar copia para respaldo de fallback si el worker experimenta problemas
+    const backupBuffer = fileData.slice(0);
+    this.activeArchives.set(comicId, {
+      fileName,
+      buffer: backupBuffer,
+      openedInDirectCore: false,
+    });
+
     // Si ya sabemos que el worker no está disponible, ir directo a archiveCore
     if (this.useFallback) {
-      return archiveCore.openArchive(comicId, fileName, fileData);
+      const info = await archiveCore.openArchive(comicId, fileName, fileData);
+      const entry = this.activeArchives.get(comicId);
+      if (entry) entry.openedInDirectCore = true;
+      return info;
     }
-
-    // Copia ligera de referencia por si se necesita fallback (ya que transferables transfiere el original)
-    const backupBuffer = fileData.slice(0);
 
     try {
       return await this.sendRequest<ComicArchiveInfo>(
@@ -146,8 +172,11 @@ export class ArchiveWorkerClient implements IArchiveExtractor {
         [fileData]
       );
     } catch {
-      // Fallback transparente al motor directo
-      return archiveCore.openArchive(comicId, fileName, backupBuffer);
+      // Fallback transparente al motor directo con la copia de respaldo
+      const info = await archiveCore.openArchive(comicId, fileName, backupBuffer);
+      const entry = this.activeArchives.get(comicId);
+      if (entry) entry.openedInDirectCore = true;
+      return info;
     }
   }
 
@@ -159,6 +188,7 @@ export class ArchiveWorkerClient implements IArchiveExtractor {
     pageIndex: number
   ): Promise<ExtractedPageResult> {
     if (this.useFallback) {
+      await this.ensureCoreSession(comicId);
       return archiveCore.extractPage(comicId, pageIndex);
     }
 
@@ -172,6 +202,7 @@ export class ArchiveWorkerClient implements IArchiveExtractor {
         },
       }));
     } catch {
+      await this.ensureCoreSession(comicId);
       return archiveCore.extractPage(comicId, pageIndex);
     }
   }
@@ -191,6 +222,7 @@ export class ArchiveWorkerClient implements IArchiveExtractor {
    * Libera la sesión de cómic activa.
    */
   public async closeArchive(comicId: string): Promise<void> {
+    this.activeArchives.delete(comicId);
     archiveCore.closeArchive(comicId);
     if (!this.useFallback && this.worker) {
       this.sendRequest<void>((id) => ({

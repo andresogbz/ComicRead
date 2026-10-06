@@ -1,6 +1,6 @@
-import React from 'react';
-import { ArrowLeft, Menu } from 'lucide-react';
+import React, { useEffect } from 'react';
 import type { StoredComic } from '../../../infrastructure/database/ComicDatabase';
+import { statusBarService } from '../../../shared/services/statusBarService';
 import { useReader } from '../hooks/useReader';
 import { useReaderGestures } from '../hooks/useReaderGestures';
 import { PagedView } from './PagedView';
@@ -55,6 +55,14 @@ export const ReaderViewport: React.FC<ReaderViewportProps> = ({
     resetZoom,
   } = useReader({ comic, allComics, onClose });
 
+  // Ocultar barra de estado nativa al ingresar al lector y restaurar al salir
+  useEffect(() => {
+    statusBarService.enterImmersiveReader();
+    return () => {
+      statusBarService.exitImmersiveReader();
+    };
+  }, []);
+
   const isSnapMode = true;
 
   const handleSwipeLeft = () => {
@@ -73,12 +81,9 @@ export const ReaderViewport: React.FC<ReaderViewportProps> = ({
     }
   };
 
+  // Dos clics / doble toque: abrir o cerrar el menú de controles del lector
   const handleDoubleTap = () => {
-    if (zoom === 1) {
-      setZoom(2.2);
-    } else {
-      resetZoom();
-    }
+    toggleHud();
   };
 
   const { containerRef } = useReaderGestures({
@@ -114,38 +119,6 @@ export const ReaderViewport: React.FC<ReaderViewportProps> = ({
       ref={containerRef}
       className="fixed inset-0 z-50 flex h-screen w-screen items-center justify-center bg-black overflow-hidden select-none"
     >
-      {/* Botones flotantes de acceso permanente garantizado cuando el HUD está oculto */}
-      {!isHudVisible && (
-        <>
-          {/* Botón flotante superior izquierdo: Salir del lector */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onClose();
-            }}
-            className="fixed top-4 left-4 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white/90 hover:bg-black/90 hover:text-white active:scale-95 transition-all cursor-pointer"
-            aria-label="Cerrar y volver a la biblioteca"
-            title="Volver"
-          >
-            <ArrowLeft className="h-5 w-5 stroke-[2.5]" />
-          </button>
-
-          {/* Botón flotante superior derecho: Mostrar menú y opciones */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleHud();
-            }}
-            className="fixed top-4 right-4 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white/90 hover:bg-black/90 hover:text-white active:scale-95 transition-all cursor-pointer"
-            aria-label="Mostrar controles y opciones del lector"
-            title="Opciones"
-          >
-            <Menu className="h-5 w-5 stroke-[2]" />
-          </button>
-        </>
-      )}
 
       {/* Vista de Lectura según el Modo */}
       {readingMode === 'webtoon' ? (
@@ -153,6 +126,7 @@ export const ReaderViewport: React.FC<ReaderViewportProps> = ({
           comicId={comic.id}
           totalPages={totalPages}
           initialPageIndex={currentPageIndex}
+          isHudVisible={isHudVisible}
           onPageChange={goToPage}
           onToggleHud={toggleHud}
           isSnapMode={isSnapMode}
@@ -171,6 +145,7 @@ export const ReaderViewport: React.FC<ReaderViewportProps> = ({
           colorFilter={colorFilter}
           zoom={zoom}
           pan={pan}
+          isHudVisible={isHudVisible}
           onNextPage={nextPage}
           onPrevPage={prevPage}
           onToggleHud={toggleHud}
