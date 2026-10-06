@@ -21,9 +21,14 @@ export const ReaderViewport: React.FC<ReaderViewportProps> = ({
     totalPages,
     readingMode,
     fitMode,
+    pageSpread,
+    brightness,
+    colorFilter,
     isHudVisible,
+    isFilmstripOpen,
     isFullscreen,
     currentPageUrl,
+    secondPageUrl,
     isLoadingPage,
     zoom,
     pan,
@@ -31,7 +36,11 @@ export const ReaderViewport: React.FC<ReaderViewportProps> = ({
     setPan,
     setReadingMode,
     setFitMode,
+    setPageSpread,
+    setBrightness,
+    setColorFilter,
     toggleHud,
+    toggleFilmstrip,
     toggleFullscreen,
     nextPage,
     prevPage,
@@ -102,7 +111,7 @@ export const ReaderViewport: React.FC<ReaderViewportProps> = ({
               e.stopPropagation();
               onClose();
             }}
-            className="fixed top-4 left-4 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white/90 backdrop-blur-md hover:bg-black/90 hover:text-white active:scale-95 transition-all cursor-pointer border border-white/15"
+            className="fixed top-4 left-4 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white/90 hover:bg-black/90 hover:text-white active:scale-95 transition-all cursor-pointer"
             aria-label="Cerrar y volver a la biblioteca"
             title="Volver"
           >
@@ -116,7 +125,7 @@ export const ReaderViewport: React.FC<ReaderViewportProps> = ({
               e.stopPropagation();
               toggleHud();
             }}
-            className="fixed top-4 right-4 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white/90 backdrop-blur-md hover:bg-black/90 hover:text-white active:scale-95 transition-all cursor-pointer border border-white/15"
+            className="fixed top-4 right-4 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white/90 hover:bg-black/90 hover:text-white active:scale-95 transition-all cursor-pointer"
             aria-label="Mostrar controles y opciones del lector"
             title="Opciones"
           >
@@ -138,10 +147,15 @@ export const ReaderViewport: React.FC<ReaderViewportProps> = ({
       ) : (
         <PagedView
           pageUrl={currentPageUrl}
+          secondPageUrl={secondPageUrl}
           isLoading={isLoadingPage}
           pageIndex={currentPageIndex}
+          totalPages={totalPages}
           readingMode={readingMode}
           fitMode={fitMode}
+          pageSpread={pageSpread}
+          brightness={brightness}
+          colorFilter={colorFilter}
           zoom={zoom}
           pan={pan}
           onNextPage={nextPage}
@@ -157,13 +171,22 @@ export const ReaderViewport: React.FC<ReaderViewportProps> = ({
         totalPages={totalPages}
         readingMode={readingMode}
         fitMode={fitMode}
+        pageSpread={pageSpread}
+        brightness={brightness}
+        colorFilter={colorFilter}
         isHudVisible={isHudVisible}
+        isFilmstripOpen={isFilmstripOpen}
         isFullscreen={isFullscreen}
         zoom={zoom}
+        comicId={comic.id}
         onClose={onClose}
         onPageChange={goToPage}
         onReadingModeChange={setReadingMode}
         onFitModeChange={setFitMode}
+        onPageSpreadChange={setPageSpread}
+        onBrightnessChange={setBrightness}
+        onColorFilterChange={setColorFilter}
+        onToggleFilmstrip={toggleFilmstrip}
         onToggleFullscreen={toggleFullscreen}
         onZoomIn={handleZoomIn}
         onZoomOut={handleZoomOut}
