@@ -65,6 +65,9 @@ export const BookReaderHUD: React.FC<BookReaderHUDProps> = ({
             ? 'translate-y-0 opacity-100 pointer-events-auto'
             : '-translate-y-full opacity-0 pointer-events-none'
         }`}
+        style={{
+          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 0.5rem)',
+        }}
       >
         <div className="flex items-center gap-3 min-w-0">
           <button

@@ -22,7 +22,12 @@ export const AppNavigation: React.FC<AppNavigationProps> = ({
   const { primaryColor } = useThemeStore();
 
   return (
-    <header className="sticky top-0 z-30 w-full max-w-full bg-gradient-to-b from-black/60 via-black/20 to-transparent transition-colors">
+    <header
+      className="sticky top-0 z-30 w-full max-w-full bg-gradient-to-b from-black/70 via-black/30 to-transparent transition-colors"
+      style={{
+        paddingTop: 'env(safe-area-inset-top, 0px)',
+      }}
+    >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8 py-3.5 sm:py-4">
         {/* Logotipo de marca Go / Gomic */}
         <button

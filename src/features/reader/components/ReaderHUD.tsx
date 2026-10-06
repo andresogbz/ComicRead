@@ -97,6 +97,9 @@ export const ReaderHUD: React.FC<ReaderHUDProps> = ({
         className={`pointer-events-auto flex items-center justify-between px-4 sm:px-6 py-3.5 bg-black/90 border-b border-zinc-900 transition-transform duration-200 ${
           isHudVisible ? 'translate-y-0' : '-translate-y-full'
         }`}
+        style={{
+          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 0.5rem)',
+        }}
       >
         <div className="flex items-center gap-3">
           <button

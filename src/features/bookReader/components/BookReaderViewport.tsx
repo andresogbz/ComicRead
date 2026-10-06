@@ -340,7 +340,12 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
 
       {/* Cabecera sutil e inmersiva Huawei Books cuando el HUD está oculto */}
       {!isHudVisible && currentChapter && !isLoading && (
-        <header className="pointer-events-none absolute top-2 inset-x-0 z-20 flex items-center justify-between px-6 sm:px-10 text-[11px] font-sans opacity-40 select-none transition-opacity duration-300">
+        <header
+          className="pointer-events-none absolute top-2 inset-x-0 z-20 flex items-center justify-between px-6 sm:px-10 text-[11px] font-sans opacity-40 select-none transition-opacity duration-300"
+          style={{
+            paddingTop: 'env(safe-area-inset-top, 0px)',
+          }}
+        >
           <span className="truncate max-w-[70%]">{currentChapter.title}</span>
           <span className="font-mono text-[10px]">
             {currentChapterIndex + 1}/{totalChapters}
