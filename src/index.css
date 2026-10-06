@@ -9,25 +9,39 @@
     letter-spacing: -0.02em;
   }
 
-  /* Animaciones de paso de página 3D realista (Efecto Hoja tipo Huawei Books) */
-  .page-flip-stage {
-    perspective: 1600px;
-    perspective-origin: center center;
-    transform-style: preserve-3d;
+  /* Transiciones fluidas y limpias de página (GPU 60fps, sin deformación 3D ni parpadeos) */
+  .page-anim-container {
+    will-change: transform, opacity;
   }
 
+  /* Deslizamiento siguiente (avance hacia adelante) */
+  .page-slide-next-exit,
   .page-flip-next-exit {
-    transform-origin: left center;
-    animation: pageFlipNext 0.32s cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
+    animation: pageSlideNextExit 0.12s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
 
-  .page-flip-prev-exit {
-    transform-origin: right center;
-    animation: pageFlipPrev 0.32s cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
-  }
-
+  .page-slide-next-enter,
   .page-flip-enter {
-    animation: pageFadeReveal 0.32s ease-out forwards;
+    animation: pageSlideNextEnter 0.14s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Deslizamiento anterior (retroceso) */
+  .page-slide-prev-exit,
+  .page-flip-prev-exit {
+    animation: pageSlidePrevExit 0.12s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  .page-slide-prev-enter {
+    animation: pageSlidePrevEnter 0.14s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Desvanecimiento puro (Fade suave / Disolver) */
+  .page-fade-exit {
+    animation: pageFadeExit 0.10s ease-in forwards;
+  }
+
+  .page-fade-enter {
+    animation: pageFadeEnter 0.12s ease-out forwards;
   }
 
   .book-prose img {
@@ -53,44 +67,65 @@
   }
 }
 
-@keyframes pageFlipNext {
+@keyframes pageSlideNextExit {
   0% {
-    transform: rotateY(0deg) scale(1);
+    transform: translateX(0);
     opacity: 1;
   }
-  45% {
-    transform: rotateY(-28deg) translateX(-6%) scale(0.98);
-    opacity: 0.9;
-  }
   100% {
-    transform: rotateY(-80deg) translateX(-18%) scale(0.94);
+    transform: translateX(-28px);
     opacity: 0;
   }
 }
 
-@keyframes pageFlipPrev {
+@keyframes pageSlideNextEnter {
   0% {
-    transform: rotateY(0deg) scale(1);
-    opacity: 1;
-  }
-  45% {
-    transform: rotateY(28deg) translateX(6%) scale(0.98);
-    opacity: 0.9;
+    transform: translateX(28px);
+    opacity: 0;
   }
   100% {
-    transform: rotateY(80deg) translateX(18%) scale(0.94);
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pageSlidePrevExit {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(28px);
     opacity: 0;
   }
 }
 
-@keyframes pageFadeReveal {
-  from {
-    opacity: 0.5;
-    transform: scale(0.98);
+@keyframes pageSlidePrevEnter {
+  0% {
+    transform: translateX(-28px);
+    opacity: 0;
   }
-  to {
+  100% {
+    transform: translateX(0);
     opacity: 1;
-    transform: scale(1);
+  }
+}
+
+@keyframes pageFadeExit {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes pageFadeEnter {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }
 

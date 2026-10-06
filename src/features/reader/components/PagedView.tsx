@@ -176,14 +176,14 @@ export const PagedView: React.FC<PagedViewProps> = ({
       className="relative flex h-screen w-screen items-center justify-center overflow-hidden bg-black select-none touch-none cursor-pointer"
       aria-label="Lienzo de lectura (toques laterales pasan página, centro abre menú)"
     >
-      {/* Escenario 3D para el efecto hoja tipo Huawei Books */}
-      <div className="relative flex h-full w-full items-center justify-center page-flip-stage">
+      {/* Escenario de lectura con transiciones fluidas */}
+      <div className="relative flex h-full w-full items-center justify-center">
         <div
-          className={`flex h-full w-full items-center justify-center transition-transform duration-75 ease-out ${
+          className={`flex h-full w-full items-center justify-center transition-transform duration-75 ease-out page-anim-container ${
             flipAnimation === 'next'
-              ? 'page-flip-next-exit'
+              ? 'page-slide-next-exit'
               : flipAnimation === 'prev'
-              ? 'page-flip-prev-exit'
+              ? 'page-slide-prev-exit'
               : ''
           }`}
           style={{

@@ -258,6 +258,59 @@ export const BookSettingsModal: React.FC<BookSettingsModalProps> = ({
               </button>
             </div>
           </div>
+
+          {/* 8. Animación de página (solo en modo paginado) */}
+          {preferences.readingMode === 'paged' && (
+            <div className="flex items-center justify-between pt-2 border-t border-zinc-800/80">
+              <div className="flex flex-col">
+                <span className="text-[11px] font-medium text-zinc-400">Paso de página</span>
+                <span className="text-[10px] text-zinc-500">
+                  {preferences.pageTransition === 'fade'
+                    ? 'Desvanecimiento suave'
+                    : preferences.pageTransition === 'none'
+                    ? 'Sin animación'
+                    : 'Deslizamiento fluido'}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => onUpdatePreferences({ pageTransition: 'slide' })}
+                  className={`px-2.5 py-1 text-xs transition-colors cursor-pointer ${
+                    (preferences.pageTransition ?? 'slide') === 'slide'
+                      ? 'bg-zinc-800 text-amber-400 font-semibold'
+                      : 'bg-zinc-900 text-zinc-400 hover:text-zinc-200'
+                  }`}
+                >
+                  Deslizar
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => onUpdatePreferences({ pageTransition: 'fade' })}
+                  className={`px-2.5 py-1 text-xs transition-colors cursor-pointer ${
+                    preferences.pageTransition === 'fade'
+                      ? 'bg-zinc-800 text-amber-400 font-semibold'
+                      : 'bg-zinc-900 text-zinc-400 hover:text-zinc-200'
+                  }`}
+                >
+                  Disolver
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => onUpdatePreferences({ pageTransition: 'none' })}
+                  className={`px-2.5 py-1 text-xs transition-colors cursor-pointer ${
+                    preferences.pageTransition === 'none'
+                      ? 'bg-zinc-800 text-amber-400 font-semibold'
+                      : 'bg-zinc-900 text-zinc-400 hover:text-zinc-200'
+                  }`}
+                >
+                  Ninguna
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

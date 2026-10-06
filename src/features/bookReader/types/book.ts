@@ -79,6 +79,8 @@ export const BOOK_THEMES: Record<BookTheme, BookThemeConfig> = {
 
 export type BookFontFamily = 'serif' | 'sans' | 'mono';
 
+export type BookPageTransition = 'slide' | 'fade' | 'none';
+
 export interface BookPreferences {
   theme: BookTheme;
   fontFamily: BookFontFamily;
@@ -87,6 +89,7 @@ export interface BookPreferences {
   marginSize: 'compact' | 'normal' | 'wide';
   readingMode: 'paged' | 'scroll';
   columnCount: 1 | 2;
+  pageTransition?: BookPageTransition;
 }
 
 export const DEFAULT_BOOK_PREFERENCES: BookPreferences = {
@@ -97,6 +100,7 @@ export const DEFAULT_BOOK_PREFERENCES: BookPreferences = {
   marginSize: 'normal',
   readingMode: 'paged',
   columnCount: 1,
+  pageTransition: 'slide',
 };
 
 export interface HighlightColorOption {

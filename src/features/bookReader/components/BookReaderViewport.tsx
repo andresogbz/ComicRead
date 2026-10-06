@@ -64,6 +64,8 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
 
   // Medición dinámica del contenedor del lector
   const [containerWidth, setContainerWidth] = useState<number>(0);
+  const viewportWrapperRef = useRef<HTMLDivElement>(null);
+  const lastWidthRef = useRef<number>(0);
 
   // Determinar si realmente se renderizan 2 columnas:
   // Solo si el usuario lo configuró explícitamente (columnCount === 2)
@@ -76,7 +78,15 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
   // Paginación en capítulo estilo Huawei Books
   const [pageInChapter, setPageInChapter] = useState(0);
   const [totalPagesInChapter, setTotalPagesInChapter] = useState(1);
-  const [flipAnimation, setFlipAnimation] = useState<'next' | 'prev' | 'enter' | null>(null);
+
+  // Animación fluida de paso de página (Deslizamiento o Desvanecimiento)
+  const [animState, setAnimState] = useState<{
+    direction: 'next' | 'prev';
+    phase: 'exit' | 'enter';
+  } | null>(null);
+  const isAnimatingRef = useRef(false);
+
+  const transitionType = preferences.pageTransition ?? 'slide';
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const targetEndRef = useRef(false);
@@ -118,21 +128,31 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
     return html;
   }, [currentChapter, chapterHighlights]);
 
-  // Observador de dimensiones del contenedor de lectura
+  // Observador de dimensiones desacoplado: observa el wrapper exterior fijo para evitar parpadeos
   useEffect(() => {
-    const el = scrollContainerRef.current;
+    const el = viewportWrapperRef.current;
     if (!el) return;
 
     const updateSize = () => {
-      if (scrollContainerRef.current) {
-        setContainerWidth(scrollContainerRef.current.clientWidth);
+      if (viewportWrapperRef.current) {
+        const w = viewportWrapperRef.current.clientWidth;
+        if (w > 0 && Math.abs(w - lastWidthRef.current) > 2) {
+          lastWidthRef.current = w;
+          setContainerWidth(w);
+        }
       }
     };
 
     updateSize();
 
-    const ro = new ResizeObserver(() => {
-      updateSize();
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const w = entry.contentRect.width;
+        if (w > 0 && Math.abs(w - lastWidthRef.current) > 2) {
+          lastWidthRef.current = w;
+          setContainerWidth(w);
+        }
+      }
     });
     ro.observe(el);
 
@@ -218,50 +238,130 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
     }
   }, [getStride]);
 
-  // Animación 3D realista de paso de página (Efecto Hoja tipo Huawei Books)
+  // Clase CSS de animación de página fluida
+  const animationClass = useMemo(() => {
+    if (!animState || transitionType === 'none') return '';
+
+    if (transitionType === 'fade') {
+      return animState.phase === 'exit' ? 'page-fade-exit' : 'page-fade-enter';
+    }
+
+    if (animState.direction === 'next') {
+      return animState.phase === 'exit' ? 'page-slide-next-exit' : 'page-slide-next-enter';
+    } else {
+      return animState.phase === 'exit' ? 'page-slide-prev-exit' : 'page-slide-prev-enter';
+    }
+  }, [animState, transitionType]);
+
+  // Animación fluida y limpia de paso de página (Zero flicker, Zero 3D distortion)
   const turnNextPage = useCallback(() => {
-    if (flipAnimation) return;
+    if (isAnimatingRef.current) return;
 
     if (pageInChapter < totalPagesInChapter - 1) {
-      setFlipAnimation('next');
+      if (transitionType === 'none') {
+        const nextP = pageInChapter + 1;
+        setPageInChapter(nextP);
+        syncScrollPosition(nextP);
+        return;
+      }
+
+      isAnimatingRef.current = true;
+      setAnimState({ direction: 'next', phase: 'exit' });
+
       setTimeout(() => {
         const nextP = pageInChapter + 1;
         setPageInChapter(nextP);
         syncScrollPosition(nextP);
-        setFlipAnimation('enter');
-        setTimeout(() => setFlipAnimation(null), 120);
-      }, 240);
+        setAnimState({ direction: 'next', phase: 'enter' });
+
+        setTimeout(() => {
+          setAnimState(null);
+          isAnimatingRef.current = false;
+        }, 140);
+      }, 120);
     } else if (currentChapterIndex < totalChapters - 1) {
-      setFlipAnimation('next');
+      if (transitionType === 'none') {
+        nextChapter();
+        setPageInChapter(0);
+        return;
+      }
+
+      isAnimatingRef.current = true;
+      setAnimState({ direction: 'next', phase: 'exit' });
+
       setTimeout(() => {
         nextChapter();
         setPageInChapter(0);
-        setFlipAnimation(null);
-      }, 200);
+        setAnimState({ direction: 'next', phase: 'enter' });
+
+        setTimeout(() => {
+          setAnimState(null);
+          isAnimatingRef.current = false;
+        }, 140);
+      }, 120);
     }
-  }, [flipAnimation, pageInChapter, totalPagesInChapter, currentChapterIndex, totalChapters, nextChapter, syncScrollPosition]);
+  }, [
+    pageInChapter,
+    totalPagesInChapter,
+    currentChapterIndex,
+    totalChapters,
+    transitionType,
+    nextChapter,
+    syncScrollPosition,
+  ]);
 
   const turnPrevPage = useCallback(() => {
-    if (flipAnimation) return;
+    if (isAnimatingRef.current) return;
 
     if (pageInChapter > 0) {
-      setFlipAnimation('prev');
+      if (transitionType === 'none') {
+        const prevP = pageInChapter - 1;
+        setPageInChapter(prevP);
+        syncScrollPosition(prevP);
+        return;
+      }
+
+      isAnimatingRef.current = true;
+      setAnimState({ direction: 'prev', phase: 'exit' });
+
       setTimeout(() => {
         const prevP = pageInChapter - 1;
         setPageInChapter(prevP);
         syncScrollPosition(prevP);
-        setFlipAnimation('enter');
-        setTimeout(() => setFlipAnimation(null), 120);
-      }, 240);
+        setAnimState({ direction: 'prev', phase: 'enter' });
+
+        setTimeout(() => {
+          setAnimState(null);
+          isAnimatingRef.current = false;
+        }, 140);
+      }, 120);
     } else if (currentChapterIndex > 0) {
+      if (transitionType === 'none') {
+        targetEndRef.current = true;
+        prevChapter();
+        return;
+      }
+
       targetEndRef.current = true;
-      setFlipAnimation('prev');
+      isAnimatingRef.current = true;
+      setAnimState({ direction: 'prev', phase: 'exit' });
+
       setTimeout(() => {
         prevChapter();
-        setFlipAnimation(null);
-      }, 200);
+        setAnimState({ direction: 'prev', phase: 'enter' });
+
+        setTimeout(() => {
+          setAnimState(null);
+          isAnimatingRef.current = false;
+        }, 140);
+      }, 120);
     }
-  }, [flipAnimation, pageInChapter, currentChapterIndex, prevChapter, syncScrollPosition]);
+  }, [
+    pageInChapter,
+    currentChapterIndex,
+    transitionType,
+    prevChapter,
+  ]);
 
   // Toques en pantalla según zonas Huawei Books:
   // - Si el menú está abierto: cualquier toque lo cierra inmediatamente
@@ -536,20 +636,15 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
           </div>
         </div>
       ) : (
-        /* Modo Paginado Huawei Books con Animación 3D y Columnas Configurables */
-        <div className="relative flex-1 w-full h-full overflow-hidden pt-8 pb-9 flex items-center justify-center page-flip-stage">
-          <div className={`w-full h-full mx-auto flex items-center justify-center ${marginWrapperClass}`}>
+        /* Modo Paginado Huawei Books con Animación Limpia y Fluida */
+        <div className="relative flex-1 w-full h-full overflow-hidden pt-8 pb-9 flex items-center justify-center">
+          <div
+            ref={viewportWrapperRef}
+            className={`w-full h-full mx-auto flex items-center justify-center ${marginWrapperClass}`}
+          >
             <div
               ref={scrollContainerRef}
-              className={`w-full h-full overflow-hidden transition-transform duration-75 ${
-                flipAnimation === 'next'
-                  ? 'page-flip-next-exit'
-                  : flipAnimation === 'prev'
-                  ? 'page-flip-prev-exit'
-                  : flipAnimation === 'enter'
-                  ? 'page-flip-enter'
-                  : ''
-              }`}
+              className={`w-full h-full overflow-hidden page-anim-container ${animationClass}`}
             >
               <div
                 ref={contentRef}
