@@ -267,13 +267,38 @@ export function useReader({ comic, allComics = [], onClose }: UseReaderProps) {
   // Control de teclado para lectura ergonómica
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+      const isNextKey =
+        e.key === 'ArrowRight' ||
+        e.key === 'PageDown' ||
+        e.key === 'l' ||
+        e.key === 'L' ||
+        e.key === 'j' ||
+        e.key === 'J' ||
+        e.key === 'MediaTrackNext' ||
+        e.key === 'VolumeDown' ||
+        e.key === 'AudioVolumeDown';
+
+      const isPrevKey =
+        e.key === 'ArrowLeft' ||
+        e.key === 'PageUp' ||
+        e.key === 'h' ||
+        e.key === 'H' ||
+        e.key === 'k' ||
+        e.key === 'K' ||
+        e.key === 'Backspace' ||
+        e.key === 'MediaTrackPrevious' ||
+        e.key === 'VolumeUp' ||
+        e.key === 'AudioVolumeUp';
+
+      if (isNextKey) {
+        e.preventDefault();
         if (readingMode === 'rtl') {
           prevPage();
         } else {
           nextPage();
         }
-      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      } else if (isPrevKey) {
+        e.preventDefault();
         if (readingMode === 'rtl') {
           nextPage();
         } else {
