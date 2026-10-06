@@ -158,9 +158,13 @@ export const ComicCard: React.FC<ComicCardProps> = ({
           </h3>
           <div className="mt-0.5 flex items-center justify-between text-[11px] text-zinc-500 dark:text-zinc-400 font-normal">
             <span>
-              {isStarted
-                ? `Página ${comic.lastReadPageIndex + 1} de ${comic.totalPages}`
-                : `${comic.totalPages} páginas`}
+              {comic.format === 'epub' || comic.format === 'txt' || comic.mediaType === 'book'
+                ? isStarted
+                  ? `Capítulo ${comic.lastReadPageIndex + 1} de ${comic.totalPages}`
+                  : `${comic.totalPages} capítulos`
+                : isStarted
+                  ? `Página ${comic.lastReadPageIndex + 1} de ${comic.totalPages}`
+                  : `${comic.totalPages} páginas`}
             </span>
             {isStarted && (
               <span

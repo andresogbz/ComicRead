@@ -1,8 +1,8 @@
 import { useState, useCallback } from 'react';
 
-const SUPPORTED_EXTENSIONS = ['.cbz', '.cbr', '.zip', '.rar'];
+const SUPPORTED_EXTENSIONS = ['.cbz', '.cbr', '.zip', '.rar', '.epub', '.txt', '.pdf'];
 
-function isComicFile(name: string): boolean {
+function isSupportedMediaFile(name: string): boolean {
   const lower = name.toLowerCase();
   return SUPPORTED_EXTENSIONS.some((ext) => lower.endsWith(ext));
 }
@@ -17,7 +17,7 @@ export function useDirectoryScanner(onFilesFound: (files: File[]) => void) {
     async (dirHandle: any, collectedFiles: File[]) => {
       for await (const entry of dirHandle.values()) {
         if (entry.kind === 'file') {
-          if (isComicFile(entry.name)) {
+          if (isSupportedMediaFile(entry.name)) {
             const file = await entry.getFile();
             collectedFiles.push(file);
           }
@@ -45,7 +45,7 @@ export function useDirectoryScanner(onFilesFound: (files: File[]) => void) {
     input.onchange = (e: Event) => {
       const target = e.target as HTMLInputElement;
       if (target.files) {
-        const files = Array.from(target.files).filter((f) => isComicFile(f.name));
+        const files = Array.from(target.files).filter((f) => isSupportedMediaFile(f.name));
         if (files.length > 0) {
           onFilesFound(files);
         }
@@ -86,18 +86,18 @@ export function useDirectoryScanner(onFilesFound: (files: File[]) => void) {
   }, [scanDirectoryHandle, onFilesFound, triggerInputDirectoryScan]);
 
   /**
-   * Selector directo para uno o múltiples archivos de cómics (.cbz, .cbr).
+   * Selector directo para cómics y libros (.cbz, .cbr, .epub, .txt).
    */
   const pickFiles = useCallback(() => {
     const input = document.createElement('input');
     input.type = 'file';
     input.multiple = true;
-    input.accept = '.cbz,.cbr,.zip,.rar';
+    input.accept = '.cbz,.cbr,.zip,.rar,.epub,.txt,.pdf';
 
     input.onchange = (e: Event) => {
       const target = e.target as HTMLInputElement;
       if (target.files) {
-        const files = Array.from(target.files).filter((f) => isComicFile(f.name));
+        const files = Array.from(target.files).filter((f) => isSupportedMediaFile(f.name));
         if (files.length > 0) {
           onFilesFound(files);
         }

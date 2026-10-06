@@ -77,6 +77,37 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     showStatus('Memoria caché temporal y recursos de lectura liberados.');
   };
 
+  const handleSaveAutoBackupNow = async () => {
+    try {
+      setIsProcessing(true);
+      const success = await backupService.saveAutoBackupToDocuments();
+      if (success) {
+        showStatus('Copia guardada con éxito en Documents/Gomic. Tus datos sobrevivirán a la desinstalación.');
+      } else {
+        showStatus('Copia guardada en el almacenamiento local persistente.');
+      }
+    } catch (err: any) {
+      showStatus(`Error guardando auto-respaldo: ${err?.message || 'Error desconocido'}`);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleRestoreFromStorageBackup = async () => {
+    try {
+      setIsProcessing(true);
+      const result = await backupService.restoreFromStorageBackup();
+      await loadLibrary();
+      showStatus(
+        `Restauración automática exitosa: ${result.updatedCount} actualizados, ${result.restoredCount} registros recuperados.`
+      );
+    } catch (err: any) {
+      showStatus(`No se pudo restaurar: ${err?.message || 'No se encontró respaldo persistente'}`);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 py-5 sm:py-6 w-full max-w-full flex flex-col gap-8 pb-16 select-none">
       {/* Encabezado con divisor estilo menú lateral */}
@@ -240,18 +271,39 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
       </section>
 
-      {/* Sección 4: Copia de Seguridad y Restauración */}
+      {/* Sección 4: Copia de Seguridad y Persistencia */}
       <section className="pb-8 border-b border-zinc-200/80 dark:border-zinc-800/80 flex flex-col gap-4">
         <div>
           <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white m-0">
             Copia de seguridad y persistencia
           </h2>
           <p className="text-xs text-zinc-500 dark:text-zinc-400 m-0 mt-0.5">
-            Exporta o restaura todo tu historial de lectura, sagas, marcadores y configuración en un archivo ligero
+            Tus datos de lectura, libros, resaltados y sagas se guardan automáticamente en Documents/Gomic para que no se pierdan al desinstalar la app.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-4 pt-1">
+        {/* Acciones principales de auto-respaldo y archivos */}
+        <div className="flex flex-wrap items-center gap-3 pt-1">
+          <button
+            type="button"
+            onClick={handleSaveAutoBackupNow}
+            disabled={isProcessing}
+            className="flex h-10 items-center gap-2 rounded-full border border-zinc-300 dark:border-zinc-700 px-5 text-xs font-medium text-zinc-800 dark:text-zinc-200 hover:text-white hover:border-zinc-500 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
+          >
+            <Download className="h-4 w-4 stroke-[1.75]" />
+            <span>Guardar en Documents/Gomic</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleRestoreFromStorageBackup}
+            disabled={isProcessing}
+            className="flex h-10 items-center gap-2 rounded-full border border-zinc-300 dark:border-zinc-700 px-5 text-xs font-medium text-zinc-800 dark:text-zinc-200 hover:text-white hover:border-zinc-500 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
+          >
+            <Upload className="h-4 w-4 stroke-[1.75]" />
+            <span>Restaurar de Documents/Gomic</span>
+          </button>
+
           <button
             type="button"
             onClick={handleExportBackup}
@@ -259,7 +311,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             className="flex h-10 items-center gap-2 rounded-full border border-zinc-300 dark:border-zinc-700 px-5 text-xs font-medium text-zinc-800 dark:text-zinc-200 hover:text-white hover:border-zinc-500 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
           >
             <Download className="h-4 w-4 stroke-[1.75]" />
-            <span>Exportar respaldo (.json)</span>
+            <span>Exportar archivo (.json)</span>
           </button>
 
           <button
@@ -269,7 +321,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             className="flex h-10 items-center gap-2 rounded-full border border-zinc-300 dark:border-zinc-700 px-5 text-xs font-medium text-zinc-800 dark:text-zinc-200 hover:text-white hover:border-zinc-500 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
           >
             <Upload className="h-4 w-4 stroke-[1.75]" />
-            <span>Restaurar respaldo (.json)</span>
+            <span>Importar archivo (.json)</span>
           </button>
 
           <input
@@ -334,8 +386,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       {/* Sección 6: Información de la Aplicación */}
       <section className="text-xs text-zinc-500 dark:text-zinc-400 flex flex-col gap-1.5">
         <BrandLogo size="md" />
-        <span>Gomic • Versión 1.0.15 • Lector de cómics minimalista de alto rendimiento</span>
-        <span>Soporte para archivos .cbz, .cbr y formato Webtoon continuo</span>
+        <span>Gomic • Versión 1.0.16 • Lector de cómics y libros minimalista de alto rendimiento</span>
+        <span>Soporte para cómics (.cbz, .cbr) y libros (.epub, .txt) con marcatextos integrado</span>
       </section>
     </div>
   );

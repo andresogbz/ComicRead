@@ -2,9 +2,12 @@ import { create } from 'zustand';
 import type { StoredComic } from '../../../infrastructure/database/ComicDatabase';
 import { comicRepository } from '../../../infrastructure/database/repositories/DexieComicRepository';
 import { comicFileService } from '../services/comicFileService';
+import { bookFileService } from '../../bookReader/services/bookFileService';
+import { backupService } from '../../settings/services/backupService';
 
 export type FilterStatus = 'all' | 'in_progress' | 'unread' | 'completed' | 'favorites' | 'bookmarks';
 export type SortOption = 'recent' | 'title' | 'progress';
+export type MediaFilter = 'all' | 'comic' | 'book';
 
 export interface ImportProgress {
   current: number;
@@ -19,6 +22,7 @@ interface LibraryState {
   errorMessage: string | null;
   searchQuery: string;
   filterStatus: FilterStatus;
+  mediaFilter: MediaFilter;
   selectedCollection: string | null;
   sortBy: SortOption;
   selectedComic: StoredComic | null;
@@ -32,6 +36,7 @@ interface LibraryState {
   deleteComic: (id: string) => Promise<void>;
   setSearchQuery: (query: string) => void;
   setFilterStatus: (status: FilterStatus) => void;
+  setMediaFilter: (mediaFilter: MediaFilter) => void;
   setSelectedCollection: (collection: string | null) => void;
   setSortBy: (sort: SortOption) => void;
   setSelectedComic: (comic: StoredComic | null) => void;
@@ -54,6 +59,7 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
   errorMessage: null,
   searchQuery: '',
   filterStatus: 'all',
+  mediaFilter: 'all',
   selectedCollection: null,
   sortBy: 'recent',
   selectedComic: null,
@@ -92,24 +98,35 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
       });
 
       try {
-        const { metadata, archiveInfo } =
-          await comicFileService.processComicFile(file);
+        const lowerName = file.name.toLowerCase();
+        const isBook = lowerName.endsWith('.epub') || lowerName.endsWith('.txt');
 
-        let coverDataUrl: string | undefined;
-        if (archiveInfo.coverBuffer && archiveInfo.coverMimeType) {
-          const coverBlob = new Blob([archiveInfo.coverBuffer], {
-            type: archiveInfo.coverMimeType,
-          });
-          coverDataUrl = await blobToDataUrl(coverBlob);
+        if (isBook) {
+          const { metadata, coverUrl } = await bookFileService.processBookFile(file);
+          const storedComic: StoredComic = {
+            ...metadata,
+            coverDataUrl: coverUrl,
+          };
+          await comicRepository.saveComic(storedComic, file);
+        } else {
+          const { metadata, archiveInfo } =
+            await comicFileService.processComicFile(file);
+
+          let coverDataUrl: string | undefined;
+          if (archiveInfo.coverBuffer && archiveInfo.coverMimeType) {
+            const coverBlob = new Blob([archiveInfo.coverBuffer], {
+              type: archiveInfo.coverMimeType,
+            });
+            coverDataUrl = await blobToDataUrl(coverBlob);
+          }
+
+          const storedComic: StoredComic = {
+            ...metadata,
+            coverDataUrl,
+          };
+
+          await comicRepository.saveComic(storedComic, file);
         }
-
-        const storedComic: StoredComic = {
-          ...metadata,
-          coverDataUrl,
-        };
-
-        // Guardar tanto metadatos como el Blob del archivo para lectura offline
-        await comicRepository.saveComic(storedComic, file);
       } catch (err: any) {
         console.error(`Error procesando archivo ${file.name}:`, err);
         set({
@@ -120,6 +137,8 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
 
     set({ importProgress: null });
     await get().loadLibrary();
+    // Programar auto-respaldo inmediato en Documents/Gomic
+    backupService.scheduleAutoBackup();
   },
 
   toggleFavorite: async (id: string) => {
@@ -129,6 +148,7 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
         c.id === id ? { ...c, isFavorite: !c.isFavorite } : c
       ),
     }));
+    backupService.scheduleAutoBackup();
   },
 
   toggleBookmark: async (id: string, pageIndex: number) => {
@@ -138,6 +158,7 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
         c.id === id ? { ...c, bookmarks: updatedBookmarks } : c
       ),
     }));
+    backupService.scheduleAutoBackup();
   },
 
   updateComicCollection: async (id: string, collection: string | undefined) => {
@@ -147,6 +168,7 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
         c.id === id ? { ...c, collection, series: collection } : c
       ),
     }));
+    backupService.scheduleAutoBackup();
   },
 
   deleteComic: async (id: string) => {
@@ -155,10 +177,12 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
       comics: state.comics.filter((c) => c.id !== id),
       selectedComic: state.selectedComic?.id === id ? null : state.selectedComic,
     }));
+    backupService.scheduleAutoBackup();
   },
 
   setSearchQuery: (searchQuery: string) => set({ searchQuery }),
   setFilterStatus: (filterStatus: FilterStatus) => set({ filterStatus }),
+  setMediaFilter: (mediaFilter: MediaFilter) => set({ mediaFilter }),
   setSelectedCollection: (selectedCollection: string | null) => set({ selectedCollection }),
   setSortBy: (sortBy: SortOption) => set({ sortBy }),
   setSelectedComic: (selectedComic: StoredComic | null) => set({ selectedComic }),

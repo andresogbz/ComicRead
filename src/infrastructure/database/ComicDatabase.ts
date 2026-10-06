@@ -1,5 +1,5 @@
 import Dexie, { type Table } from 'dexie';
-import type { ComicFormat } from '../../domain/entities/Comic';
+import type { ComicFormat, MediaType, BookHighlight } from '../../domain/entities/Comic';
 
 export interface StoredComic {
   id: string;
@@ -7,6 +7,7 @@ export interface StoredComic {
   fileName: string;
   fileSize: number;
   format: ComicFormat;
+  mediaType?: MediaType;
   totalPages: number;
   coverDataUrl?: string;
   lastReadPageIndex: number;
@@ -16,6 +17,7 @@ export interface StoredComic {
   series?: string;
   collection?: string;
   bookmarks?: number[];
+  highlights?: BookHighlight[];
   isFavorite?: boolean;
 }
 
@@ -39,6 +41,11 @@ export class ComicDatabase extends Dexie {
 
     this.version(2).stores({
       comics: 'id, title, format, progressPercentage, lastReadAt, addedAt, isFavorite, series, collection',
+      comicFiles: 'comicId',
+    });
+
+    this.version(3).stores({
+      comics: 'id, title, format, mediaType, progressPercentage, lastReadAt, addedAt, isFavorite, series, collection',
       comicFiles: 'comicId',
     });
   }

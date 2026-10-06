@@ -9,6 +9,7 @@ export function useLibrary() {
     errorMessage,
     searchQuery,
     filterStatus,
+    mediaFilter,
     selectedCollection,
     sortBy,
     loadLibrary,
@@ -19,6 +20,7 @@ export function useLibrary() {
     deleteComic,
     setSearchQuery,
     setFilterStatus,
+    setMediaFilter,
     setSelectedCollection,
     setSortBy,
     clearError,
@@ -40,6 +42,17 @@ export function useLibrary() {
 
   const filteredComics = useMemo(() => {
     let result = [...comics];
+
+    // Filtro por tipo de medio: Cómics vs Libros
+    if (mediaFilter === 'comic') {
+      result = result.filter(
+        (c) => c.format !== 'epub' && c.format !== 'txt' && c.mediaType !== 'book'
+      );
+    } else if (mediaFilter === 'book') {
+      result = result.filter(
+        (c) => c.format === 'epub' || c.format === 'txt' || c.mediaType === 'book'
+      );
+    }
 
     // Filtro por colección activa
     if (selectedCollection) {
@@ -101,7 +114,7 @@ export function useLibrary() {
     });
 
     return result;
-  }, [comics, selectedCollection, searchQuery, filterStatus, sortBy]);
+  }, [comics, mediaFilter, selectedCollection, searchQuery, filterStatus, sortBy]);
 
   const stats = useMemo(() => {
     const total = comics.length;
@@ -111,8 +124,14 @@ export function useLibrary() {
     const completed = comics.filter((c) => c.progressPercentage >= 100).length;
     const favorites = comics.filter((c) => !!c.isFavorite).length;
     const bookmarksCount = comics.filter((c) => (c.bookmarks?.length || 0) > 0).length;
+    const comicsCount = comics.filter(
+      (c) => c.format !== 'epub' && c.format !== 'txt' && c.mediaType !== 'book'
+    ).length;
+    const booksCount = comics.filter(
+      (c) => c.format === 'epub' || c.format === 'txt' || c.mediaType === 'book'
+    ).length;
 
-    return { total, inProgress, completed, favorites, bookmarksCount };
+    return { total, inProgress, completed, favorites, bookmarksCount, comicsCount, booksCount };
   }, [comics]);
 
   return {
@@ -126,6 +145,7 @@ export function useLibrary() {
     errorMessage,
     searchQuery,
     filterStatus,
+    mediaFilter,
     sortBy,
     stats,
     importFiles,
@@ -135,6 +155,7 @@ export function useLibrary() {
     deleteComic,
     setSearchQuery,
     setFilterStatus,
+    setMediaFilter,
     setSelectedCollection,
     setSortBy,
     clearError,

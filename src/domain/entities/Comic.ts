@@ -1,4 +1,16 @@
-export type ComicFormat = 'cbz' | 'cbr' | 'pdf' | 'folder';
+export type ComicFormat = 'cbz' | 'cbr' | 'pdf' | 'folder' | 'epub' | 'txt';
+export type MediaType = 'comic' | 'book';
+
+export interface BookHighlight {
+  id: string;
+  comicId: string;
+  text: string;
+  color: string;
+  note?: string;
+  chapterIndex?: number;
+  chapterTitle?: string;
+  createdAt: number;
+}
 
 export interface ComicMetadata {
   id: string;
@@ -7,6 +19,7 @@ export interface ComicMetadata {
   filePath?: string;
   fileSize: number;
   format: ComicFormat;
+  mediaType?: MediaType;
   totalPages: number;
   coverUrl?: string;
   lastReadPageIndex: number;
@@ -14,6 +27,9 @@ export interface ComicMetadata {
   lastReadAt?: number;
   addedAt: number;
   series?: string;
+  collection?: string;
+  bookmarks?: number[];
+  highlights?: BookHighlight[];
   isFavorite?: boolean;
 }
 

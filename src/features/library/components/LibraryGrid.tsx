@@ -33,6 +33,7 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({
     errorMessage,
     searchQuery,
     filterStatus,
+    mediaFilter,
     sortBy,
     stats,
     importFiles,
@@ -41,6 +42,7 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({
     deleteComic,
     setSearchQuery,
     setFilterStatus,
+    setMediaFilter,
     setSelectedCollection,
     setSortBy,
     clearError,
@@ -100,6 +102,8 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({
           onSearchChange={setSearchQuery}
           filterStatus={filterStatus}
           onFilterChange={setFilterStatus}
+          mediaFilter={mediaFilter}
+          onMediaFilterChange={setMediaFilter}
           collections={collections}
           selectedCollection={selectedCollection}
           onCollectionChange={setSelectedCollection}

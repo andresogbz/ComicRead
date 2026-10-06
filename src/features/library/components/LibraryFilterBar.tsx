@@ -1,8 +1,9 @@
 import React from 'react';
-import { Search, X, ArrowUpDown, Folder, Bookmark } from 'lucide-react';
+import { Search, X, ArrowUpDown, Folder, Bookmark, BookOpen, Layers } from 'lucide-react';
 import type {
   FilterStatus,
   SortOption,
+  MediaFilter,
 } from '../stores/useLibraryStore';
 import { useThemeStore } from '../../../core/theme/useThemeStore';
 
@@ -11,6 +12,8 @@ interface LibraryFilterBarProps {
   onSearchChange: (query: string) => void;
   filterStatus: FilterStatus;
   onFilterChange: (status: FilterStatus) => void;
+  mediaFilter?: MediaFilter;
+  onMediaFilterChange?: (media: MediaFilter) => void;
   collections?: string[];
   selectedCollection?: string | null;
   onCollectionChange?: (collection: string | null) => void;
@@ -22,6 +25,8 @@ interface LibraryFilterBarProps {
     completed: number;
     favorites: number;
     bookmarksCount?: number;
+    comicsCount?: number;
+    booksCount?: number;
   };
 }
 
@@ -39,6 +44,8 @@ export const LibraryFilterBar: React.FC<LibraryFilterBarProps> = ({
   onSearchChange,
   filterStatus,
   onFilterChange,
+  mediaFilter = 'all',
+  onMediaFilterChange,
   collections = [],
   selectedCollection = null,
   onCollectionChange,
@@ -51,8 +58,62 @@ export const LibraryFilterBar: React.FC<LibraryFilterBarProps> = ({
   return (
     <div className="flex flex-col gap-3 py-2 pb-5 border-b border-zinc-200/80 dark:border-zinc-800/80 mb-6 select-none">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-        {/* Chips de filtro de estado */}
+        {/* Chips de filtro: Tipo de Medio y Estado */}
         <div className="flex flex-wrap items-center gap-1.5">
+          {/* Selector de medio: Cómics vs Libros */}
+          {onMediaFilterChange && (
+            <div className="flex items-center gap-1 mr-2 pr-2 border-r border-zinc-200 dark:border-zinc-800">
+              <button
+                type="button"
+                onClick={() => onMediaFilterChange('all')}
+                className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs transition-all duration-150 cursor-pointer ${
+                  mediaFilter === 'all'
+                    ? 'font-semibold text-white'
+                    : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+                }`}
+                style={mediaFilter === 'all' ? { backgroundColor: primaryColor.hex } : undefined}
+              >
+                <Layers className="h-3 w-3 stroke-[2]" />
+                <span>Todo</span>
+                <span className="text-[10px] opacity-75">{stats.total}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onMediaFilterChange('comic')}
+                className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs transition-all duration-150 cursor-pointer ${
+                  mediaFilter === 'comic'
+                    ? 'font-semibold text-white'
+                    : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+                }`}
+                style={mediaFilter === 'comic' ? { backgroundColor: primaryColor.hex } : undefined}
+              >
+                <span>Cómics</span>
+                {typeof stats.comicsCount === 'number' && (
+                  <span className="text-[10px] opacity-75">{stats.comicsCount}</span>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onMediaFilterChange('book')}
+                className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs transition-all duration-150 cursor-pointer ${
+                  mediaFilter === 'book'
+                    ? 'font-semibold text-white'
+                    : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+                }`}
+                style={mediaFilter === 'book' ? { backgroundColor: primaryColor.hex } : undefined}
+              >
+                <BookOpen className="h-3 w-3 stroke-[2]" />
+                <span>Libros</span>
+                {typeof stats.booksCount === 'number' && (
+                  <span className="text-[10px] opacity-75">{stats.booksCount}</span>
+                )}
+              </button>
+            </div>
+          )}
+
+          {/* Chips de filtro de estado */}
           {FILTER_ITEMS.map((item) => {
             const isActive = filterStatus === item.id;
             const count = item.countKey ? stats[item.countKey] : undefined;

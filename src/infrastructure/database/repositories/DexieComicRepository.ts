@@ -1,4 +1,5 @@
 import { db, type StoredComic } from '../ComicDatabase';
+import type { BookHighlight } from '../../../domain/entities/Comic';
 
 export class DexieComicRepository {
   public async getAllComics(): Promise<StoredComic[]> {
@@ -68,6 +69,47 @@ export class DexieComicRepository {
   public async getBookmarks(id: string): Promise<number[]> {
     const comic = await db.comics.get(id);
     return comic?.bookmarks || [];
+  }
+
+  public async addHighlight(comicId: string, highlight: BookHighlight): Promise<BookHighlight[]> {
+    const comic = await db.comics.get(comicId);
+    if (!comic) return [];
+
+    const currentHighlights = comic.highlights || [];
+    const newHighlights = [...currentHighlights, highlight];
+    await db.comics.update(comicId, { highlights: newHighlights });
+    return newHighlights;
+  }
+
+  public async deleteHighlight(comicId: string, highlightId: string): Promise<BookHighlight[]> {
+    const comic = await db.comics.get(comicId);
+    if (!comic) return [];
+
+    const currentHighlights = comic.highlights || [];
+    const newHighlights = currentHighlights.filter((h) => h.id !== highlightId);
+    await db.comics.update(comicId, { highlights: newHighlights });
+    return newHighlights;
+  }
+
+  public async updateHighlightNote(
+    comicId: string,
+    highlightId: string,
+    note: string
+  ): Promise<BookHighlight[]> {
+    const comic = await db.comics.get(comicId);
+    if (!comic) return [];
+
+    const currentHighlights = comic.highlights || [];
+    const newHighlights = currentHighlights.map((h) =>
+      h.id === highlightId ? { ...h, note } : h
+    );
+    await db.comics.update(comicId, { highlights: newHighlights });
+    return newHighlights;
+  }
+
+  public async getHighlights(comicId: string): Promise<BookHighlight[]> {
+    const comic = await db.comics.get(comicId);
+    return comic?.highlights || [];
   }
 
   public async updateCollection(id: string, collection: string | undefined): Promise<void> {

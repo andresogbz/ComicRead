@@ -8,6 +8,8 @@ import { LibraryGrid } from './features/library/components/LibraryGrid';
 import { AnalyticsView } from './features/analytics/components/AnalyticsView';
 import { SettingsView } from './features/settings/components/SettingsView';
 import { ReaderViewport } from './features/reader/components/ReaderViewport';
+import { BookReaderViewport } from './features/bookReader/components/BookReaderViewport';
+import { backupService } from './features/settings/services/backupService';
 import { ImportProgressModal } from './features/library/components/ImportProgressModal';
 import { SplashScreen } from './shared/components/SplashScreen';
 import { useLibraryStore } from './features/library/stores/useLibraryStore';
@@ -41,13 +43,22 @@ export function App() {
     loadLibrary();
   }, [loadLibrary]);
 
+  // Recuperación automática en primer arranque tras reinstalación
+  useEffect(() => {
+    const initApp = async () => {
+      await backupService.checkAndRestoreOnFirstLaunch();
+      await loadLibrary();
+    };
+    initApp();
+  }, [loadLibrary]);
+
   // Manejo del botón de hacia atrás físico / gestual en Android
   useEffect(() => {
     let backListener: { remove: () => void } | null = null;
 
     const setupListener = async () => {
       backListener = await CapApp.addListener('backButton', () => {
-        // 1. Si el lector de cómics está activo, regresar a la biblioteca sin cerrar la app
+        // 1. Si el lector de cómics o libros está activo, regresar a la biblioteca sin cerrar la app
         if (activeComic) {
           handleCloseReader();
           return;
@@ -109,12 +120,21 @@ export function App() {
       {/* Capa de contenido interactivo */}
       <div className="relative z-10 min-h-screen w-full max-w-full overflow-x-hidden">
         {activeComic ? (
-          <ReaderViewport
-            comic={activeComic}
-            allComics={rawComics}
-            onClose={handleCloseReader}
-            onOpenComic={handleOpenComic}
-          />
+          activeComic.format === 'epub' ||
+          activeComic.format === 'txt' ||
+          activeComic.mediaType === 'book' ? (
+            <BookReaderViewport
+              book={activeComic}
+              onClose={handleCloseReader}
+            />
+          ) : (
+            <ReaderViewport
+              comic={activeComic}
+              allComics={rawComics}
+              onClose={handleCloseReader}
+              onOpenComic={handleOpenComic}
+            />
+          )
         ) : (
           <div className="flex flex-col min-h-screen w-full max-w-full overflow-x-hidden">
             {/* Header minimalista y transparente */}
