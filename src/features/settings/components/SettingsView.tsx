@@ -4,13 +4,13 @@ import {
   Moon,
   FolderSearch,
   Plus,
-  Check,
   Download,
   Upload,
   Trash2,
   Keyboard,
+  RotateCcw,
 } from 'lucide-react';
-import { useThemeStore, PRIMARY_COLORS } from '../../../core/theme/useThemeStore';
+import { useThemeStore } from '../../../core/theme/useThemeStore';
 import { BrandLogo } from '../../../shared/components/BrandLogo';
 import { backupService } from '../services/backupService';
 import { readerCache } from '../../reader/services/readerCacheService';
@@ -27,7 +27,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   onScanDirectory,
   isScanning,
 }) => {
-  const { mode, toggleMode, primaryColor, setPrimaryColor } = useThemeStore();
+  const {
+    mode,
+    toggleMode,
+    primaryColor,
+    customBgColor,
+    setCustomBgColor,
+    setPrimaryHex,
+  } = useThemeStore();
   const loadLibrary = useLibraryStore((state) => state.loadLibrary);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -190,50 +197,119 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
       </section>
 
-      {/* Sección 2: Color de acento primario */}
+      {/* Sección 2: Color de fondo (Color Picker) */}
       <section className="pb-8 border-b border-zinc-200/80 dark:border-zinc-800/80 flex flex-col gap-4">
-        <div>
-          <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white m-0">
-            Color de acento
-          </h2>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 m-0 mt-0.5">
-            Elige el color distintivo que acompañará tus barras de progreso y botones
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white m-0">
+              Color de fondo
+            </h2>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 m-0 mt-0.5">
+              Personaliza el fondo continuo de la aplicación y la barra de estado
+            </p>
+          </div>
+          {customBgColor && (
+            <button
+              type="button"
+              onClick={() => setCustomBgColor(null)}
+              className="text-xs text-zinc-400 hover:text-zinc-200 flex items-center gap-1 cursor-pointer"
+              title="Restablecer fondo predeterminado"
+            >
+              <RotateCcw className="h-3 w-3" />
+              <span>Predeterminado</span>
+            </button>
+          )}
         </div>
 
-        <div className="flex flex-wrap items-center gap-5 pt-1">
-          {PRIMARY_COLORS.map((col) => {
-            const isSelected = col.id === primaryColor.id;
-            return (
-              <button
-                key={col.id}
-                type="button"
-                onClick={() => setPrimaryColor(col)}
-                className="flex items-center gap-2.5 transition-all cursor-pointer group"
-                title={col.name}
-              >
-                <div
-                  className={`relative flex h-6 w-6 items-center justify-center rounded-full transition-transform active:scale-95 ${
-                    isSelected ? 'ring-2 ring-offset-2 ring-zinc-500 scale-110' : 'opacity-80 group-hover:opacity-100'
-                  }`}
-                  style={{ backgroundColor: col.hex }}
-                >
-                  {isSelected && (
-                    <Check className="h-3.5 w-3.5 stroke-[3] text-white" />
-                  )}
-                </div>
-                <span
-                  className={`text-xs ${
-                    isSelected
-                      ? 'font-bold text-zinc-900 dark:text-white'
-                      : 'font-normal text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-800 dark:group-hover:text-zinc-200'
-                  }`}
-                >
-                  {col.name}
-                </span>
-              </button>
-            );
-          })}
+        <div className="flex items-center gap-4 pt-1">
+          <label className="relative flex items-center justify-center cursor-pointer group">
+            <div
+              className="h-10 w-10 rounded-full border border-zinc-300 dark:border-zinc-700 transition-transform active:scale-95 group-hover:scale-105"
+              style={{ backgroundColor: customBgColor || (mode === 'dark' ? '#0c0c0e' : '#ffffff') }}
+            />
+            <input
+              type="color"
+              value={customBgColor || (mode === 'dark' ? '#0c0c0e' : '#ffffff')}
+              onChange={(e) => setCustomBgColor(e.target.value)}
+              className="sr-only"
+            />
+          </label>
+
+          <div className="flex flex-col">
+            <input
+              type="text"
+              value={(customBgColor || (mode === 'dark' ? '#0C0C0E' : '#FFFFFF')).toUpperCase()}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (/^#[0-9A-Fa-f]{0,6}$/.test(val)) {
+                  if (val.length === 7) setCustomBgColor(val);
+                }
+              }}
+              className="font-mono text-sm font-semibold text-zinc-900 dark:text-white bg-transparent border-b border-zinc-300 dark:border-zinc-700 w-28 focus:outline-none focus:border-[var(--primary-color)]"
+              placeholder="#0C0C0E"
+            />
+            <span className="text-[11px] text-zinc-500 mt-1">
+              Toca el círculo para abrir el selector de color
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* Sección 3: Color de acentuación (Color Picker) */}
+      <section className="pb-8 border-b border-zinc-200/80 dark:border-zinc-800/80 flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white m-0">
+              Color de acentuación
+            </h2>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 m-0 mt-0.5">
+              Personaliza el color distintivo para barras de progreso, iconos y botones
+            </p>
+          </div>
+          {primaryColor.hex.toLowerCase() !== '#6366f1' && (
+            <button
+              type="button"
+              onClick={() => setPrimaryHex('#6366f1')}
+              className="text-xs text-zinc-400 hover:text-zinc-200 flex items-center gap-1 cursor-pointer"
+              title="Restablecer color de acentuación"
+            >
+              <RotateCcw className="h-3 w-3" />
+              <span>Predeterminado</span>
+            </button>
+          )}
+        </div>
+
+        <div className="flex items-center gap-4 pt-1">
+          <label className="relative flex items-center justify-center cursor-pointer group">
+            <div
+              className="h-10 w-10 rounded-full border border-zinc-300 dark:border-zinc-700 transition-transform active:scale-95 group-hover:scale-105"
+              style={{ backgroundColor: primaryColor.hex }}
+            />
+            <input
+              type="color"
+              value={primaryColor.hex}
+              onChange={(e) => setPrimaryHex(e.target.value)}
+              className="sr-only"
+            />
+          </label>
+
+          <div className="flex flex-col">
+            <input
+              type="text"
+              value={primaryColor.hex.toUpperCase()}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (/^#[0-9A-Fa-f]{0,6}$/.test(val)) {
+                  if (val.length === 7) setPrimaryHex(val);
+                }
+              }}
+              className="font-mono text-sm font-semibold text-zinc-900 dark:text-white bg-transparent border-b border-zinc-300 dark:border-zinc-700 w-28 focus:outline-none focus:border-[var(--primary-color)]"
+              placeholder="#6366F1"
+            />
+            <span className="text-[11px] text-zinc-500 mt-1">
+              Toca el círculo para abrir el selector de color
+            </span>
+          </div>
         </div>
       </section>
 

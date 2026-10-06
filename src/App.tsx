@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { App as CapApp } from '@capacitor/app';
 import type { StoredComic } from './infrastructure/database/ComicDatabase';
 import { AppNavigation } from './shared/components/AppNavigation';
@@ -109,38 +109,10 @@ export function App() {
     };
   }, [activeComic, activeTab, handleCloseReader]);
 
-  // Portada destacada para el fondo global de toda la app
-  const activeCoverUrl = useMemo(() => {
-    if (activeComic?.coverDataUrl) return activeComic.coverDataUrl;
-    if (rawComics.length === 0) return null;
-    const inProgress = rawComics
-      .filter((c) => c.progressPercentage > 0 && c.progressPercentage < 100 && c.coverDataUrl)
-      .sort((a, b) => (b.lastReadAt || 0) - (a.lastReadAt || 0));
-    if (inProgress.length > 0) return inProgress[0].coverDataUrl;
-    const withCover = rawComics.find((c) => !!c.coverDataUrl);
-    return withCover?.coverDataUrl || null;
-  }, [activeComic, rawComics]);
-
   return (
-    <div className="relative min-h-screen w-full max-w-full overflow-x-hidden bg-transparent text-[var(--text-main)] transition-colors duration-150">
-      {/* Portada como fondo de absolutamente toda la aplicación */}
-      {activeCoverUrl ? (
-        <div
-          className="fixed inset-0 z-0 pointer-events-none overflow-hidden select-none"
-          aria-hidden="true"
-        >
-          <img
-            src={activeCoverUrl}
-            alt=""
-            className="h-full w-full object-cover object-center scale-105 filter blur-[3px] transition-all duration-700 ease-out"
-          />
-          {/* Capas de gradiente y contraste para máxima legibilidad de alto contraste */}
-          <div className="absolute inset-0 bg-black/75 dark:bg-black/85 backdrop-blur-xs" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-main)]/90 via-transparent to-black/60" />
-        </div>
-      ) : (
-        <div className="fixed inset-0 z-0 bg-[var(--bg-main)] pointer-events-none" />
-      )}
+    <div className="relative min-h-screen w-full max-w-full overflow-x-hidden bg-[var(--bg-main)] text-[var(--text-main)] transition-colors duration-150">
+      {/* Fondo sólido continuo y limpio (Seamless Canvas para Edge-to-Edge status bar) */}
+      <div className="fixed inset-0 z-0 bg-[var(--bg-main)] pointer-events-none transition-colors duration-200" />
 
       {/* Capa de contenido interactivo */}
       <div className="relative z-10 min-h-screen w-full max-w-full overflow-x-hidden">
