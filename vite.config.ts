@@ -8,6 +8,9 @@ export default defineConfig({
     tailwindcss(),
     react(),
   ],
+  build: {
+    target: ['es2020', 'chrome80'],
+  },
   server: {
     host: true,
     port: 5173,

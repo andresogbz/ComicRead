@@ -1,16 +1,29 @@
-import * as pdfjsLib from 'pdfjs-dist';
-import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+import type * as PdfJsTypes from 'pdfjs-dist';
 import type { ComicMetadata } from '../../../domain/entities/Comic';
 import { comicRepository } from '../../../infrastructure/database/repositories/DexieComicRepository';
 
-// Configurar el worker de PDF.js de forma estática y offline para Vite y Capacitor
-if (typeof window !== 'undefined' && pdfjsLib.GlobalWorkerOptions) {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+let pdfLibInstance: typeof PdfJsTypes | null = null;
+
+/**
+ * Carga perezosa (lazy load) de pdfjs-dist.
+ * Evita cargar la pesada librería en el arranque inicial de la app para que la aplicación
+ * abra de inmediato y no bloquee WebViews de tablets o dispositivos más antiguos.
+ */
+async function getPdfLib(): Promise<typeof PdfJsTypes> {
+  if (!pdfLibInstance) {
+    const lib = await import('pdfjs-dist');
+    const workerUrl = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default;
+    if (typeof window !== 'undefined' && lib.GlobalWorkerOptions) {
+      lib.GlobalWorkerOptions.workerSrc = workerUrl;
+    }
+    pdfLibInstance = lib;
+  }
+  return pdfLibInstance;
 }
 
 export class PdfService {
-  private openDocs = new Map<string, pdfjsLib.PDFDocumentProxy>();
-  private openPromises = new Map<string, Promise<pdfjsLib.PDFDocumentProxy>>();
+  private openDocs = new Map<string, PdfJsTypes.PDFDocumentProxy>();
+  private openPromises = new Map<string, Promise<PdfJsTypes.PDFDocumentProxy>>();
 
   /**
    * Abre o reutiliza una instancia de PDFDocumentProxy para un cómic o libro específico.
@@ -18,7 +31,7 @@ export class PdfService {
   public async getOrOpenDocument(
     comicId: string,
     providedBuffer?: ArrayBuffer
-  ): Promise<pdfjsLib.PDFDocumentProxy> {
+  ): Promise<PdfJsTypes.PDFDocumentProxy> {
     const existing = this.openDocs.get(comicId);
     if (existing) {
       return existing;
@@ -40,6 +53,7 @@ export class PdfService {
           buffer = await fileBlob.arrayBuffer();
         }
 
+        const pdfjsLib = await getPdfLib();
         const loadingTask = pdfjsLib.getDocument({
           data: new Uint8Array(buffer),
           cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@6.4.299/cmaps/',

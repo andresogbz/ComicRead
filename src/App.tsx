@@ -47,9 +47,23 @@ export function App() {
   // Recuperación automática e inicialización de la barra de estado (#0C0C0E)
   useEffect(() => {
     const initApp = async () => {
-      await statusBarService.initAppTheme();
-      await backupService.checkAndRestoreOnFirstLaunch();
-      await loadLibrary();
+      try {
+        await statusBarService.initAppTheme();
+      } catch (err) {
+        console.warn('[App] Error al inicializar barra de estado:', err);
+      }
+
+      try {
+        await backupService.checkAndRestoreOnFirstLaunch();
+      } catch (err) {
+        console.warn('[App] Error al verificar respaldo automático:', err);
+      }
+
+      try {
+        await loadLibrary();
+      } catch (err) {
+        console.warn('[App] Error al cargar biblioteca:', err);
+      }
     };
     initApp();
   }, [loadLibrary]);
