@@ -100,14 +100,13 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
           <button
             type="button"
             onClick={() => setMediaTab('all')}
-            className={`relative pb-1 text-sm font-semibold transition-colors cursor-pointer ${
-              mediaTab === 'all'
-                ? 'text-zinc-900 dark:text-white'
-                : 'text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
-            }`}
+            className="relative pb-1 text-sm font-semibold transition-colors cursor-pointer"
+            style={{
+              color: mediaTab === 'all' ? 'var(--text-title)' : 'var(--text-muted)',
+            }}
           >
             <span>Todo</span>
-            <span className="ml-1.5 text-xs text-zinc-500 font-normal">
+            <span className="ml-1.5 text-xs font-normal opacity-80">
               {comics.length}
             </span>
             {mediaTab === 'all' && (
@@ -121,14 +120,13 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
           <button
             type="button"
             onClick={() => setMediaTab('comic')}
-            className={`relative pb-1 text-sm font-semibold transition-colors cursor-pointer ${
-              mediaTab === 'comic'
-                ? 'text-zinc-900 dark:text-white'
-                : 'text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
-            }`}
+            className="relative pb-1 text-sm font-semibold transition-colors cursor-pointer"
+            style={{
+              color: mediaTab === 'comic' ? 'var(--text-title)' : 'var(--text-muted)',
+            }}
           >
             <span>Cómics</span>
-            <span className="ml-1.5 text-xs text-zinc-500 font-normal">
+            <span className="ml-1.5 text-xs font-normal opacity-80">
               {comicsList.length}
             </span>
             {mediaTab === 'comic' && (
@@ -142,14 +140,13 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
           <button
             type="button"
             onClick={() => setMediaTab('book')}
-            className={`relative pb-1 text-sm font-semibold transition-colors cursor-pointer ${
-              mediaTab === 'book'
-                ? 'text-zinc-900 dark:text-white'
-                : 'text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
-            }`}
+            className="relative pb-1 text-sm font-semibold transition-colors cursor-pointer"
+            style={{
+              color: mediaTab === 'book' ? 'var(--text-title)' : 'var(--text-muted)',
+            }}
           >
             <span>Libros</span>
-            <span className="ml-1.5 text-xs text-zinc-500 font-normal">
+            <span className="ml-1.5 text-xs font-normal opacity-80">
               {booksList.length}
             </span>
             {mediaTab === 'book' && (
@@ -173,14 +170,18 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               >
                 Cómics en curso
               </span>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white m-0 mt-1">
+              <h2
+                className="text-xl sm:text-2xl font-bold tracking-tight m-0 mt-1"
+                style={{ color: 'var(--text-title)' }}
+              >
                 Continuar leyendo cómics
               </h2>
             </div>
             <button
               type="button"
               onClick={onGoToLibrary}
-              className="flex items-center gap-1 text-xs font-semibold text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
+              className="flex items-center gap-1 text-xs font-semibold hover:opacity-80 transition-opacity cursor-pointer"
+              style={{ color: 'var(--text-muted)' }}
             >
               <span>Ver estantería</span>
               <ArrowRight className="h-3.5 w-3.5 stroke-[2]" />
@@ -212,14 +213,18 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               >
                 Libros en curso
               </span>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white m-0 mt-1">
+              <h2
+                className="text-xl sm:text-2xl font-bold tracking-tight m-0 mt-1"
+                style={{ color: 'var(--text-title)' }}
+              >
                 Continuar lectura de libros
               </h2>
             </div>
             <button
               type="button"
               onClick={onGoToLibrary}
-              className="flex items-center gap-1 text-xs font-semibold text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
+              className="flex items-center gap-1 text-xs font-semibold hover:opacity-80 transition-opacity cursor-pointer"
+              style={{ color: 'var(--text-muted)' }}
             >
               <span>Ver estantería</span>
               <ArrowRight className="h-3.5 w-3.5 stroke-[2]" />
@@ -251,14 +256,18 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               >
                 Colección gráfica
               </span>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white m-0 mt-1">
+              <h2
+                className="text-xl sm:text-2xl font-bold tracking-tight m-0 mt-1"
+                style={{ color: 'var(--text-title)' }}
+              >
                 Cómics recientes
               </h2>
             </div>
             <button
               type="button"
               onClick={onGoToLibrary}
-              className="flex items-center gap-1 text-xs font-semibold text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
+              className="flex items-center gap-1 text-xs font-semibold hover:opacity-80 transition-opacity cursor-pointer"
+              style={{ color: 'var(--text-muted)' }}
             >
               <span>Ver catálogo</span>
               <ArrowRight className="h-3.5 w-3.5 stroke-[2]" />
@@ -290,14 +299,18 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               >
                 Biblioteca literaria
               </span>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white m-0 mt-1">
+              <h2
+                className="text-xl sm:text-2xl font-bold tracking-tight m-0 mt-1"
+                style={{ color: 'var(--text-title)' }}
+              >
                 Libros y novelas recientes
               </h2>
             </div>
             <button
               type="button"
               onClick={onGoToLibrary}
-              className="flex items-center gap-1 text-xs font-semibold text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
+              className="flex items-center gap-1 text-xs font-semibold hover:opacity-80 transition-opacity cursor-pointer"
+              style={{ color: 'var(--text-muted)' }}
             >
               <span>Ver catálogo</span>
               <ArrowRight className="h-3.5 w-3.5 stroke-[2]" />
@@ -329,7 +342,10 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               >
                 Destacados
               </span>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white m-0 mt-1">
+              <h2
+                className="text-xl sm:text-2xl font-bold tracking-tight m-0 mt-1"
+                style={{ color: 'var(--text-title)' }}
+              >
                 Cómics favoritos
               </h2>
             </div>
@@ -359,7 +375,10 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               >
                 Destacados
               </span>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white m-0 mt-1">
+              <h2
+                className="text-xl sm:text-2xl font-bold tracking-tight m-0 mt-1"
+                style={{ color: 'var(--text-title)' }}
+              >
                 Libros favoritos
               </h2>
             </div>

@@ -32,7 +32,10 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
     <div
       className={`inline-flex items-center font-brand font-medium select-none ${sizeStyles[size]} ${className}`}
     >
-      <span className="text-white transition-opacity hover:opacity-90">
+      <span
+        className="transition-opacity hover:opacity-90"
+        style={{ color: 'var(--text-title)' }}
+      >
         Go
       </span>
       {showDot && (

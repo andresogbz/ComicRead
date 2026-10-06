@@ -133,13 +133,15 @@
   :root {
     --primary-color: #6366f1;
     --bg-main: #ffffff;
-    --text-main: #111111;
+    --text-title: #09090b;
+    --text-main: #18181b;
     --text-muted: #71717a;
     --border-subtle: #e4e4e7;
   }
 
   html.dark {
     --bg-main: #0c0c0e;
+    --text-title: #ffffff;
     --text-main: #f4f4f5;
     --text-muted: #a1a1aa;
     --border-subtle: #27272a;
@@ -147,6 +149,7 @@
 
   html {
     background-color: var(--bg-main);
+    color: var(--text-main);
   }
 
   body {

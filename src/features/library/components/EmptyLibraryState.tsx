@@ -57,15 +57,24 @@ export const EmptyLibraryState: React.FC<EmptyLibraryStateProps> = ({
         )}
       </div>
 
-      <h2 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight m-0">
+      <h2
+        className="text-xl font-bold tracking-tight m-0"
+        style={{ color: 'var(--text-title)' }}
+      >
         Tu estantería está vacía
       </h2>
-      <p className="mt-2 max-w-sm text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed m-0 font-normal">
+      <p
+        className="mt-2 max-w-sm text-xs sm:text-sm leading-relaxed m-0 font-normal"
+        style={{ color: 'var(--text-muted)' }}
+      >
         Arrastra tus cómics aquí o utiliza los botones para importar archivos locales o carpetas completas.
       </p>
 
       {/* Badges de formatos planos */}
-      <div className="mt-5 flex flex-wrap items-center justify-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+      <div
+        className="mt-5 flex flex-wrap items-center justify-center gap-1.5 text-xs"
+        style={{ color: 'var(--text-muted)' }}
+      >
         <span className="rounded-full bg-zinc-200/60 dark:bg-zinc-800 px-3 py-1 font-medium">
           .cbz (zip)
         </span>

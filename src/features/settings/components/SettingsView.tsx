@@ -32,8 +32,15 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     toggleMode,
     primaryColor,
     customBgColor,
+    customTitleColor,
+    customTextColor,
+    customMutedColor,
     setCustomBgColor,
+    setCustomTitleColor,
+    setCustomTextColor,
+    setCustomMutedColor,
     setPrimaryHex,
+    resetColors,
   } = useThemeStore();
   const loadLibrary = useLibraryStore((state) => state.loadLibrary);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -128,11 +135,17 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             Configuración
           </span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-white m-0">
+        <h1
+          className="text-2xl sm:text-3xl font-bold tracking-tight m-0"
+          style={{ color: 'var(--text-title)' }}
+        >
           Ajustes generales
         </h1>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal m-0 mt-1">
-          Personaliza la iluminación, el color de acento, respaldos de lectura y controles
+        <p
+          className="text-xs font-normal m-0 mt-1"
+          style={{ color: 'var(--text-muted)' }}
+        >
+          Personaliza iluminación, colores de textos, fondo, acento y respaldos de lectura
         </p>
       </header>
 
@@ -154,11 +167,17 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       {/* Sección 1: Modo visual */}
       <section className="pb-8 border-b border-zinc-200/80 dark:border-zinc-800/80 flex flex-col gap-4">
         <div>
-          <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white m-0">
+          <h2
+            className="text-base sm:text-lg font-bold m-0"
+            style={{ color: 'var(--text-title)' }}
+          >
             Modo visual
           </h2>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 m-0 mt-0.5">
-            Selecciona la iluminación adecuada para tu lectura
+          <p
+            className="text-xs m-0 mt-0.5"
+            style={{ color: 'var(--text-muted)' }}
+          >
+            Selecciona la iluminación base para tu lectura
           </p>
         </div>
 
@@ -168,12 +187,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             onClick={() => {
               if (mode === 'dark') toggleMode();
             }}
-            className={`flex items-center gap-2 text-sm font-semibold transition-all cursor-pointer py-1 ${
-              mode === 'light'
-                ? 'text-zinc-900 dark:text-white underline underline-offset-8 decoration-2'
-                : 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
-            }`}
-            style={mode === 'light' ? { textDecorationColor: primaryColor.hex } : undefined}
+            className="flex items-center gap-2 text-sm font-semibold transition-all cursor-pointer py-1"
+            style={{
+              color: mode === 'light' ? 'var(--text-title)' : 'var(--text-muted)',
+              textDecoration: mode === 'light' ? 'underline' : 'none',
+              textUnderlineOffset: '8px',
+              textDecorationColor: primaryColor.hex,
+            }}
           >
             <Sun className="h-4 w-4 stroke-[2]" />
             <span>Modo claro</span>
@@ -184,12 +204,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             onClick={() => {
               if (mode === 'light') toggleMode();
             }}
-            className={`flex items-center gap-2 text-sm font-semibold transition-all cursor-pointer py-1 ${
-              mode === 'dark'
-                ? 'text-zinc-900 dark:text-white underline underline-offset-8 decoration-2'
-                : 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
-            }`}
-            style={mode === 'dark' ? { textDecorationColor: primaryColor.hex } : undefined}
+            className="flex items-center gap-2 text-sm font-semibold transition-all cursor-pointer py-1"
+            style={{
+              color: mode === 'dark' ? 'var(--text-title)' : 'var(--text-muted)',
+              textDecoration: mode === 'dark' ? 'underline' : 'none',
+              textUnderlineOffset: '8px',
+              textDecorationColor: primaryColor.hex,
+            }}
           >
             <Moon className="h-4 w-4 stroke-[2]" />
             <span>Modo oscuro</span>
@@ -197,118 +218,332 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
       </section>
 
-      {/* Sección 2: Color de fondo (Color Picker) */}
-      <section className="pb-8 border-b border-zinc-200/80 dark:border-zinc-800/80 flex flex-col gap-4">
-        <div className="flex items-center justify-between">
+      {/* Sección 2: Paleta y Colores (Fondo, Títulos, Textos y Acento) */}
+      <section className="pb-8 border-b border-zinc-200/80 dark:border-zinc-800/80 flex flex-col gap-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white m-0">
-              Color de fondo
+            <h2
+              className="text-base sm:text-lg font-bold m-0"
+              style={{ color: 'var(--text-title)' }}
+            >
+              Colores y personalización visual
             </h2>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 m-0 mt-0.5">
-              Personaliza el fondo continuo de la aplicación y la barra de estado
+            <p
+              className="text-xs m-0 mt-0.5"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              Selecciona el color exacto para el fondo continuo, títulos, textos normales y acento
             </p>
           </div>
-          {customBgColor && (
+
+          {(customBgColor || customTitleColor || customTextColor || customMutedColor || primaryColor.hex.toLowerCase() !== '#6366f1') && (
             <button
               type="button"
-              onClick={() => setCustomBgColor(null)}
-              className="text-xs text-zinc-400 hover:text-zinc-200 flex items-center gap-1 cursor-pointer"
-              title="Restablecer fondo predeterminado"
+              onClick={resetColors}
+              className="flex items-center gap-1.5 text-xs font-medium py-1 px-2.5 rounded-lg border border-zinc-300/60 dark:border-zinc-700/60 hover:opacity-80 transition-opacity cursor-pointer self-start sm:self-center"
+              style={{ color: 'var(--text-muted)' }}
+              title="Restablecer toda la paleta a los valores originales"
             >
-              <RotateCcw className="h-3 w-3" />
-              <span>Predeterminado</span>
+              <RotateCcw className="h-3.5 w-3.5" />
+              <span>Restablecer todo</span>
             </button>
           )}
         </div>
 
-        <div className="flex items-center gap-4 pt-1">
-          <label className="relative flex items-center justify-center cursor-pointer group">
-            <div
-              className="h-10 w-10 rounded-full border border-zinc-300 dark:border-zinc-700 transition-transform active:scale-95 group-hover:scale-105"
-              style={{ backgroundColor: customBgColor || (mode === 'dark' ? '#0c0c0e' : '#ffffff') }}
-            />
-            <input
-              type="color"
-              value={customBgColor || (mode === 'dark' ? '#0c0c0e' : '#ffffff')}
-              onChange={(e) => setCustomBgColor(e.target.value)}
-              className="sr-only"
-            />
-          </label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-1">
+          {/* 1. Color de Fondo */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xs sm:text-sm font-semibold m-0" style={{ color: 'var(--text-title)' }}>
+                  Color de fondo
+                </h3>
+                <p className="text-[11px] sm:text-xs m-0 mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                  Lienzo de la app y barra de estado
+                </p>
+              </div>
+              {customBgColor && (
+                <button
+                  type="button"
+                  onClick={() => setCustomBgColor(null)}
+                  className="text-xs flex items-center gap-1 hover:opacity-80 transition-opacity cursor-pointer"
+                  style={{ color: 'var(--text-muted)' }}
+                >
+                  <RotateCcw className="h-3 w-3" />
+                  <span>Predeterminado</span>
+                </button>
+              )}
+            </div>
 
-          <div className="flex flex-col">
-            <input
-              type="text"
-              value={(customBgColor || (mode === 'dark' ? '#0C0C0E' : '#FFFFFF')).toUpperCase()}
-              onChange={(e) => {
-                const val = e.target.value;
-                if (/^#[0-9A-Fa-f]{0,6}$/.test(val)) {
-                  if (val.length === 7) setCustomBgColor(val);
-                }
-              }}
-              className="font-mono text-sm font-semibold text-zinc-900 dark:text-white bg-transparent border-b border-zinc-300 dark:border-zinc-700 w-28 focus:outline-none focus:border-[var(--primary-color)]"
-              placeholder="#0C0C0E"
-            />
-            <span className="text-[11px] text-zinc-500 mt-1">
-              Toca el círculo para abrir el selector de color
-            </span>
+            <div className="flex items-center gap-3 pt-0.5">
+              <label className="relative flex items-center justify-center cursor-pointer group shrink-0">
+                <div
+                  className="h-9 w-9 rounded-full border border-zinc-300/60 dark:border-zinc-700/60 transition-transform active:scale-95 group-hover:scale-105"
+                  style={{ backgroundColor: customBgColor || (mode === 'dark' ? '#0c0c0e' : '#ffffff') }}
+                />
+                <input
+                  type="color"
+                  value={customBgColor || (mode === 'dark' ? '#0c0c0e' : '#ffffff')}
+                  onChange={(e) => setCustomBgColor(e.target.value)}
+                  className="sr-only"
+                />
+              </label>
+
+              <div className="flex flex-col">
+                <input
+                  type="text"
+                  value={(customBgColor || (mode === 'dark' ? '#0C0C0E' : '#FFFFFF')).toUpperCase()}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (/^#[0-9A-Fa-f]{0,6}$/.test(val)) {
+                      if (val.length === 7) setCustomBgColor(val);
+                    }
+                  }}
+                  className="font-mono text-xs font-semibold bg-transparent border-b border-zinc-300 dark:border-zinc-700 w-24 focus:outline-none"
+                  style={{ color: 'var(--text-title)', borderBottomColor: primaryColor.hex }}
+                  placeholder="#0C0C0E"
+                />
+                <span className="text-[10px] mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                  Toca el círculo para selector
+                </span>
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
 
-      {/* Sección 3: Color de acentuación (Color Picker) */}
-      <section className="pb-8 border-b border-zinc-200/80 dark:border-zinc-800/80 flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white m-0">
-              Color de acentuación
-            </h2>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 m-0 mt-0.5">
-              Personaliza el color distintivo para barras de progreso, iconos y botones
-            </p>
+          {/* 2. Color de Títulos */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xs sm:text-sm font-semibold m-0" style={{ color: 'var(--text-title)' }}>
+                  Color de títulos
+                </h3>
+                <p className="text-[11px] sm:text-xs m-0 mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                  Títulos de obras, secciones y logo
+                </p>
+              </div>
+              {customTitleColor && (
+                <button
+                  type="button"
+                  onClick={() => setCustomTitleColor(null)}
+                  className="text-xs flex items-center gap-1 hover:opacity-80 transition-opacity cursor-pointer"
+                  style={{ color: 'var(--text-muted)' }}
+                >
+                  <RotateCcw className="h-3 w-3" />
+                  <span>Predeterminado</span>
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-3 pt-0.5">
+              <label className="relative flex items-center justify-center cursor-pointer group shrink-0">
+                <div
+                  className="h-9 w-9 rounded-full border border-zinc-300/60 dark:border-zinc-700/60 transition-transform active:scale-95 group-hover:scale-105"
+                  style={{ backgroundColor: customTitleColor || (mode === 'dark' ? '#ffffff' : '#09090b') }}
+                />
+                <input
+                  type="color"
+                  value={customTitleColor || (mode === 'dark' ? '#ffffff' : '#09090b')}
+                  onChange={(e) => setCustomTitleColor(e.target.value)}
+                  className="sr-only"
+                />
+              </label>
+
+              <div className="flex flex-col">
+                <input
+                  type="text"
+                  value={(customTitleColor || (mode === 'dark' ? '#FFFFFF' : '#09090B')).toUpperCase()}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (/^#[0-9A-Fa-f]{0,6}$/.test(val)) {
+                      if (val.length === 7) setCustomTitleColor(val);
+                    }
+                  }}
+                  className="font-mono text-xs font-semibold bg-transparent border-b border-zinc-300 dark:border-zinc-700 w-24 focus:outline-none"
+                  style={{ color: 'var(--text-title)', borderBottomColor: primaryColor.hex }}
+                  placeholder="#FFFFFF"
+                />
+                <span className="text-[10px] mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                  Toca el círculo para selector
+                </span>
+              </div>
+            </div>
           </div>
-          {primaryColor.hex.toLowerCase() !== '#6366f1' && (
-            <button
-              type="button"
-              onClick={() => setPrimaryHex('#6366f1')}
-              className="text-xs text-zinc-400 hover:text-zinc-200 flex items-center gap-1 cursor-pointer"
-              title="Restablecer color de acentuación"
-            >
-              <RotateCcw className="h-3 w-3" />
-              <span>Predeterminado</span>
-            </button>
-          )}
-        </div>
 
-        <div className="flex items-center gap-4 pt-1">
-          <label className="relative flex items-center justify-center cursor-pointer group">
-            <div
-              className="h-10 w-10 rounded-full border border-zinc-300 dark:border-zinc-700 transition-transform active:scale-95 group-hover:scale-105"
-              style={{ backgroundColor: primaryColor.hex }}
-            />
-            <input
-              type="color"
-              value={primaryColor.hex}
-              onChange={(e) => setPrimaryHex(e.target.value)}
-              className="sr-only"
-            />
-          </label>
+          {/* 3. Color de Texto Principal */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xs sm:text-sm font-semibold m-0" style={{ color: 'var(--text-title)' }}>
+                  Color de texto normal
+                </h3>
+                <p className="text-[11px] sm:text-xs m-0 mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                  Párrafos, descripciones y cuerpo
+                </p>
+              </div>
+              {customTextColor && (
+                <button
+                  type="button"
+                  onClick={() => setCustomTextColor(null)}
+                  className="text-xs flex items-center gap-1 hover:opacity-80 transition-opacity cursor-pointer"
+                  style={{ color: 'var(--text-muted)' }}
+                >
+                  <RotateCcw className="h-3 w-3" />
+                  <span>Predeterminado</span>
+                </button>
+              )}
+            </div>
 
-          <div className="flex flex-col">
-            <input
-              type="text"
-              value={primaryColor.hex.toUpperCase()}
-              onChange={(e) => {
-                const val = e.target.value;
-                if (/^#[0-9A-Fa-f]{0,6}$/.test(val)) {
-                  if (val.length === 7) setPrimaryHex(val);
-                }
-              }}
-              className="font-mono text-sm font-semibold text-zinc-900 dark:text-white bg-transparent border-b border-zinc-300 dark:border-zinc-700 w-28 focus:outline-none focus:border-[var(--primary-color)]"
-              placeholder="#6366F1"
-            />
-            <span className="text-[11px] text-zinc-500 mt-1">
-              Toca el círculo para abrir el selector de color
-            </span>
+            <div className="flex items-center gap-3 pt-0.5">
+              <label className="relative flex items-center justify-center cursor-pointer group shrink-0">
+                <div
+                  className="h-9 w-9 rounded-full border border-zinc-300/60 dark:border-zinc-700/60 transition-transform active:scale-95 group-hover:scale-105"
+                  style={{ backgroundColor: customTextColor || (mode === 'dark' ? '#f4f4f5' : '#18181b') }}
+                />
+                <input
+                  type="color"
+                  value={customTextColor || (mode === 'dark' ? '#f4f4f5' : '#18181b')}
+                  onChange={(e) => setCustomTextColor(e.target.value)}
+                  className="sr-only"
+                />
+              </label>
+
+              <div className="flex flex-col">
+                <input
+                  type="text"
+                  value={(customTextColor || (mode === 'dark' ? '#F4F4F5' : '#18181B')).toUpperCase()}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (/^#[0-9A-Fa-f]{0,6}$/.test(val)) {
+                      if (val.length === 7) setCustomTextColor(val);
+                    }
+                  }}
+                  className="font-mono text-xs font-semibold bg-transparent border-b border-zinc-300 dark:border-zinc-700 w-24 focus:outline-none"
+                  style={{ color: 'var(--text-title)', borderBottomColor: primaryColor.hex }}
+                  placeholder="#F4F4F5"
+                />
+                <span className="text-[10px] mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                  Toca el círculo para selector
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* 4. Color de Texto Secundario / Detalles */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xs sm:text-sm font-semibold m-0" style={{ color: 'var(--text-title)' }}>
+                  Color de texto secundario
+                </h3>
+                <p className="text-[11px] sm:text-xs m-0 mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                  Metadatos, páginas leídas y leyendas
+                </p>
+              </div>
+              {customMutedColor && (
+                <button
+                  type="button"
+                  onClick={() => setCustomMutedColor(null)}
+                  className="text-xs flex items-center gap-1 hover:opacity-80 transition-opacity cursor-pointer"
+                  style={{ color: 'var(--text-muted)' }}
+                >
+                  <RotateCcw className="h-3 w-3" />
+                  <span>Predeterminado</span>
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-3 pt-0.5">
+              <label className="relative flex items-center justify-center cursor-pointer group shrink-0">
+                <div
+                  className="h-9 w-9 rounded-full border border-zinc-300/60 dark:border-zinc-700/60 transition-transform active:scale-95 group-hover:scale-105"
+                  style={{ backgroundColor: customMutedColor || (mode === 'dark' ? '#a1a1aa' : '#71717a') }}
+                />
+                <input
+                  type="color"
+                  value={customMutedColor || (mode === 'dark' ? '#a1a1aa' : '#71717a')}
+                  onChange={(e) => setCustomMutedColor(e.target.value)}
+                  className="sr-only"
+                />
+              </label>
+
+              <div className="flex flex-col">
+                <input
+                  type="text"
+                  value={(customMutedColor || (mode === 'dark' ? '#A1A1AA' : '#71717A')).toUpperCase()}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (/^#[0-9A-Fa-f]{0,6}$/.test(val)) {
+                      if (val.length === 7) setCustomMutedColor(val);
+                    }
+                  }}
+                  className="font-mono text-xs font-semibold bg-transparent border-b border-zinc-300 dark:border-zinc-700 w-24 focus:outline-none"
+                  style={{ color: 'var(--text-title)', borderBottomColor: primaryColor.hex }}
+                  placeholder="#A1A1AA"
+                />
+                <span className="text-[10px] mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                  Toca el círculo para selector
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* 5. Color de Acentuación */}
+          <div className="flex flex-col gap-2 md:col-span-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xs sm:text-sm font-semibold m-0" style={{ color: 'var(--text-title)' }}>
+                  Color de acentuación
+                </h3>
+                <p className="text-[11px] sm:text-xs m-0 mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                  Barras de progreso, iconos y botones principales
+                </p>
+              </div>
+              {primaryColor.hex.toLowerCase() !== '#6366f1' && (
+                <button
+                  type="button"
+                  onClick={() => setPrimaryHex('#6366f1')}
+                  className="text-xs flex items-center gap-1 hover:opacity-80 transition-opacity cursor-pointer"
+                  style={{ color: 'var(--text-muted)' }}
+                >
+                  <RotateCcw className="h-3 w-3" />
+                  <span>Predeterminado</span>
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-3 pt-0.5">
+              <label className="relative flex items-center justify-center cursor-pointer group shrink-0">
+                <div
+                  className="h-9 w-9 rounded-full border border-zinc-300/60 dark:border-zinc-700/60 transition-transform active:scale-95 group-hover:scale-105"
+                  style={{ backgroundColor: primaryColor.hex }}
+                />
+                <input
+                  type="color"
+                  value={primaryColor.hex}
+                  onChange={(e) => setPrimaryHex(e.target.value)}
+                  className="sr-only"
+                />
+              </label>
+
+              <div className="flex flex-col">
+                <input
+                  type="text"
+                  value={primaryColor.hex.toUpperCase()}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (/^#[0-9A-Fa-f]{0,6}$/.test(val)) {
+                      if (val.length === 7) setPrimaryHex(val);
+                    }
+                  }}
+                  className="font-mono text-xs font-semibold bg-transparent border-b border-zinc-300 dark:border-zinc-700 w-24 focus:outline-none"
+                  style={{ color: 'var(--text-title)', borderBottomColor: primaryColor.hex }}
+                  placeholder="#6366F1"
+                />
+                <span className="text-[10px] mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                  Toca el círculo para selector
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -316,10 +551,16 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       {/* Sección 3: Almacenamiento y Cómics */}
       <section className="pb-8 border-b border-zinc-200/80 dark:border-zinc-800/80 flex flex-col gap-4">
         <div>
-          <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white m-0">
+          <h2
+            className="text-base sm:text-lg font-bold m-0"
+            style={{ color: 'var(--text-title)' }}
+          >
             Almacenamiento y biblioteca
           </h2>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 m-0 mt-0.5">
+          <p
+            className="text-xs m-0 mt-0.5"
+            style={{ color: 'var(--text-muted)' }}
+          >
             Gestiona la indexación de tus archivos locales
           </p>
         </div>
@@ -350,10 +591,16 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       {/* Sección 4: Copia de Seguridad y Persistencia */}
       <section className="pb-8 border-b border-zinc-200/80 dark:border-zinc-800/80 flex flex-col gap-4">
         <div>
-          <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white m-0">
+          <h2
+            className="text-base sm:text-lg font-bold m-0"
+            style={{ color: 'var(--text-title)' }}
+          >
             Copia de seguridad y persistencia
           </h2>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 m-0 mt-0.5">
+          <p
+            className="text-xs m-0 mt-0.5"
+            style={{ color: 'var(--text-muted)' }}
+          >
             Tus datos de lectura, libros, resaltados y sagas se guardan automáticamente en Documents/Gomic para que no se pierdan al desinstalar la app.
           </p>
         </div>
@@ -364,7 +611,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             type="button"
             onClick={handleSaveAutoBackupNow}
             disabled={isProcessing}
-            className="flex h-10 items-center gap-2 rounded-full border border-zinc-300 dark:border-zinc-700 px-5 text-xs font-medium text-zinc-800 dark:text-zinc-200 hover:text-white hover:border-zinc-500 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
+            className="flex h-10 items-center gap-2 rounded-full border border-zinc-300 dark:border-zinc-700 px-5 text-xs font-medium text-zinc-800 dark:text-zinc-200 hover:opacity-80 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
           >
             <Download className="h-4 w-4 stroke-[1.75]" />
             <span>Guardar en Documents/Gomic</span>
@@ -374,7 +621,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             type="button"
             onClick={handleRestoreFromStorageBackup}
             disabled={isProcessing}
-            className="flex h-10 items-center gap-2 rounded-full border border-zinc-300 dark:border-zinc-700 px-5 text-xs font-medium text-zinc-800 dark:text-zinc-200 hover:text-white hover:border-zinc-500 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
+            className="flex h-10 items-center gap-2 rounded-full border border-zinc-300 dark:border-zinc-700 px-5 text-xs font-medium text-zinc-800 dark:text-zinc-200 hover:opacity-80 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
           >
             <Upload className="h-4 w-4 stroke-[1.75]" />
             <span>Restaurar de Documents/Gomic</span>
@@ -384,7 +631,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             type="button"
             onClick={handleExportBackup}
             disabled={isProcessing}
-            className="flex h-10 items-center gap-2 rounded-full border border-zinc-300 dark:border-zinc-700 px-5 text-xs font-medium text-zinc-800 dark:text-zinc-200 hover:text-white hover:border-zinc-500 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
+            className="flex h-10 items-center gap-2 rounded-full border border-zinc-300 dark:border-zinc-700 px-5 text-xs font-medium text-zinc-800 dark:text-zinc-200 hover:opacity-80 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
           >
             <Download className="h-4 w-4 stroke-[1.75]" />
             <span>Exportar archivo (.json)</span>
@@ -394,7 +641,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={isProcessing}
-            className="flex h-10 items-center gap-2 rounded-full border border-zinc-300 dark:border-zinc-700 px-5 text-xs font-medium text-zinc-800 dark:text-zinc-200 hover:text-white hover:border-zinc-500 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
+            className="flex h-10 items-center gap-2 rounded-full border border-zinc-300 dark:border-zinc-700 px-5 text-xs font-medium text-zinc-800 dark:text-zinc-200 hover:opacity-80 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
           >
             <Upload className="h-4 w-4 stroke-[1.75]" />
             <span>Importar archivo (.json)</span>
@@ -422,48 +669,57 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       {/* Sección 5: Atajos de Teclado y Mandos Bluetooth */}
       <section className="pb-8 border-b border-zinc-200/80 dark:border-zinc-800/80 flex flex-col gap-4">
         <div className="flex items-center gap-2">
-          <Keyboard className="h-4 w-4 text-zinc-400" />
-          <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white m-0">
+          <Keyboard className="h-4 w-4" style={{ color: 'var(--text-muted)' }} />
+          <h2
+            className="text-base sm:text-lg font-bold m-0"
+            style={{ color: 'var(--text-title)' }}
+          >
             Atajos y control bluetooth
           </h2>
         </div>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400 m-0">
+        <p
+          className="text-xs m-0"
+          style={{ color: 'var(--text-muted)' }}
+        >
           Usa tu teclado físico, disparador bluetooth o botones de volumen para pasar de página
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-2 text-xs text-zinc-400">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-2 text-xs" style={{ color: 'var(--text-muted)' }}>
           <div className="flex items-center justify-between py-1.5 border-b border-zinc-800/50">
             <span>Página siguiente</span>
-            <span className="font-mono text-[11px] text-zinc-200">Flecha Der, Espacio, J, L, Vol -</span>
+            <span className="font-mono text-[11px]" style={{ color: 'var(--text-title)' }}>Flecha Der, Espacio, J, L, Vol -</span>
           </div>
           <div className="flex items-center justify-between py-1.5 border-b border-zinc-800/50">
             <span>Página anterior</span>
-            <span className="font-mono text-[11px] text-zinc-200">Flecha Izq, Backspace, K, H, Vol +</span>
+            <span className="font-mono text-[11px]" style={{ color: 'var(--text-title)' }}>Flecha Izq, Backspace, K, H, Vol +</span>
           </div>
           <div className="flex items-center justify-between py-1.5 border-b border-zinc-800/50">
             <span>Guardar marcador</span>
-            <span className="font-mono text-[11px] text-zinc-200">Tecla B</span>
+            <span className="font-mono text-[11px]" style={{ color: 'var(--text-title)' }}>Tecla B</span>
           </div>
           <div className="flex items-center justify-between py-1.5 border-b border-zinc-800/50">
             <span>Tira de miniaturas</span>
-            <span className="font-mono text-[11px] text-zinc-200">Tecla M</span>
+            <span className="font-mono text-[11px]" style={{ color: 'var(--text-title)' }}>Tecla M</span>
           </div>
           <div className="flex items-center justify-between py-1.5 border-b border-zinc-800/50">
             <span>Modo doble página</span>
-            <span className="font-mono text-[11px] text-zinc-200">Tecla D</span>
+            <span className="font-mono text-[11px]" style={{ color: 'var(--text-title)' }}>Tecla D</span>
           </div>
           <div className="flex items-center justify-between py-1.5 border-b border-zinc-800/50">
             <span>Pantalla completa / Salir</span>
-            <span className="font-mono text-[11px] text-zinc-200">Tecla F / Escape</span>
+            <span className="font-mono text-[11px]" style={{ color: 'var(--text-title)' }}>Tecla F / Escape</span>
           </div>
         </div>
       </section>
 
       {/* Sección 6: Información de la Aplicación */}
-      <section className="text-xs text-zinc-500 dark:text-zinc-400 flex flex-col gap-1.5">
+      <section
+        className="text-xs flex flex-col gap-1.5"
+        style={{ color: 'var(--text-muted)' }}
+      >
         <BrandLogo size="md" />
-        <span>Gomic • Versión 1.0.16 • Lector de cómics y libros minimalista de alto rendimiento</span>
-        <span>Soporte para cómics (.cbz, .cbr) y libros (.epub, .txt) con marcatextos integrado</span>
+        <span>Gomic • Versión 1.0.24 • Lector de cómics y libros minimalista de alto rendimiento</span>
+        <span>Soporte para cómics (.cbz, .cbr, .pdf) y libros (.epub, .txt) con marcatextos integrado</span>
       </section>
     </div>
   );

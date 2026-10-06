@@ -32,17 +32,27 @@ interface ThemeState {
   mode: ThemeMode;
   primaryColor: PrimaryColorOption;
   customBgColor: string | null;
+  customTitleColor: string | null;
+  customTextColor: string | null;
+  customMutedColor: string | null;
   setMode: (mode: ThemeMode) => void;
   toggleMode: () => void;
   setPrimaryColor: (color: PrimaryColorOption) => void;
   setPrimaryHex: (hex: string) => void;
   setCustomBgColor: (hex: string | null) => void;
+  setCustomTitleColor: (hex: string | null) => void;
+  setCustomTextColor: (hex: string | null) => void;
+  setCustomMutedColor: (hex: string | null) => void;
+  resetColors: () => void;
   resetToDefaults: () => void;
 }
 
 const STORAGE_KEY_MODE = 'comicread_theme_mode';
 const STORAGE_KEY_COLOR = 'comicread_theme_color';
 const STORAGE_KEY_BG = 'comicread_theme_bg';
+const STORAGE_KEY_TITLE = 'comicread_theme_title';
+const STORAGE_KEY_TEXT = 'comicread_theme_text';
+const STORAGE_KEY_MUTED = 'comicread_theme_muted';
 
 function getInitialMode(): ThemeMode {
   if (typeof window === 'undefined') return 'dark';
@@ -68,36 +78,53 @@ function getInitialColor(): PrimaryColorOption {
   return PRIMARY_COLORS[0];
 }
 
-function getInitialBg(): string | null {
+function getInitialStored(key: string): string | null {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem(STORAGE_KEY_BG) || null;
+  return localStorage.getItem(key) || null;
 }
 
-function applyTheme(mode: ThemeMode, color: PrimaryColorOption, customBg: string | null) {
+function applyTheme(
+  mode: ThemeMode,
+  color: PrimaryColorOption,
+  customBg: string | null,
+  customTitle: string | null,
+  customText: string | null,
+  customMuted: string | null
+) {
   if (typeof document === 'undefined') return;
 
   const root = document.documentElement;
   const effectiveBg = customBg || (mode === 'dark' ? '#0c0c0e' : '#ffffff');
   const isDark = isDarkColor(effectiveBg);
 
+  // Valores predeterminados adaptativos de alto contraste
+  const defaultTitle = isDark ? '#ffffff' : '#09090b';
+  const defaultText = isDark ? '#f4f4f5' : '#18181b';
+  const defaultMuted = isDark ? '#a1a1aa' : '#71717a';
+  const defaultBorder = isDark ? '#27272a' : '#e4e4e7';
+
+  const effectiveTitle = customTitle || defaultTitle;
+  const effectiveText = customText || defaultText;
+  const effectiveMuted = customMuted || defaultMuted;
+
   if (isDark) {
     root.classList.add('dark');
-    root.style.setProperty('--bg-main', effectiveBg);
-    root.style.setProperty('--text-main', '#f4f4f5');
-    root.style.setProperty('--text-muted', '#a1a1aa');
-    root.style.setProperty('--border-subtle', '#27272a');
   } else {
     root.classList.remove('dark');
-    root.style.setProperty('--bg-main', effectiveBg);
-    root.style.setProperty('--text-main', '#111111');
-    root.style.setProperty('--text-muted', '#71717a');
-    root.style.setProperty('--border-subtle', '#e4e4e7');
   }
 
+  root.style.setProperty('--bg-main', effectiveBg);
+  root.style.setProperty('--text-title', effectiveTitle);
+  root.style.setProperty('--text-main', effectiveText);
+  root.style.setProperty('--text-muted', effectiveMuted);
+  root.style.setProperty('--border-subtle', defaultBorder);
   root.style.setProperty('--primary-color', color.hex);
   root.style.setProperty('--primary-glow', 'transparent');
+
   root.style.backgroundColor = effectiveBg;
+  root.style.color = effectiveText;
   document.body.style.backgroundColor = effectiveBg;
+  document.body.style.color = effectiveText;
 
   // Actualizar meta theme-color para navegadores y WebView
   const metaTheme = document.querySelector('meta[name="theme-color"]');
@@ -112,32 +139,69 @@ function applyTheme(mode: ThemeMode, color: PrimaryColorOption, customBg: string
 export const useThemeStore = create<ThemeState>((set, get) => {
   const initialMode = getInitialMode();
   const initialColor = getInitialColor();
-  const initialBg = getInitialBg();
+  const initialBg = getInitialStored(STORAGE_KEY_BG);
+  const initialTitle = getInitialStored(STORAGE_KEY_TITLE);
+  const initialText = getInitialStored(STORAGE_KEY_TEXT);
+  const initialMuted = getInitialStored(STORAGE_KEY_MUTED);
 
   // Aplicar inmediatamente en inicialización
-  applyTheme(initialMode, initialColor, initialBg);
+  applyTheme(
+    initialMode,
+    initialColor,
+    initialBg,
+    initialTitle,
+    initialText,
+    initialMuted
+  );
 
   return {
     mode: initialMode,
     primaryColor: initialColor,
     customBgColor: initialBg,
+    customTitleColor: initialTitle,
+    customTextColor: initialText,
+    customMutedColor: initialMuted,
 
     setMode: (mode: ThemeMode) => {
       localStorage.setItem(STORAGE_KEY_MODE, mode);
-      applyTheme(mode, get().primaryColor, get().customBgColor);
+      const state = get();
+      applyTheme(
+        mode,
+        state.primaryColor,
+        state.customBgColor,
+        state.customTitleColor,
+        state.customTextColor,
+        state.customMutedColor
+      );
       set({ mode });
     },
 
     toggleMode: () => {
       const nextMode = get().mode === 'dark' ? 'light' : 'dark';
       localStorage.setItem(STORAGE_KEY_MODE, nextMode);
-      applyTheme(nextMode, get().primaryColor, get().customBgColor);
+      const state = get();
+      applyTheme(
+        nextMode,
+        state.primaryColor,
+        state.customBgColor,
+        state.customTitleColor,
+        state.customTextColor,
+        state.customMutedColor
+      );
       set({ mode: nextMode });
     },
 
     setPrimaryColor: (color: PrimaryColorOption) => {
       localStorage.setItem(STORAGE_KEY_COLOR, color.hex);
-      applyTheme(get().mode, color, get().customBgColor);
+      const state = get();
+      applyTheme(
+        state.mode,
+        color,
+        state.customBgColor,
+        state.customTitleColor,
+        state.customTextColor,
+        state.customMutedColor
+      );
       set({ primaryColor: color });
     },
 
@@ -149,7 +213,15 @@ export const useThemeStore = create<ThemeState>((set, get) => {
         glow: 'transparent',
       };
       localStorage.setItem(STORAGE_KEY_COLOR, hex);
-      applyTheme(get().mode, option, get().customBgColor);
+      const state = get();
+      applyTheme(
+        state.mode,
+        option,
+        state.customBgColor,
+        state.customTitleColor,
+        state.customTextColor,
+        state.customMutedColor
+      );
       set({ primaryColor: option });
     },
 
@@ -159,19 +231,91 @@ export const useThemeStore = create<ThemeState>((set, get) => {
       } else {
         localStorage.removeItem(STORAGE_KEY_BG);
       }
-      applyTheme(get().mode, get().primaryColor, hex);
+      const state = get();
+      applyTheme(
+        state.mode,
+        state.primaryColor,
+        hex,
+        state.customTitleColor,
+        state.customTextColor,
+        state.customMutedColor
+      );
       set({ customBgColor: hex });
     },
 
-    resetToDefaults: () => {
+    setCustomTitleColor: (hex: string | null) => {
+      if (hex) {
+        localStorage.setItem(STORAGE_KEY_TITLE, hex);
+      } else {
+        localStorage.removeItem(STORAGE_KEY_TITLE);
+      }
+      const state = get();
+      applyTheme(
+        state.mode,
+        state.primaryColor,
+        state.customBgColor,
+        hex,
+        state.customTextColor,
+        state.customMutedColor
+      );
+      set({ customTitleColor: hex });
+    },
+
+    setCustomTextColor: (hex: string | null) => {
+      if (hex) {
+        localStorage.setItem(STORAGE_KEY_TEXT, hex);
+      } else {
+        localStorage.removeItem(STORAGE_KEY_TEXT);
+      }
+      const state = get();
+      applyTheme(
+        state.mode,
+        state.primaryColor,
+        state.customBgColor,
+        state.customTitleColor,
+        hex,
+        state.customMutedColor
+      );
+      set({ customTextColor: hex });
+    },
+
+    setCustomMutedColor: (hex: string | null) => {
+      if (hex) {
+        localStorage.setItem(STORAGE_KEY_MUTED, hex);
+      } else {
+        localStorage.removeItem(STORAGE_KEY_MUTED);
+      }
+      const state = get();
+      applyTheme(
+        state.mode,
+        state.primaryColor,
+        state.customBgColor,
+        state.customTitleColor,
+        state.customTextColor,
+        hex
+      );
+      set({ customMutedColor: hex });
+    },
+
+    resetColors: () => {
       localStorage.removeItem(STORAGE_KEY_BG);
+      localStorage.removeItem(STORAGE_KEY_TITLE);
+      localStorage.removeItem(STORAGE_KEY_TEXT);
+      localStorage.removeItem(STORAGE_KEY_MUTED);
       localStorage.removeItem(STORAGE_KEY_COLOR);
       const defaultColor = PRIMARY_COLORS[0];
-      applyTheme(get().mode, defaultColor, null);
+      applyTheme(get().mode, defaultColor, null, null, null, null);
       set({
         primaryColor: defaultColor,
         customBgColor: null,
+        customTitleColor: null,
+        customTextColor: null,
+        customMutedColor: null,
       });
+    },
+
+    resetToDefaults: () => {
+      get().resetColors();
     },
   };
 });

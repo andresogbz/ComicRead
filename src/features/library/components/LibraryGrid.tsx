@@ -153,10 +153,18 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({
           {/* Sección de Cómics */}
           <div>
             <div className="flex items-center gap-2 mb-4 pb-2 border-b border-zinc-200/40 dark:border-zinc-800/40">
-              <h2 className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-white m-0">
+              <h2
+                className="text-sm font-semibold tracking-tight m-0"
+                style={{ color: 'var(--text-title)' }}
+              >
                 Cómics
               </h2>
-              <span className="text-xs text-zinc-500 font-normal">({comicsSection.length})</span>
+              <span
+                className="text-xs font-normal"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                ({comicsSection.length})
+              </span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
               {comicsSection.map((comic) => (
@@ -176,10 +184,18 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({
           {/* Sección de Libros */}
           <div>
             <div className="flex items-center gap-2 mb-4 pb-2 border-b border-zinc-200/40 dark:border-zinc-800/40">
-              <h2 className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-white m-0">
+              <h2
+                className="text-sm font-semibold tracking-tight m-0"
+                style={{ color: 'var(--text-title)' }}
+              >
                 Libros
               </h2>
-              <span className="text-xs text-zinc-500 font-normal">({booksSection.length})</span>
+              <span
+                className="text-xs font-normal"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                ({booksSection.length})
+              </span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
               {booksSection.map((book) => (

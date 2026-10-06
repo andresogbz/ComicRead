@@ -33,10 +33,16 @@ export const LibraryHeader: React.FC<LibraryHeaderProps> = ({
             Colección local
           </span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-white transition-colors m-0">
+        <h1
+          className="text-2xl sm:text-3xl font-bold tracking-tight transition-colors m-0"
+          style={{ color: 'var(--text-title)' }}
+        >
           Biblioteca
         </h1>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal transition-colors m-0 mt-1">
+        <p
+          className="text-xs font-normal transition-colors m-0 mt-1"
+          style={{ color: 'var(--text-muted)' }}
+        >
           {totalComics === 0
             ? 'Sin cómics importados en el almacenamiento'
             : totalComics === 1

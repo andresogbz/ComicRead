@@ -67,14 +67,13 @@ export const LibraryFilterBar: React.FC<LibraryFilterBarProps> = ({
           <button
             type="button"
             onClick={() => onMediaFilterChange('all')}
-            className={`relative pb-1 text-sm font-semibold transition-colors cursor-pointer ${
-              mediaFilter === 'all'
-                ? 'text-zinc-900 dark:text-white'
-                : 'text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
-            }`}
+            className="relative pb-1 text-sm font-semibold transition-colors cursor-pointer"
+            style={{
+              color: mediaFilter === 'all' ? 'var(--text-title)' : 'var(--text-muted)',
+            }}
           >
             <span>Todo</span>
-            <span className="ml-1.5 text-xs text-zinc-500 font-normal">
+            <span className="ml-1.5 text-xs font-normal opacity-80">
               {stats.total}
             </span>
             {mediaFilter === 'all' && (
@@ -88,15 +87,14 @@ export const LibraryFilterBar: React.FC<LibraryFilterBarProps> = ({
           <button
             type="button"
             onClick={() => onMediaFilterChange('comic')}
-            className={`relative pb-1 text-sm font-semibold transition-colors cursor-pointer ${
-              mediaFilter === 'comic'
-                ? 'text-zinc-900 dark:text-white'
-                : 'text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
-            }`}
+            className="relative pb-1 text-sm font-semibold transition-colors cursor-pointer"
+            style={{
+              color: mediaFilter === 'comic' ? 'var(--text-title)' : 'var(--text-muted)',
+            }}
           >
             <span>Cómics</span>
             {typeof stats.comicsCount === 'number' && (
-              <span className="ml-1.5 text-xs text-zinc-500 font-normal">
+              <span className="ml-1.5 text-xs font-normal opacity-80">
                 {stats.comicsCount}
               </span>
             )}
@@ -111,15 +109,14 @@ export const LibraryFilterBar: React.FC<LibraryFilterBarProps> = ({
           <button
             type="button"
             onClick={() => onMediaFilterChange('book')}
-            className={`relative pb-1 text-sm font-semibold transition-colors cursor-pointer ${
-              mediaFilter === 'book'
-                ? 'text-zinc-900 dark:text-white'
-                : 'text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
-            }`}
+            className="relative pb-1 text-sm font-semibold transition-colors cursor-pointer"
+            style={{
+              color: mediaFilter === 'book' ? 'var(--text-title)' : 'var(--text-muted)',
+            }}
           >
             <span>Libros</span>
             {typeof stats.booksCount === 'number' && (
-              <span className="ml-1.5 text-xs text-zinc-500 font-normal">
+              <span className="ml-1.5 text-xs font-normal opacity-80">
                 {stats.booksCount}
               </span>
             )}
@@ -223,11 +220,11 @@ export const LibraryFilterBar: React.FC<LibraryFilterBarProps> = ({
           <button
             type="button"
             onClick={() => onCollectionChange(null)}
-            className={`px-2.5 py-0.5 rounded-lg text-xs transition-colors shrink-0 cursor-pointer ${
-              selectedCollection === null
-                ? 'font-medium text-zinc-900 dark:text-white'
-                : 'text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200'
-            }`}
+            className="px-2.5 py-0.5 rounded-lg text-xs transition-colors shrink-0 cursor-pointer"
+            style={{
+              color: selectedCollection === null ? 'var(--text-title)' : 'var(--text-muted)',
+              fontWeight: selectedCollection === null ? 600 : 400,
+            }}
           >
             Todas
           </button>
@@ -237,11 +234,12 @@ export const LibraryFilterBar: React.FC<LibraryFilterBarProps> = ({
               key={col}
               type="button"
               onClick={() => onCollectionChange(selectedCollection === col ? null : col)}
-              className={`px-2.5 py-0.5 rounded-lg text-xs transition-colors shrink-0 cursor-pointer ${
-                selectedCollection === col
-                  ? 'font-medium text-zinc-900 dark:text-white underline'
-                  : 'text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200'
-              }`}
+              className="px-2.5 py-0.5 rounded-lg text-xs transition-colors shrink-0 cursor-pointer"
+              style={{
+                color: selectedCollection === col ? 'var(--text-title)' : 'var(--text-muted)',
+                fontWeight: selectedCollection === col ? 600 : 400,
+                textDecoration: selectedCollection === col ? 'underline' : 'none',
+              }}
             >
               {col}
             </button>

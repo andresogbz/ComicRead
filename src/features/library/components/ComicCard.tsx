@@ -154,12 +154,16 @@ export const ComicCard: React.FC<ComicCardProps> = ({
         {/* Información del Cómic fusionada de forma natural */}
         <div className="mt-2.5 flex flex-col px-0.5">
           <h3
-            className="line-clamp-1 text-xs sm:text-sm font-semibold text-zinc-900 dark:text-zinc-100 transition-colors"
+            className="line-clamp-1 text-xs sm:text-sm font-semibold transition-colors"
+            style={{ color: 'var(--text-title)' }}
             title={comic.title}
           >
             {comic.title}
           </h3>
-          <div className="mt-0.5 flex items-center justify-between text-[11px] text-zinc-500 dark:text-zinc-400 font-normal">
+          <div
+            className="mt-0.5 flex items-center justify-between text-[11px] font-normal"
+            style={{ color: 'var(--text-muted)' }}
+          >
             <span>
               {comic.format === 'epub' || comic.format === 'txt' || comic.mediaType === 'book'
                 ? isStarted
