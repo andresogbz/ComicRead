@@ -23,7 +23,7 @@ export const AppNavigation: React.FC<AppNavigationProps> = ({
 
   return (
     <header
-      className="sticky top-0 z-30 w-full max-w-full bg-gradient-to-b from-black/70 via-black/30 to-transparent transition-colors"
+      className="sticky top-0 z-30 w-full max-w-full bg-[var(--bg-main)] border-b border-zinc-200/30 dark:border-zinc-800/30 transition-colors duration-150"
       style={{
         paddingTop: 'env(safe-area-inset-top, 0px)',
       }}

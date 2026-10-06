@@ -96,7 +96,14 @@ function applyTheme(mode: ThemeMode, color: PrimaryColorOption, customBg: string
 
   root.style.setProperty('--primary-color', color.hex);
   root.style.setProperty('--primary-glow', 'transparent');
+  root.style.backgroundColor = effectiveBg;
   document.body.style.backgroundColor = effectiveBg;
+
+  // Actualizar meta theme-color para navegadores y WebView
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+  if (metaTheme) {
+    metaTheme.setAttribute('content', effectiveBg);
+  }
 
   // Sincronizar estilo e iconos de la barra de estado
   statusBarService.updateStatusBarStyle(isDark);

@@ -145,6 +145,10 @@
     --border-subtle: #27272a;
   }
 
+  html {
+    background-color: var(--bg-main);
+  }
+
   body {
     background-color: var(--bg-main);
     color: var(--text-main);
