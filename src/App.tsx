@@ -9,6 +9,7 @@ import { AnalyticsView } from './features/analytics/components/AnalyticsView';
 import { SettingsView } from './features/settings/components/SettingsView';
 import { ReaderViewport } from './features/reader/components/ReaderViewport';
 import { ImportProgressModal } from './features/library/components/ImportProgressModal';
+import { SplashScreen } from './shared/components/SplashScreen';
 import { useLibraryStore } from './features/library/stores/useLibraryStore';
 import { useLibrary } from './features/library/hooks/useLibrary';
 import { useDirectoryScanner } from './features/library/hooks/useDirectoryScanner';
@@ -172,6 +173,9 @@ export function App() {
             {importProgress && <ImportProgressModal progress={importProgress} />}
           </div>
         )}
+
+        {/* Pantalla de bienvenida / Splash personalizada */}
+        <SplashScreen />
       </div>
     </div>
   );

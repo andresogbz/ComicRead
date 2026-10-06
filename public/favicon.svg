@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="128" fill="#0C0C0E"/>
-  <text x="236" y="295" font-family="Montserrat, 'Arial Black', -apple-system, sans-serif" font-weight="900" font-size="95" fill="#FFFFFF" text-anchor="middle" letter-spacing="-3">OGMIC</text>
-  <circle cx="410" cy="235" r="14" fill="#6366F1"/>
+  <rect width="512" height="512" rx="120" fill="#0C0C0E"/>
+  <text x="216" y="324" font-family="'Outfit', 'Plus Jakarta Sans', -apple-system, sans-serif" font-weight="500" font-size="200" fill="#F4F4F5" text-anchor="middle" letter-spacing="-4">Go</text>
+  <circle cx="372" cy="286" r="18" fill="#6366F1"/>
 </svg>

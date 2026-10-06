@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">OGMIC</string>
-    <string name="title_activity_main">OGMIC</string>
+    <string name="app_name">Gomic</string>
+    <string name="title_activity_main">Gomic</string>
     <string name="package_name">com.comicread.app</string>
     <string name="custom_url_scheme">com.comicread.app</string>
 </resources>

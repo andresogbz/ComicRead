@@ -24,12 +24,12 @@ export const AppNavigation: React.FC<AppNavigationProps> = ({
   return (
     <header className="sticky top-0 z-30 w-full max-w-full bg-gradient-to-b from-black/60 via-black/20 to-transparent transition-colors">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8 py-3.5 sm:py-4">
-        {/* Logotipo de marca OGMIC distintivo */}
+        {/* Logotipo de marca Go / Gomic */}
         <button
           type="button"
           onClick={() => onTabChange('home')}
           className="flex items-center text-left focus:outline-none cursor-pointer shrink-0"
-          aria-label="Ir a Inicio - OGMIC"
+          aria-label="Ir a Inicio - Gomic"
         >
           <BrandLogo size="md" />
         </button>

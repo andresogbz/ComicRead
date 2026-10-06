@@ -23,17 +23,17 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
 
   const dotSizes = {
     sm: 'h-1.5 w-1.5 ml-1 mb-0.5',
-    md: 'h-2 w-2 ml-1.5 mb-1',
-    lg: 'h-3 w-3 ml-2 mb-1.5',
-    xl: 'h-3.5 w-3.5 ml-2.5 mb-2',
+    md: 'h-2 w-2 ml-1.5 mb-0.5',
+    lg: 'h-2.5 w-2.5 ml-2 mb-1',
+    xl: 'h-3.5 w-3.5 ml-2.5 mb-1',
   };
 
   return (
     <div
-      className={`inline-flex items-center font-brand font-black select-none ${sizeStyles[size]} ${className}`}
+      className={`inline-flex items-center font-brand font-medium select-none ${sizeStyles[size]} ${className}`}
     >
       <span className="text-white transition-opacity hover:opacity-90">
-        OGMIC
+        Go
       </span>
       {showDot && (
         <span
