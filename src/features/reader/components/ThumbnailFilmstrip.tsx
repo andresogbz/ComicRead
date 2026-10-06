@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Bookmark } from 'lucide-react';
 import { readerCache } from '../services/readerCacheService';
 import { useThemeStore } from '../../../core/theme/useThemeStore';
 
@@ -6,6 +7,7 @@ interface ThumbnailFilmstripProps {
   comicId: string;
   totalPages: number;
   currentPageIndex: number;
+  bookmarks?: number[];
   isOpen: boolean;
   onSelectPage: (index: number) => void;
 }
@@ -14,8 +16,9 @@ const ThumbnailCard: React.FC<{
   comicId: string;
   index: number;
   isActive: boolean;
+  isBookmarked: boolean;
   onSelect: (index: number) => void;
-}> = ({ comicId, index, isActive, onSelect }) => {
+}> = ({ comicId, index, isActive, isBookmarked, onSelect }) => {
   const [thumbUrl, setThumbUrl] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const cardRef = useRef<HTMLButtonElement>(null);
@@ -96,6 +99,13 @@ const ThumbnailCard: React.FC<{
           </span>
         )}
 
+        {/* Indicador de marcador guardado */}
+        {isBookmarked && (
+          <div className="absolute top-1 right-1 p-0.5 rounded-sm bg-black/80 z-10">
+            <Bookmark className="h-2.5 w-2.5 fill-amber-400 text-amber-400 stroke-[1.5]" />
+          </div>
+        )}
+
         {/* Indicador lineal sutil de página activa */}
         {isActive && (
           <div
@@ -120,6 +130,7 @@ export const ThumbnailFilmstrip: React.FC<ThumbnailFilmstripProps> = ({
   comicId,
   totalPages,
   currentPageIndex,
+  bookmarks = [],
   isOpen,
   onSelectPage,
 }) => {
@@ -134,9 +145,17 @@ export const ThumbnailFilmstrip: React.FC<ThumbnailFilmstripProps> = ({
     >
       <div className="flex items-center justify-between text-[11px] text-zinc-400 font-mono mb-2 px-1 max-w-4xl mx-auto">
         <span>Navegador de páginas</span>
-        <span>
-          Página {currentPageIndex + 1} de {totalPages}
-        </span>
+        <div className="flex items-center gap-3">
+          {bookmarks.length > 0 && (
+            <span className="flex items-center gap-1 text-amber-400">
+              <Bookmark className="h-3 w-3 fill-amber-400" />
+              {bookmarks.length} {bookmarks.length === 1 ? 'marcador' : 'marcadores'}
+            </span>
+          )}
+          <span>
+            Página {currentPageIndex + 1} de {totalPages}
+          </span>
+        </div>
       </div>
 
       <div
@@ -150,6 +169,7 @@ export const ThumbnailFilmstrip: React.FC<ThumbnailFilmstripProps> = ({
             comicId={comicId}
             index={i}
             isActive={i === currentPageIndex}
+            isBookmarked={bookmarks.includes(i)}
             onSelect={onSelectPage}
           />
         ))}

@@ -3,7 +3,7 @@ import type { StoredComic } from '../../../infrastructure/database/ComicDatabase
 import { comicRepository } from '../../../infrastructure/database/repositories/DexieComicRepository';
 import { comicFileService } from '../services/comicFileService';
 
-export type FilterStatus = 'all' | 'in_progress' | 'unread' | 'completed' | 'favorites';
+export type FilterStatus = 'all' | 'in_progress' | 'unread' | 'completed' | 'favorites' | 'bookmarks';
 export type SortOption = 'recent' | 'title' | 'progress';
 
 export interface ImportProgress {
@@ -19,6 +19,7 @@ interface LibraryState {
   errorMessage: string | null;
   searchQuery: string;
   filterStatus: FilterStatus;
+  selectedCollection: string | null;
   sortBy: SortOption;
   selectedComic: StoredComic | null;
 
@@ -26,9 +27,12 @@ interface LibraryState {
   loadLibrary: () => Promise<void>;
   importFiles: (files: File[]) => Promise<void>;
   toggleFavorite: (id: string) => Promise<void>;
+  toggleBookmark: (id: string, pageIndex: number) => Promise<void>;
+  updateComicCollection: (id: string, collection: string | undefined) => Promise<void>;
   deleteComic: (id: string) => Promise<void>;
   setSearchQuery: (query: string) => void;
   setFilterStatus: (status: FilterStatus) => void;
+  setSelectedCollection: (collection: string | null) => void;
   setSortBy: (sort: SortOption) => void;
   setSelectedComic: (comic: StoredComic | null) => void;
   clearError: () => void;
@@ -50,6 +54,7 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
   errorMessage: null,
   searchQuery: '',
   filterStatus: 'all',
+  selectedCollection: null,
   sortBy: 'recent',
   selectedComic: null,
 
@@ -126,6 +131,24 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
     }));
   },
 
+  toggleBookmark: async (id: string, pageIndex: number) => {
+    const updatedBookmarks = await comicRepository.toggleBookmark(id, pageIndex);
+    set((state) => ({
+      comics: state.comics.map((c) =>
+        c.id === id ? { ...c, bookmarks: updatedBookmarks } : c
+      ),
+    }));
+  },
+
+  updateComicCollection: async (id: string, collection: string | undefined) => {
+    await comicRepository.updateCollection(id, collection);
+    set((state) => ({
+      comics: state.comics.map((c) =>
+        c.id === id ? { ...c, collection, series: collection } : c
+      ),
+    }));
+  },
+
   deleteComic: async (id: string) => {
     await comicRepository.deleteComic(id);
     set((state) => ({
@@ -136,6 +159,7 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
 
   setSearchQuery: (searchQuery: string) => set({ searchQuery }),
   setFilterStatus: (filterStatus: FilterStatus) => set({ filterStatus }),
+  setSelectedCollection: (selectedCollection: string | null) => set({ selectedCollection }),
   setSortBy: (sortBy: SortOption) => set({ sortBy }),
   setSelectedComic: (selectedComic: StoredComic | null) => set({ selectedComic }),
   clearError: () => set({ errorMessage: null }),

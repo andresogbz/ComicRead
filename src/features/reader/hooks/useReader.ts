@@ -1,11 +1,13 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import type { StoredComic } from '../../../infrastructure/database/ComicDatabase';
 import { comicRepository } from '../../../infrastructure/database/repositories/DexieComicRepository';
 import { readerCache } from '../services/readerCacheService';
+import { findNextComic } from '../services/chapterNavigation';
 import type { ReadingMode, FitMode, PageSpread, ColorFilter } from '../types/readerTypes';
 
 interface UseReaderProps {
   comic: StoredComic;
+  allComics?: StoredComic[];
   onClose: () => void;
 }
 
@@ -37,12 +39,13 @@ function savePrefs(prefs: Partial<StoredReaderPrefs>) {
   }
 }
 
-export function useReader({ comic, onClose }: UseReaderProps) {
+export function useReader({ comic, allComics = [], onClose }: UseReaderProps) {
   const savedPrefs = loadSavedPrefs();
 
   const [currentPageIndex, setCurrentPageIndex] = useState<number>(
     comic.lastReadPageIndex || 0
   );
+  const [bookmarks, setBookmarks] = useState<number[]>(comic.bookmarks || []);
   const [readingMode, setReadingModeState] = useState<ReadingMode>(
     savedPrefs.readingMode || 'ltr'
   );
@@ -69,6 +72,9 @@ export function useReader({ comic, onClose }: UseReaderProps) {
   const [pan, setPan] = useState({ x: 0, y: 0 });
 
   const hudTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Siguiente cómic detectado automáticamente
+  const nextComic = useMemo(() => findNextComic(comic, allComics), [comic, allComics]);
 
   // Setters con persistencia en localStorage
   const setReadingMode = useCallback((mode: ReadingMode) => {
@@ -100,6 +106,16 @@ export function useReader({ comic, onClose }: UseReaderProps) {
   const toggleFilmstrip = useCallback(() => {
     setIsFilmstripOpen((prev) => !prev);
   }, []);
+
+  // Alternar marcador en la página indicada (o actual)
+  const toggleBookmark = useCallback(
+    async (targetIndex?: number) => {
+      const idx = targetIndex !== undefined ? targetIndex : currentPageIndex;
+      const updated = await comicRepository.toggleBookmark(comic.id, idx);
+      setBookmarks(updated);
+    },
+    [comic.id, currentPageIndex]
+  );
 
   // Inicializar sesión de cómic en caché y Web Worker
   useEffect(() => {
@@ -134,7 +150,6 @@ export function useReader({ comic, onClose }: UseReaderProps) {
     setPan({ x: 0, y: 0 });
 
     const isDoubleActive = pageSpread === 'double' && readingMode !== 'webtoon';
-    // En modo doble, si estamos en página > 0 (o si se fuerza), buscar la segunda página contigua
     const needsSecondPage = isDoubleActive && currentPageIndex > 0 && currentPageIndex + 1 < comic.totalPages;
 
     const promises: Promise<string | null>[] = [
@@ -164,11 +179,10 @@ export function useReader({ comic, onClose }: UseReaderProps) {
     };
   }, [comic.id, comic.totalPages, currentPageIndex, pageSpread, readingMode]);
 
-  // Auto-ocultar HUD tras 4 segundos de inactividad (si la tira de miniaturas no está abierta)
+  // Auto-ocultar HUD tras 4 segundos de inactividad
   const resetHudTimer = useCallback(() => {
     if (hudTimerRef.current) clearTimeout(hudTimerRef.current);
     hudTimerRef.current = setTimeout(() => {
-      // Si la tira de miniaturas está activa, no cerrar abruptamente
       if (!isFilmstripOpen) {
         setIsHudVisible(false);
       }
@@ -242,7 +256,6 @@ export function useReader({ comic, onClose }: UseReaderProps) {
     }
   }, []);
 
-  // Escuchar cambios de pantalla completa iniciados por tecla F11 o sistema
   useEffect(() => {
     const handleFsChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
@@ -277,6 +290,8 @@ export function useReader({ comic, onClose }: UseReaderProps) {
         goToPage(0);
       } else if (e.key === 'End') {
         goToPage(comic.totalPages - 1);
+      } else if (e.key === 'b' || e.key === 'B') {
+        toggleBookmark();
       } else if (e.key === 'm' || e.key === 'M') {
         toggleFilmstrip();
       } else if (e.key === 'd' || e.key === 'D') {
@@ -294,7 +309,7 @@ export function useReader({ comic, onClose }: UseReaderProps) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [readingMode, nextPage, prevPage, goToPage, comic.totalPages, toggleFilmstrip, toggleFullscreen, isFullscreen, onClose]);
+  }, [readingMode, nextPage, prevPage, goToPage, comic.totalPages, toggleBookmark, toggleFilmstrip, toggleFullscreen, isFullscreen, onClose]);
 
   const resetZoom = useCallback(() => {
     setZoom(1);
@@ -309,6 +324,8 @@ export function useReader({ comic, onClose }: UseReaderProps) {
     pageSpread,
     brightness,
     colorFilter,
+    bookmarks,
+    nextComic,
     isHudVisible,
     isFilmstripOpen,
     isFullscreen,
@@ -324,6 +341,7 @@ export function useReader({ comic, onClose }: UseReaderProps) {
     setPageSpread,
     setBrightness,
     setColorFilter,
+    toggleBookmark,
     toggleHud,
     toggleFilmstrip,
     showHudTemporarily,

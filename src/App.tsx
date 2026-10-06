@@ -109,7 +109,12 @@ export function App() {
       {/* Capa de contenido interactivo */}
       <div className="relative z-10 min-h-screen w-full max-w-full overflow-x-hidden">
         {activeComic ? (
-          <ReaderViewport comic={activeComic} onClose={handleCloseReader} />
+          <ReaderViewport
+            comic={activeComic}
+            allComics={rawComics}
+            onClose={handleCloseReader}
+            onOpenComic={handleOpenComic}
+          />
         ) : (
           <div className="flex flex-col min-h-screen w-full max-w-full overflow-x-hidden">
             {/* Header minimalista y transparente */}

@@ -26,6 +26,8 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({
   const {
     comics,
     allComicsCount,
+    collections,
+    selectedCollection,
     isLoading,
     importProgress: _importProgress,
     errorMessage,
@@ -35,9 +37,11 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({
     stats,
     importFiles,
     toggleFavorite,
+    updateComicCollection,
     deleteComic,
     setSearchQuery,
     setFilterStatus,
+    setSelectedCollection,
     setSortBy,
     clearError,
   } = useLibrary();
@@ -81,7 +85,7 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({
           <button
             type="button"
             onClick={clearError}
-            className="flex h-6 w-6 items-center justify-center rounded-full hover:bg-rose-500/20 text-rose-400 transition-colors"
+            className="flex h-6 w-6 items-center justify-center rounded-full hover:bg-rose-500/20 text-rose-400 transition-colors cursor-pointer"
             aria-label="Cerrar mensaje de error"
           >
             <X className="h-4 w-4" />
@@ -89,13 +93,16 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({
         </div>
       )}
 
-      {/* Barra de Filtros y Búsqueda (si hay cómics) */}
+      {/* Barra de Filtros, Sagas y Búsqueda (si hay cómics) */}
       {allComicsCount > 0 && (
         <LibraryFilterBar
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           filterStatus={filterStatus}
           onFilterChange={setFilterStatus}
+          collections={collections}
+          selectedCollection={selectedCollection}
+          onCollectionChange={setSelectedCollection}
           sortBy={sortBy}
           onSortChange={setSortBy}
           stats={stats}
@@ -121,8 +128,9 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({
             onClick={() => {
               setSearchQuery('');
               setFilterStatus('all');
+              setSelectedCollection(null);
             }}
-            className="mt-3 text-xs underline underline-offset-4 font-medium transition-colors"
+            className="mt-3 text-xs underline underline-offset-4 font-medium transition-colors cursor-pointer"
             style={{ color: primaryColor.hex }}
           >
             Limpiar filtros
@@ -135,9 +143,11 @@ export const LibraryGrid: React.FC<LibraryGridProps> = ({
             <ComicCard
               key={comic.id}
               comic={comic}
+              existingCollections={collections}
               onOpen={onOpenComic}
               onToggleFavorite={handleToggleFavorite}
               onDelete={handleDeleteComic}
+              onUpdateCollection={updateComicCollection}
             />
           ))}
         </div>

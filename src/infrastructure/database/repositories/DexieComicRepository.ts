@@ -51,6 +51,32 @@ export class DexieComicRepository {
     return newFavorite;
   }
 
+  public async toggleBookmark(id: string, pageIndex: number): Promise<number[]> {
+    const comic = await db.comics.get(id);
+    if (!comic) return [];
+
+    const currentBookmarks = comic.bookmarks || [];
+    const exists = currentBookmarks.includes(pageIndex);
+    const newBookmarks = exists
+      ? currentBookmarks.filter((p) => p !== pageIndex)
+      : [...currentBookmarks, pageIndex].sort((a, b) => a - b);
+
+    await db.comics.update(id, { bookmarks: newBookmarks });
+    return newBookmarks;
+  }
+
+  public async getBookmarks(id: string): Promise<number[]> {
+    const comic = await db.comics.get(id);
+    return comic?.bookmarks || [];
+  }
+
+  public async updateCollection(id: string, collection: string | undefined): Promise<void> {
+    await db.comics.update(id, {
+      collection: collection?.trim() || undefined,
+      series: collection?.trim() || undefined,
+    });
+  }
+
   public async deleteComic(id: string): Promise<void> {
     await db.transaction('rw', db.comics, db.comicFiles, async () => {
       await db.comics.delete(id);

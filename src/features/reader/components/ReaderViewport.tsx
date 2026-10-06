@@ -9,12 +9,16 @@ import { ReaderHUD } from './ReaderHUD';
 
 interface ReaderViewportProps {
   comic: StoredComic;
+  allComics?: StoredComic[];
   onClose: () => void;
+  onOpenComic?: (comic: StoredComic) => void;
 }
 
 export const ReaderViewport: React.FC<ReaderViewportProps> = ({
   comic,
+  allComics = [],
   onClose,
+  onOpenComic,
 }) => {
   const {
     currentPageIndex,
@@ -24,6 +28,8 @@ export const ReaderViewport: React.FC<ReaderViewportProps> = ({
     pageSpread,
     brightness,
     colorFilter,
+    bookmarks,
+    nextComic,
     isHudVisible,
     isFilmstripOpen,
     isFullscreen,
@@ -39,6 +45,7 @@ export const ReaderViewport: React.FC<ReaderViewportProps> = ({
     setPageSpread,
     setBrightness,
     setColorFilter,
+    toggleBookmark,
     toggleHud,
     toggleFilmstrip,
     toggleFullscreen,
@@ -46,7 +53,7 @@ export const ReaderViewport: React.FC<ReaderViewportProps> = ({
     prevPage,
     goToPage,
     resetZoom,
-  } = useReader({ comic, onClose });
+  } = useReader({ comic, allComics, onClose });
 
   const isSnapMode = true;
 
@@ -94,6 +101,12 @@ export const ReaderViewport: React.FC<ReaderViewportProps> = ({
       if (next === 1) setPan({ x: 0, y: 0 });
       return next;
     });
+  };
+
+  const handleOpenNext = (targetComic: StoredComic) => {
+    if (onOpenComic) {
+      onOpenComic(targetComic);
+    }
   };
 
   return (
@@ -174,6 +187,8 @@ export const ReaderViewport: React.FC<ReaderViewportProps> = ({
         pageSpread={pageSpread}
         brightness={brightness}
         colorFilter={colorFilter}
+        bookmarks={bookmarks}
+        nextComic={nextComic}
         isHudVisible={isHudVisible}
         isFilmstripOpen={isFilmstripOpen}
         isFullscreen={isFullscreen}
@@ -186,6 +201,8 @@ export const ReaderViewport: React.FC<ReaderViewportProps> = ({
         onPageSpreadChange={setPageSpread}
         onBrightnessChange={setBrightness}
         onColorFilterChange={setColorFilter}
+        onToggleBookmark={toggleBookmark}
+        onOpenNextComic={handleOpenNext}
         onToggleFilmstrip={toggleFilmstrip}
         onToggleFullscreen={toggleFullscreen}
         onZoomIn={handleZoomIn}

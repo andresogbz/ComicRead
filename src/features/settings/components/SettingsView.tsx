@@ -167,7 +167,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       {/* Sección 4: Información de la Aplicación */}
       <section className="text-xs text-zinc-500 dark:text-zinc-400 flex flex-col gap-1.5">
         <BrandLogo size="md" />
-        <span>Gomic • Versión 1.0.13 • Lector de cómics minimalista de alto rendimiento</span>
+        <span>Gomic • Versión 1.0.14 • Lector de cómics minimalista de alto rendimiento</span>
         <span>Soporte para archivos .cbz, .cbr y formato Webtoon continuo</span>
       </section>
     </div>

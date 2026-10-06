@@ -14,6 +14,8 @@ export interface StoredComic {
   lastReadAt?: number;
   addedAt: number;
   series?: string;
+  collection?: string;
+  bookmarks?: number[];
   isFavorite?: boolean;
 }
 
@@ -32,6 +34,11 @@ export class ComicDatabase extends Dexie {
 
     this.version(1).stores({
       comics: 'id, title, format, progressPercentage, lastReadAt, addedAt, isFavorite, series',
+      comicFiles: 'comicId',
+    });
+
+    this.version(2).stores({
+      comics: 'id, title, format, progressPercentage, lastReadAt, addedAt, isFavorite, series, collection',
       comicFiles: 'comicId',
     });
   }
