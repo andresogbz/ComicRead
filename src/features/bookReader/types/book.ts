@@ -86,6 +86,7 @@ export interface BookPreferences {
   lineHeight: number; // 1.4 a 2.2
   marginSize: 'compact' | 'normal' | 'wide';
   readingMode: 'paged' | 'scroll';
+  columnCount: 1 | 2;
 }
 
 export const DEFAULT_BOOK_PREFERENCES: BookPreferences = {
@@ -95,6 +96,7 @@ export const DEFAULT_BOOK_PREFERENCES: BookPreferences = {
   lineHeight: 1.7,
   marginSize: 'normal',
   readingMode: 'paged',
+  columnCount: 1,
 };
 
 export interface HighlightColorOption {

@@ -29,6 +29,28 @@
   .page-flip-enter {
     animation: pageFadeReveal 0.32s ease-out forwards;
   }
+
+  .book-prose img {
+    max-width: 100%;
+    max-height: 85%;
+    object-fit: contain;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin: 0.5rem auto;
+    display: block;
+  }
+
+  .book-prose p {
+    text-align: justify;
+    text-justify: inter-word;
+    hyphens: auto;
+    margin-bottom: 0.75em;
+  }
+
+  .book-prose h1, .book-prose h2, .book-prose h3 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
 }
 
 @keyframes pageFlipNext {

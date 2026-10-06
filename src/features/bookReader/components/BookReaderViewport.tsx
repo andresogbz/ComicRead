@@ -62,22 +62,16 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
     };
   }, []);
 
-  // Detección de orientación Horizontal (Landscape) para eliminar márgenes muertos
-  const [isLandscape, setIsLandscape] = useState<boolean>(() => {
-    return typeof window !== 'undefined' && window.innerWidth > window.innerHeight;
-  });
+  // Medición dinámica del contenedor del lector
+  const [containerWidth, setContainerWidth] = useState<number>(0);
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsLandscape(window.innerWidth > window.innerHeight);
-    };
-    window.addEventListener('resize', handleResize);
-    window.addEventListener('orientationchange', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      window.removeEventListener('orientationchange', handleResize);
-    };
-  }, []);
+  // Determinar si realmente se renderizan 2 columnas:
+  // Solo si el usuario lo configuró explícitamente (columnCount === 2)
+  // y la pantalla tiene ancho suficiente (>= 560px)
+  const isTwoColumns = (preferences.columnCount ?? 1) === 2 && containerWidth >= 560;
+
+  // En 2 columnas, la separación entre páginas es de 36px. En 1 columna, es 0px.
+  const columnGapPx = isTwoColumns ? 36 : 0;
 
   // Paginación en capítulo estilo Huawei Books
   const [pageInChapter, setPageInChapter] = useState(0);
@@ -88,6 +82,17 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
   const targetEndRef = useRef(false);
   const touchStartXRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
+
+  // Stride (paso de avance exacto entre páginas/spreads)
+  // Spread S empieza exactamente en S * (containerWidth + columnGapPx)
+  const getStride = useCallback(() => {
+    const el = scrollContainerRef.current;
+    const w = el ? el.clientWidth : containerWidth;
+    if (w <= 0) return 0;
+    const twoCols = (preferences.columnCount ?? 1) === 2 && w >= 560;
+    const gap = twoCols ? 36 : 0;
+    return w + gap;
+  }, [preferences.columnCount, containerWidth]);
 
   // Filtrar resaltados para el capítulo actual
   const chapterHighlights = useMemo(() => {
@@ -113,42 +118,85 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
     return html;
   }, [currentChapter, chapterHighlights]);
 
+  // Observador de dimensiones del contenedor de lectura
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+
+    const updateSize = () => {
+      if (scrollContainerRef.current) {
+        setContainerWidth(scrollContainerRef.current.clientWidth);
+      }
+    };
+
+    updateSize();
+
+    const ro = new ResizeObserver(() => {
+      updateSize();
+    });
+    ro.observe(el);
+
+    const handleWindowResize = () => {
+      updateSize();
+    };
+    window.addEventListener('resize', handleWindowResize);
+    window.addEventListener('orientationchange', handleWindowResize);
+
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', handleWindowResize);
+      window.removeEventListener('orientationchange', handleWindowResize);
+    };
+  }, [preferences.readingMode, preferences.marginSize, preferences.columnCount]);
+
   // Recalcular número de páginas en el capítulo al cambiar contenido o dimensiones
   const recalculatePages = useCallback(() => {
     if (preferences.readingMode === 'scroll') return;
     const el = scrollContainerRef.current;
     if (!el) return;
 
-    // Con column-fill: auto y overflow: hidden, el número de páginas es el ancho total entre el ancho visible
     const clientW = el.clientWidth;
     if (clientW <= 0) return;
 
+    const twoCols = (preferences.columnCount ?? 1) === 2 && clientW >= 560;
+    const gap = twoCols ? 36 : 0;
+    const stride = clientW + gap;
+
     const scrollW = el.scrollWidth;
-    const computedPages = Math.max(1, Math.round(scrollW / clientW));
+    const computedPages = Math.max(1, Math.ceil((scrollW - 10) / stride));
     setTotalPagesInChapter(computedPages);
 
     if (targetEndRef.current) {
       targetEndRef.current = false;
       const lastPage = Math.max(0, computedPages - 1);
       setPageInChapter(lastPage);
-      el.scrollTo({ left: lastPage * clientW, behavior: 'instant' });
+      el.scrollTo({ left: lastPage * stride, behavior: 'instant' });
     } else {
       setPageInChapter((prev) => {
         const clamped = Math.min(prev, Math.max(0, computedPages - 1));
-        el.scrollTo({ left: clamped * clientW, behavior: 'instant' });
+        el.scrollTo({ left: clamped * stride, behavior: 'instant' });
         return clamped;
       });
     }
-  }, [preferences.readingMode]);
+  }, [preferences.readingMode, preferences.columnCount]);
 
-  // Ejecutar recálculo cuando cambia el capítulo, el HTML, o las dimensiones
+  // Ejecutar recálculo cuando cambia el capítulo, el HTML, o las preferencias
   useEffect(() => {
     const timer = setTimeout(() => {
       recalculatePages();
-    }, 60);
+    }, 50);
 
     return () => clearTimeout(timer);
-  }, [renderedContent, preferences.fontSize, preferences.lineHeight, preferences.fontFamily, isLandscape, recalculatePages]);
+  }, [
+    renderedContent,
+    preferences.fontSize,
+    preferences.lineHeight,
+    preferences.fontFamily,
+    preferences.columnCount,
+    preferences.marginSize,
+    containerWidth,
+    recalculatePages,
+  ]);
 
   // Al cambiar de capítulo externamente
   useEffect(() => {
@@ -164,8 +212,11 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
   const syncScrollPosition = useCallback((targetPage: number) => {
     const el = scrollContainerRef.current;
     if (!el) return;
-    el.scrollTo({ left: targetPage * el.clientWidth, behavior: 'instant' });
-  }, []);
+    const stride = getStride();
+    if (stride > 0) {
+      el.scrollTo({ left: targetPage * stride, behavior: 'instant' });
+    }
+  }, [getStride]);
 
   // Animación 3D realista de paso de página (Efecto Hoja tipo Huawei Books)
   const turnNextPage = useCallback(() => {
@@ -295,6 +346,45 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
       ? 'ui-monospace, SFMono-Regular, Menlo, monospace'
       : 'system-ui, -apple-system, sans-serif';
 
+  // Margen y ancho dinámicos según preferencias de lectura
+  const marginWrapperClass = useMemo(() => {
+    const isTwoCol = (preferences.columnCount ?? 1) === 2;
+    if (isTwoCol) {
+      switch (preferences.marginSize) {
+        case 'compact':
+          return 'max-w-7xl px-3 sm:px-6';
+        case 'wide':
+          return 'max-w-5xl px-8 sm:px-14';
+        case 'normal':
+        default:
+          return 'max-w-6xl px-5 sm:px-10';
+      }
+    }
+
+    // 1 Columna (Default): Medida cómoda de lectura tipo libro
+    switch (preferences.marginSize) {
+      case 'compact':
+        return 'max-w-4xl px-3 sm:px-6';
+      case 'wide':
+        return 'max-w-xl px-8 sm:px-14';
+      case 'normal':
+      default:
+        return 'max-w-2xl lg:max-w-3xl px-5 sm:px-10';
+    }
+  }, [preferences.marginSize, preferences.columnCount]);
+
+  const scrollModeMarginClass = useMemo(() => {
+    switch (preferences.marginSize) {
+      case 'compact':
+        return 'max-w-4xl';
+      case 'wide':
+        return 'max-w-2xl';
+      case 'normal':
+      default:
+        return 'max-w-3xl';
+    }
+  }, [preferences.marginSize]);
+
   // Porcentaje general de avance del libro
   const overallBookPercent =
     totalChapters > 0
@@ -422,7 +512,7 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
           onTouchEnd={handleTextSelection}
           className="flex-1 w-full overflow-y-auto overflow-x-hidden pt-12 pb-20 px-4 sm:px-12 md:px-20 focus:outline-none"
         >
-          <div className="mx-auto w-full max-w-4xl">
+          <div className={`mx-auto w-full ${scrollModeMarginClass}`}>
             {currentChapter && (
               <header className="mb-8 pb-4 border-b border-current opacity-30 select-none">
                 <span className="text-xs font-sans uppercase opacity-75">
@@ -446,36 +536,43 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
           </div>
         </div>
       ) : (
-        /* Modo Paginado Huawei Books con Animación 3D y 2 Columnas en Horizontal */
-        <div className="relative flex-1 w-full h-full overflow-hidden pt-8 pb-9 px-5 sm:px-10 md:px-16 page-flip-stage">
-          <div
-            ref={scrollContainerRef}
-            className={`w-full h-full overflow-hidden transition-transform duration-75 ${
-              flipAnimation === 'next'
-                ? 'page-flip-next-exit'
-                : flipAnimation === 'prev'
-                ? 'page-flip-prev-exit'
-                : flipAnimation === 'enter'
-                ? 'page-flip-enter'
-                : ''
-            }`}
-          >
+        /* Modo Paginado Huawei Books con Animación 3D y Columnas Configurables */
+        <div className="relative flex-1 w-full h-full overflow-hidden pt-8 pb-9 flex items-center justify-center page-flip-stage">
+          <div className={`w-full h-full mx-auto flex items-center justify-center ${marginWrapperClass}`}>
             <div
-              ref={contentRef}
-              onMouseUp={handleTextSelection}
-              onTouchEnd={handleTextSelection}
-              className="h-full w-full book-prose focus:outline-none"
-              style={{
-                fontFamily: fontFamilyStyle,
-                fontSize: `${preferences.fontSize}px`,
-                lineHeight: preferences.lineHeight,
-                height: '100%',
-                columnFill: 'auto',
-                columnWidth: isLandscape ? 'calc((100vw - 12rem) / 2)' : 'calc(100vw - 3rem)',
-                columnGap: isLandscape ? '4rem' : '0px',
-              }}
-              dangerouslySetInnerHTML={{ __html: renderedContent }}
-            />
+              ref={scrollContainerRef}
+              className={`w-full h-full overflow-hidden transition-transform duration-75 ${
+                flipAnimation === 'next'
+                  ? 'page-flip-next-exit'
+                  : flipAnimation === 'prev'
+                  ? 'page-flip-prev-exit'
+                  : flipAnimation === 'enter'
+                  ? 'page-flip-enter'
+                  : ''
+              }`}
+            >
+              <div
+                ref={contentRef}
+                onMouseUp={handleTextSelection}
+                onTouchEnd={handleTextSelection}
+                className="h-full w-full book-prose focus:outline-none"
+                style={{
+                  fontFamily: fontFamilyStyle,
+                  fontSize: `${preferences.fontSize}px`,
+                  lineHeight: preferences.lineHeight,
+                  height: '100%',
+                  columnFill: 'auto',
+                  columnWidth:
+                    isTwoColumns && containerWidth > 0
+                      ? `${(containerWidth - columnGapPx) / 2}px`
+                      : containerWidth > 0
+                      ? `${containerWidth}px`
+                      : '100%',
+                  columnGap: `${columnGapPx}px`,
+                }}
+                dangerouslySetInnerHTML={{ __html: renderedContent }}
+              />
+            </div>
           </div>
         </div>
       )}

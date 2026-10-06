@@ -223,6 +223,41 @@ export const BookSettingsModal: React.FC<BookSettingsModalProps> = ({
               </button>
             </div>
           </div>
+
+          {/* 7. Columnas de lectura */}
+          <div className="flex items-center justify-between pt-2 border-t border-zinc-800/80">
+            <div className="flex flex-col">
+              <span className="text-[11px] font-medium text-zinc-400">Columnas</span>
+              <span className="text-[10px] text-zinc-500">
+                {(preferences.columnCount ?? 1) === 2 ? '2 columnas' : '1 columna'}
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => onUpdatePreferences({ columnCount: 1 })}
+                className={`px-3 py-1 text-xs transition-colors cursor-pointer ${
+                  (preferences.columnCount ?? 1) === 1
+                    ? 'bg-zinc-800 text-amber-400 font-semibold'
+                    : 'bg-zinc-900 text-zinc-400 hover:text-zinc-200'
+                }`}
+              >
+                1 Columna
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onUpdatePreferences({ columnCount: 2 })}
+                className={`px-3 py-1 text-xs transition-colors cursor-pointer ${
+                  preferences.columnCount === 2
+                    ? 'bg-zinc-800 text-amber-400 font-semibold'
+                    : 'bg-zinc-900 text-zinc-400 hover:text-zinc-200'
+                }`}
+              >
+                2 Columnas
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
