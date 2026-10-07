@@ -91,10 +91,10 @@ export const EmptyLibraryState: React.FC<EmptyLibraryStateProps> = ({
         <button
           type="button"
           onClick={onPickFiles}
-          className="flex h-10 items-center gap-2 rounded-full px-6 text-xs font-semibold text-white active:scale-95 transition-all cursor-pointer"
-          style={{ backgroundColor: primaryColor.hex }}
+          className="flex h-10 items-center gap-2 rounded-full px-6 text-xs font-semibold active:scale-95 transition-all cursor-pointer"
+          style={{ backgroundColor: primaryColor.hex, color: 'var(--btn-text)' }}
         >
-          <BookPlus className="h-4 w-4 stroke-[2]" />
+          <BookPlus className="h-4 w-4 stroke-[2]" style={{ color: 'var(--btn-text)' }} />
           <span>Seleccionar cómics</span>
         </button>
 

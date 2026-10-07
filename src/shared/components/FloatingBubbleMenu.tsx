@@ -137,10 +137,10 @@ export const FloatingBubbleMenu: React.FC<FloatingBubbleMenuProps> = ({
                     }}
                     className={`flex h-12 w-12 items-center justify-center rounded-full backdrop-blur-md hover:scale-110 active:scale-95 transition-all cursor-pointer border ${
                       isActive
-                        ? 'text-white border-white/30 scale-105'
+                        ? 'border-white/30 scale-105'
                         : 'bg-zinc-900/90 text-zinc-300 hover:text-white border-white/10'
                     }`}
-                    style={isActive ? { backgroundColor: primaryColor.hex } : undefined}
+                    style={isActive ? { backgroundColor: primaryColor.hex, color: 'var(--btn-text)' } : undefined}
                     aria-label={`Ir a ${item.label}`}
                   >
                     <IconComponent className="h-5 w-5 stroke-[2]" />
@@ -155,14 +155,14 @@ export const FloatingBubbleMenu: React.FC<FloatingBubbleMenuProps> = ({
         <button
           type="button"
           onClick={() => setIsOpen((prev) => !prev)}
-          className="flex h-14 w-14 items-center justify-center rounded-full text-white shadow-none hover:scale-105 active:scale-90 transition-all cursor-pointer"
-          style={{ backgroundColor: primaryColor.hex }}
+          className="flex h-14 w-14 items-center justify-center rounded-full shadow-none hover:scale-105 active:scale-90 transition-all cursor-pointer"
+          style={{ backgroundColor: primaryColor.hex, color: 'var(--btn-text)' }}
           aria-label={isOpen ? 'Cerrar menú' : 'Abrir menú de navegación'}
         >
           {isOpen ? (
-            <X className="h-6 w-6 stroke-[2.5] transition-transform duration-200 rotate-90 animate-in spin-in-90" />
+            <X className="h-6 w-6 stroke-[2.5] transition-transform duration-200 rotate-90 animate-in spin-in-90" style={{ color: 'var(--btn-text)' }} />
           ) : (
-            <Menu className="h-6 w-6 stroke-[2.5] transition-transform duration-200" />
+            <Menu className="h-6 w-6 stroke-[2.5] transition-transform duration-200" style={{ color: 'var(--btn-text)' }} />
           )}
         </button>
       </div>

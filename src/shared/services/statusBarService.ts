@@ -6,16 +6,16 @@ let currentBgColor = '#0c0c0e';
 
 export const statusBarService = {
   /**
-   * Configura la barra de estado para que coincida con el fondo de la aplicación
-   * (Edge-to-Edge al estilo GitHub / Android moderno), adaptándose con precisión
-   * tanto a teléfonos móviles como a tablets (eliminando la máscara gris en Huawei EMUI / HarmonyOS).
+   * Configura la barra de estado para que coincida exactamente con el fondo de la app
+   * (blanco en modo claro, oscuro en modo oscuro, o color personalizado),
+   * garantizando que tome el color real tanto en teléfonos como en tablets Huawei/Android.
    */
   async initAppTheme(isDark = true, bgColor = isDark ? '#0c0c0e' : '#ffffff'): Promise<void> {
     currentIsDark = isDark;
     currentBgColor = bgColor;
     if (!Capacitor.isNativePlatform()) return;
     try {
-      await StatusBar.setOverlaysWebView({ overlay: true });
+      await StatusBar.setOverlaysWebView({ overlay: false });
       await StatusBar.setStyle({ style: isDark ? Style.Dark : Style.Light });
       await StatusBar.setBackgroundColor({ color: bgColor });
       await StatusBar.show();
@@ -34,7 +34,7 @@ export const statusBarService = {
     }
     if (!Capacitor.isNativePlatform()) return;
     try {
-      await StatusBar.setOverlaysWebView({ overlay: true });
+      await StatusBar.setOverlaysWebView({ overlay: false });
       await StatusBar.setStyle({ style: isDark ? Style.Dark : Style.Light });
       await StatusBar.setBackgroundColor({ color: currentBgColor });
       await StatusBar.show();
@@ -63,7 +63,7 @@ export const statusBarService = {
     if (Capacitor.isNativePlatform()) {
       try {
         await StatusBar.show();
-        await StatusBar.setOverlaysWebView({ overlay: true });
+        await StatusBar.setOverlaysWebView({ overlay: false });
         await StatusBar.setStyle({ style: currentIsDark ? Style.Dark : Style.Light });
         await StatusBar.setBackgroundColor({ color: currentBgColor });
       } catch (e) {

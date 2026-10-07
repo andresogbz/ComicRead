@@ -68,13 +68,14 @@ export const LibraryHeader: React.FC<LibraryHeaderProps> = ({
         <button
           type="button"
           onClick={onPickFiles}
-          className="flex h-8 sm:h-9 items-center gap-1.5 rounded-full px-3.5 sm:px-4 text-xs font-semibold text-white active:scale-95 transition-all cursor-pointer"
+          className="flex h-8 sm:h-9 items-center gap-1.5 rounded-full px-3.5 sm:px-4 text-xs font-semibold active:scale-95 transition-all cursor-pointer"
           style={{
             backgroundColor: primaryColor.hex,
+            color: 'var(--btn-text)',
           }}
           aria-label="Abrir cómic"
         >
-          <Plus className="h-4 w-4 stroke-[2.5]" />
+          <Plus className="h-4 w-4 stroke-[2.5]" style={{ color: 'var(--btn-text)' }} />
           <span>Abrir cómic</span>
         </button>
       </div>

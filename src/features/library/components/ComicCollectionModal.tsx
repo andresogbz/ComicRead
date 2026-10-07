@@ -131,8 +131,8 @@ export const ComicCollectionModal: React.FC<ComicCollectionModalProps> = ({
               </button>
               <button
                 type="submit"
-                className="px-4 py-1.5 text-xs font-semibold text-white rounded-full transition-opacity cursor-pointer active:scale-95"
-                style={{ backgroundColor: primaryColor.hex }}
+                className="px-4 py-1.5 text-xs font-semibold rounded-full transition-opacity cursor-pointer active:scale-95"
+                style={{ backgroundColor: primaryColor.hex, color: 'var(--btn-text)' }}
               >
                 Guardar
               </button>

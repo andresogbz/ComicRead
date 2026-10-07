@@ -43,15 +43,16 @@ export const AppNavigation: React.FC<AppNavigationProps> = ({
         <button
           type="button"
           onClick={onPickFiles}
-          className="flex h-8 sm:h-9 items-center justify-center gap-1.5 rounded-full px-3.5 sm:px-4 text-xs font-bold text-white active:scale-95 transition-all cursor-pointer shrink-0"
+          className="flex h-8 sm:h-9 items-center justify-center gap-1.5 rounded-full px-3.5 sm:px-4 text-xs font-bold active:scale-95 transition-all cursor-pointer shrink-0"
           style={{
             backgroundColor: primaryColor.hex,
+            color: 'var(--btn-text)',
           }}
           title="Agregar cómic"
           aria-label="Agregar cómic"
         >
-          <Plus className="h-4 w-4 stroke-[2.5]" />
-          <span className="hidden sm:inline">Agregar cómic</span>
+          <Plus className="h-4 w-4 stroke-[2.5]" style={{ color: 'var(--btn-text)' }} />
+          <span className="hidden sm:inline" style={{ color: 'var(--btn-text)' }}>Agregar cómic</span>
         </button>
       </div>
     </header>

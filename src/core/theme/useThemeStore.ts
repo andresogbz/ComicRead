@@ -35,6 +35,7 @@ interface ThemeState {
   customTitleColor: string | null;
   customTextColor: string | null;
   customMutedColor: string | null;
+  customButtonTextColor: string | null;
   setMode: (mode: ThemeMode) => void;
   toggleMode: () => void;
   setPrimaryColor: (color: PrimaryColorOption) => void;
@@ -43,6 +44,7 @@ interface ThemeState {
   setCustomTitleColor: (hex: string | null) => void;
   setCustomTextColor: (hex: string | null) => void;
   setCustomMutedColor: (hex: string | null) => void;
+  setCustomButtonTextColor: (hex: string | null) => void;
   resetColors: () => void;
   resetToDefaults: () => void;
 }
@@ -53,6 +55,7 @@ const STORAGE_KEY_BG = 'comicread_theme_bg';
 const STORAGE_KEY_TITLE = 'comicread_theme_title';
 const STORAGE_KEY_TEXT = 'comicread_theme_text';
 const STORAGE_KEY_MUTED = 'comicread_theme_muted';
+const STORAGE_KEY_BTN_TEXT = 'comicread_theme_btn_text';
 
 function getInitialMode(): ThemeMode {
   if (typeof window === 'undefined') return 'dark';
@@ -89,7 +92,8 @@ function applyTheme(
   customBg: string | null,
   customTitle: string | null,
   customText: string | null,
-  customMuted: string | null
+  customMuted: string | null,
+  customBtnText: string | null
 ) {
   if (typeof document === 'undefined') return;
 
@@ -102,10 +106,12 @@ function applyTheme(
   const defaultText = isDark ? '#f4f4f5' : '#18181b';
   const defaultMuted = isDark ? '#a1a1aa' : '#71717a';
   const defaultBorder = isDark ? '#27272a' : '#e4e4e7';
+  const defaultBtnText = isDarkColor(color.hex) ? '#ffffff' : '#09090b';
 
   const effectiveTitle = customTitle || defaultTitle;
   const effectiveText = customText || defaultText;
   const effectiveMuted = customMuted || defaultMuted;
+  const effectiveBtnText = customBtnText || defaultBtnText;
 
   if (isDark) {
     root.classList.add('dark');
@@ -120,6 +126,7 @@ function applyTheme(
   root.style.setProperty('--border-subtle', defaultBorder);
   root.style.setProperty('--primary-color', color.hex);
   root.style.setProperty('--primary-glow', 'transparent');
+  root.style.setProperty('--btn-text', effectiveBtnText);
 
   root.style.backgroundColor = effectiveBg;
   root.style.color = effectiveText;
@@ -143,6 +150,7 @@ export const useThemeStore = create<ThemeState>((set, get) => {
   const initialTitle = getInitialStored(STORAGE_KEY_TITLE);
   const initialText = getInitialStored(STORAGE_KEY_TEXT);
   const initialMuted = getInitialStored(STORAGE_KEY_MUTED);
+  const initialBtnText = getInitialStored(STORAGE_KEY_BTN_TEXT);
 
   // Aplicar inmediatamente en inicialización
   applyTheme(
@@ -151,7 +159,8 @@ export const useThemeStore = create<ThemeState>((set, get) => {
     initialBg,
     initialTitle,
     initialText,
-    initialMuted
+    initialMuted,
+    initialBtnText
   );
 
   return {
@@ -161,6 +170,7 @@ export const useThemeStore = create<ThemeState>((set, get) => {
     customTitleColor: initialTitle,
     customTextColor: initialText,
     customMutedColor: initialMuted,
+    customButtonTextColor: initialBtnText,
 
     setMode: (mode: ThemeMode) => {
       localStorage.setItem(STORAGE_KEY_MODE, mode);
@@ -171,7 +181,8 @@ export const useThemeStore = create<ThemeState>((set, get) => {
         state.customBgColor,
         state.customTitleColor,
         state.customTextColor,
-        state.customMutedColor
+        state.customMutedColor,
+        state.customButtonTextColor
       );
       set({ mode });
     },
@@ -186,7 +197,8 @@ export const useThemeStore = create<ThemeState>((set, get) => {
         state.customBgColor,
         state.customTitleColor,
         state.customTextColor,
-        state.customMutedColor
+        state.customMutedColor,
+        state.customButtonTextColor
       );
       set({ mode: nextMode });
     },
@@ -200,7 +212,8 @@ export const useThemeStore = create<ThemeState>((set, get) => {
         state.customBgColor,
         state.customTitleColor,
         state.customTextColor,
-        state.customMutedColor
+        state.customMutedColor,
+        state.customButtonTextColor
       );
       set({ primaryColor: color });
     },
@@ -220,7 +233,8 @@ export const useThemeStore = create<ThemeState>((set, get) => {
         state.customBgColor,
         state.customTitleColor,
         state.customTextColor,
-        state.customMutedColor
+        state.customMutedColor,
+        state.customButtonTextColor
       );
       set({ primaryColor: option });
     },
@@ -238,7 +252,8 @@ export const useThemeStore = create<ThemeState>((set, get) => {
         hex,
         state.customTitleColor,
         state.customTextColor,
-        state.customMutedColor
+        state.customMutedColor,
+        state.customButtonTextColor
       );
       set({ customBgColor: hex });
     },
@@ -256,7 +271,8 @@ export const useThemeStore = create<ThemeState>((set, get) => {
         state.customBgColor,
         hex,
         state.customTextColor,
-        state.customMutedColor
+        state.customMutedColor,
+        state.customButtonTextColor
       );
       set({ customTitleColor: hex });
     },
@@ -274,7 +290,8 @@ export const useThemeStore = create<ThemeState>((set, get) => {
         state.customBgColor,
         state.customTitleColor,
         hex,
-        state.customMutedColor
+        state.customMutedColor,
+        state.customButtonTextColor
       );
       set({ customTextColor: hex });
     },
@@ -292,9 +309,29 @@ export const useThemeStore = create<ThemeState>((set, get) => {
         state.customBgColor,
         state.customTitleColor,
         state.customTextColor,
-        hex
+        hex,
+        state.customButtonTextColor
       );
       set({ customMutedColor: hex });
+    },
+
+    setCustomButtonTextColor: (hex: string | null) => {
+      if (hex) {
+        localStorage.setItem(STORAGE_KEY_BTN_TEXT, hex);
+      } else {
+        localStorage.removeItem(STORAGE_KEY_BTN_TEXT);
+      }
+      const state = get();
+      applyTheme(
+        state.mode,
+        state.primaryColor,
+        state.customBgColor,
+        state.customTitleColor,
+        state.customTextColor,
+        state.customMutedColor,
+        hex
+      );
+      set({ customButtonTextColor: hex });
     },
 
     resetColors: () => {
@@ -302,15 +339,17 @@ export const useThemeStore = create<ThemeState>((set, get) => {
       localStorage.removeItem(STORAGE_KEY_TITLE);
       localStorage.removeItem(STORAGE_KEY_TEXT);
       localStorage.removeItem(STORAGE_KEY_MUTED);
+      localStorage.removeItem(STORAGE_KEY_BTN_TEXT);
       localStorage.removeItem(STORAGE_KEY_COLOR);
       const defaultColor = PRIMARY_COLORS[0];
-      applyTheme(get().mode, defaultColor, null, null, null, null);
+      applyTheme(get().mode, defaultColor, null, null, null, null, null);
       set({
         primaryColor: defaultColor,
         customBgColor: null,
         customTitleColor: null,
         customTextColor: null,
         customMutedColor: null,
+        customButtonTextColor: null,
       });
     },
 

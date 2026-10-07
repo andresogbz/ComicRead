@@ -44,8 +44,8 @@ export const HomeHero: React.FC<HomeHeroProps> = ({
             <button
               type="button"
               onClick={onPickFiles}
-              className="flex h-11 items-center gap-2 rounded-full px-6 text-xs sm:text-sm font-bold text-white active:scale-95 transition-all cursor-pointer"
-              style={{ backgroundColor: primaryColor.hex }}
+              className="flex h-11 items-center gap-2 rounded-full px-6 text-xs sm:text-sm font-bold active:scale-95 transition-all cursor-pointer"
+              style={{ backgroundColor: primaryColor.hex, color: 'var(--btn-text)' }}
             >
               <span>Agregar cómics</span>
             </button>
@@ -67,8 +67,8 @@ export const HomeHero: React.FC<HomeHeroProps> = ({
           {/* Badges de estado, medio y formato */}
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <span
-              className="rounded-full px-3 py-0.5 text-[11px] font-bold text-white"
-              style={{ backgroundColor: primaryColor.hex }}
+              className="rounded-full px-3 py-0.5 text-[11px] font-bold"
+              style={{ backgroundColor: primaryColor.hex, color: 'var(--btn-text)' }}
             >
               {isBook ? 'Libro' : 'Cómic'} · .{comic.format}
             </span>
@@ -131,11 +131,11 @@ export const HomeHero: React.FC<HomeHeroProps> = ({
             <button
               type="button"
               onClick={() => onOpenComic(comic)}
-              className="flex h-11 items-center gap-2.5 rounded-full px-7 text-xs sm:text-sm font-bold text-white active:scale-95 transition-all cursor-pointer"
-              style={{ backgroundColor: primaryColor.hex }}
+              className="flex h-11 items-center gap-2.5 rounded-full px-7 text-xs sm:text-sm font-bold active:scale-95 transition-all cursor-pointer"
+              style={{ backgroundColor: primaryColor.hex, color: 'var(--btn-text)' }}
             >
-              <Play className="h-4 w-4 fill-white stroke-[2]" />
-              <span>{isStarted ? 'Continuar lectura' : 'Comenzar a leer'}</span>
+              <Play className="h-4 w-4 stroke-[2]" style={{ fill: 'var(--btn-text)', color: 'var(--btn-text)' }} />
+              <span style={{ color: 'var(--btn-text)' }}>{isStarted ? 'Continuar lectura' : 'Comenzar a leer'}</span>
             </button>
           </div>
         </div>

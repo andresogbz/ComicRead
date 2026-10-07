@@ -10,7 +10,7 @@ import {
   Keyboard,
   RotateCcw,
 } from 'lucide-react';
-import { useThemeStore } from '../../../core/theme/useThemeStore';
+import { useThemeStore, isDarkColor } from '../../../core/theme/useThemeStore';
 import { BrandLogo } from '../../../shared/components/BrandLogo';
 import { backupService } from '../services/backupService';
 import { readerCache } from '../../reader/services/readerCacheService';
@@ -35,10 +35,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     customTitleColor,
     customTextColor,
     customMutedColor,
+    customButtonTextColor,
     setCustomBgColor,
     setCustomTitleColor,
     setCustomTextColor,
     setCustomMutedColor,
+    setCustomButtonTextColor,
     setPrimaryHex,
     resetColors,
   } = useThemeStore();
@@ -236,7 +238,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             </p>
           </div>
 
-          {(customBgColor || customTitleColor || customTextColor || customMutedColor || primaryColor.hex.toLowerCase() !== '#6366f1') && (
+          {(customBgColor || customTitleColor || customTextColor || customMutedColor || customButtonTextColor || primaryColor.hex.toLowerCase() !== '#6366f1') && (
             <button
               type="button"
               onClick={resetColors}
@@ -487,15 +489,15 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             </div>
           </div>
 
-          {/* 5. Color de Acentuación */}
-          <div className="flex flex-col gap-2 md:col-span-2">
+          {/* 5. Color de Acentuación (Fondo de botones) */}
+          <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xs sm:text-sm font-semibold m-0" style={{ color: 'var(--text-title)' }}>
                   Color de acentuación
                 </h3>
                 <p className="text-[11px] sm:text-xs m-0 mt-0.5" style={{ color: 'var(--text-muted)' }}>
-                  Barras de progreso, iconos y botones principales
+                  Fondo de botones principales y badges
                 </p>
               </div>
               {primaryColor.hex.toLowerCase() !== '#6366f1' && (
@@ -538,6 +540,65 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   className="font-mono text-xs font-semibold bg-transparent border-b border-zinc-300 dark:border-zinc-700 w-24 focus:outline-none"
                   style={{ color: 'var(--text-title)', borderBottomColor: primaryColor.hex }}
                   placeholder="#6366F1"
+                />
+                <span className="text-[10px] mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                  Toca el círculo para selector
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* 6. Color de Texto de Botones */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xs sm:text-sm font-semibold m-0" style={{ color: 'var(--text-title)' }}>
+                  Color de texto en botones
+                </h3>
+                <p className="text-[11px] sm:text-xs m-0 mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                  Texto e iconos dentro de botones y acciones
+                </p>
+              </div>
+              {customButtonTextColor && (
+                <button
+                  type="button"
+                  onClick={() => setCustomButtonTextColor(null)}
+                  className="text-xs flex items-center gap-1 hover:opacity-80 transition-opacity cursor-pointer"
+                  style={{ color: 'var(--text-muted)' }}
+                >
+                  <RotateCcw className="h-3 w-3" />
+                  <span>Predeterminado</span>
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-3 pt-0.5">
+              <label className="relative flex items-center justify-center cursor-pointer group shrink-0">
+                <div
+                  className="h-9 w-9 rounded-full border border-zinc-300/60 dark:border-zinc-700/60 transition-transform active:scale-95 group-hover:scale-105"
+                  style={{ backgroundColor: customButtonTextColor || (isDarkColor(primaryColor.hex) ? '#ffffff' : '#09090b') }}
+                />
+                <input
+                  type="color"
+                  value={customButtonTextColor || (isDarkColor(primaryColor.hex) ? '#ffffff' : '#09090b')}
+                  onChange={(e) => setCustomButtonTextColor(e.target.value)}
+                  className="sr-only"
+                />
+              </label>
+
+              <div className="flex flex-col">
+                <input
+                  type="text"
+                  value={(customButtonTextColor || (isDarkColor(primaryColor.hex) ? '#FFFFFF' : '#09090B')).toUpperCase()}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (/^#[0-9A-Fa-f]{0,6}$/.test(val)) {
+                      if (val.length === 7) setCustomButtonTextColor(val);
+                    }
+                  }}
+                  className="font-mono text-xs font-semibold bg-transparent border-b border-zinc-300 dark:border-zinc-700 w-24 focus:outline-none"
+                  style={{ color: 'var(--text-title)', borderBottomColor: primaryColor.hex }}
+                  placeholder="#FFFFFF"
                 />
                 <span className="text-[10px] mt-0.5" style={{ color: 'var(--text-muted)' }}>
                   Toca el círculo para selector

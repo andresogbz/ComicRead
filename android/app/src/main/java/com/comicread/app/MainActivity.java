@@ -15,7 +15,6 @@ public class MainActivity extends BridgeActivity {
         Window window = getWindow();
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.setStatusBarColor(Color.TRANSPARENT);
         window.setNavigationBarColor(Color.parseColor("#0C0C0E"));
 
         // En Android 10+ (API 29+), deshabilitar la imposición de contraste que
@@ -25,7 +24,8 @@ public class MainActivity extends BridgeActivity {
             window.setNavigationBarContrastEnforced(false);
         }
 
-        WindowCompat.setDecorFitsSystemWindows(window, false);
+        // Permitir que la barra de estado se coloree sólidamente según el modo (claro/oscuro)
+        WindowCompat.setDecorFitsSystemWindows(window, true);
     }
 
     @Override
