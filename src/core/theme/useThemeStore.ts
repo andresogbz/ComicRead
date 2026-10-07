@@ -132,8 +132,8 @@ function applyTheme(
     metaTheme.setAttribute('content', effectiveBg);
   }
 
-  // Sincronizar estilo e iconos de la barra de estado
-  statusBarService.updateStatusBarStyle(isDark);
+  // Sincronizar estilo, contraste y color de fondo de la barra de estado
+  statusBarService.updateStatusBarStyle(isDark, effectiveBg);
 }
 
 export const useThemeStore = create<ThemeState>((set, get) => {

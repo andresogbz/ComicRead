@@ -1,33 +1,43 @@
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { Capacitor } from '@capacitor/core';
 
+let currentIsDark = true;
+let currentBgColor = '#0c0c0e';
+
 export const statusBarService = {
   /**
-   * Configura la barra de estado para que sea 100% transparente y superpuesta
-   * sobre el lienzo de la app (Edge-to-Edge al estilo GitHub / Android moderno),
-   * haciendo que adopte el color exacto del fondo de la aplicación.
+   * Configura la barra de estado para que coincida con el fondo de la aplicación
+   * (Edge-to-Edge al estilo GitHub / Android moderno), adaptándose con precisión
+   * tanto a teléfonos móviles como a tablets (eliminando la máscara gris en Huawei EMUI / HarmonyOS).
    */
-  async initAppTheme(isDark = true): Promise<void> {
+  async initAppTheme(isDark = true, bgColor = isDark ? '#0c0c0e' : '#ffffff'): Promise<void> {
+    currentIsDark = isDark;
+    currentBgColor = bgColor;
     if (!Capacitor.isNativePlatform()) return;
     try {
       await StatusBar.setOverlaysWebView({ overlay: true });
       await StatusBar.setStyle({ style: isDark ? Style.Dark : Style.Light });
-      await StatusBar.setBackgroundColor({ color: '#00000000' });
+      await StatusBar.setBackgroundColor({ color: bgColor });
       await StatusBar.show();
     } catch (e) {
-      console.warn('[StatusBar] No se pudo inicializar la barra de estado transparente:', e);
+      console.warn('[StatusBar] No se pudo inicializar la barra de estado:', e);
     }
   },
 
   /**
-   * Actualiza el contraste de iconos según la luminosidad del color de fondo seleccionado.
+   * Actualiza el contraste de iconos y el color exacto de la barra según el fondo seleccionado.
    */
-  async updateStatusBarStyle(isDark: boolean): Promise<void> {
+  async updateStatusBarStyle(isDark: boolean, bgColor?: string): Promise<void> {
+    currentIsDark = isDark;
+    if (bgColor) {
+      currentBgColor = bgColor;
+    }
     if (!Capacitor.isNativePlatform()) return;
     try {
       await StatusBar.setOverlaysWebView({ overlay: true });
       await StatusBar.setStyle({ style: isDark ? Style.Dark : Style.Light });
-      await StatusBar.setBackgroundColor({ color: '#00000000' });
+      await StatusBar.setBackgroundColor({ color: currentBgColor });
+      await StatusBar.show();
     } catch (e) {
       console.warn('[StatusBar] No se pudo actualizar el estilo de la barra:', e);
     }
@@ -47,15 +57,15 @@ export const statusBarService = {
   },
 
   /**
-   * Restaura la barra de estado transparente y superpuesta cuando se sale del lector.
+   * Restaura la barra de estado con el color y estilo actual al salir del lector.
    */
-  async exitImmersiveReader(isDark = true): Promise<void> {
+  async exitImmersiveReader(): Promise<void> {
     if (Capacitor.isNativePlatform()) {
       try {
         await StatusBar.show();
         await StatusBar.setOverlaysWebView({ overlay: true });
-        await StatusBar.setStyle({ style: isDark ? Style.Dark : Style.Light });
-        await StatusBar.setBackgroundColor({ color: '#00000000' });
+        await StatusBar.setStyle({ style: currentIsDark ? Style.Dark : Style.Light });
+        await StatusBar.setBackgroundColor({ color: currentBgColor });
       } catch (e) {
         console.warn('[StatusBar] No se pudo restaurar la barra de estado:', e);
       }

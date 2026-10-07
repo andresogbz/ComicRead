@@ -16,6 +16,7 @@ import { useLibraryStore } from './features/library/stores/useLibraryStore';
 import { useLibrary } from './features/library/hooks/useLibrary';
 import { useDirectoryScanner } from './features/library/hooks/useDirectoryScanner';
 import { statusBarService } from './shared/services/statusBarService';
+import { useThemeStore, isDarkColor } from './core/theme/useThemeStore';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<AppTab>('home');
@@ -44,11 +45,14 @@ export function App() {
     loadLibrary();
   }, [loadLibrary]);
 
-  // Recuperación automática e inicialización de la barra de estado (#0C0C0E)
+  // Recuperación automática e inicialización de la barra de estado
   useEffect(() => {
     const initApp = async () => {
       try {
-        await statusBarService.initAppTheme();
+        const { mode, customBgColor } = useThemeStore.getState();
+        const effectiveBg = customBgColor || (mode === 'dark' ? '#0c0c0e' : '#ffffff');
+        const isDark = isDarkColor(effectiveBg);
+        await statusBarService.initAppTheme(isDark, effectiveBg);
       } catch (err) {
         console.warn('[App] Error al inicializar barra de estado:', err);
       }

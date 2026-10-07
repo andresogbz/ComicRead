@@ -17,6 +17,14 @@ public class MainActivity extends BridgeActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(Color.TRANSPARENT);
         window.setNavigationBarColor(Color.parseColor("#0C0C0E"));
+
+        // En Android 10+ (API 29+), deshabilitar la imposición de contraste que
+        // en tablets Huawei (EMUI/HarmonyOS) dibuja una máscara gris forzada sobre la barra.
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            window.setStatusBarContrastEnforced(false);
+            window.setNavigationBarContrastEnforced(false);
+        }
+
         WindowCompat.setDecorFitsSystemWindows(window, false);
     }
 

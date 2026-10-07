@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
-import { Highlighter, Copy, Loader2, AlertCircle, Menu } from 'lucide-react';
+import { Highlighter, Copy, Loader2, AlertCircle } from 'lucide-react';
 import type { StoredComic } from '../../../infrastructure/database/ComicDatabase';
 import { statusBarService } from '../../../shared/services/statusBarService';
 import { useBookReader } from '../hooks/useBookReader';
@@ -527,41 +527,6 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
         onOpenHighlights={() => setIsHighlightsOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
       />
-
-      {/* Cabecera superior visible con botón de Menú cuando el HUD está oculto */}
-      {!isHudVisible && !isLoading && (
-        <header
-          className="absolute top-2 inset-x-0 z-30 flex items-center justify-between px-5 sm:px-8 text-[11px] font-sans opacity-70 hover:opacity-100 select-none transition-opacity duration-150"
-          style={{
-            paddingTop: 'env(safe-area-inset-top, 0px)',
-          }}
-        >
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleHud();
-            }}
-            className="flex items-center gap-1.5 py-1 px-2 -ml-2 rounded text-current hover:opacity-90 cursor-pointer max-w-[70%]"
-            title="Abrir menú y controles"
-          >
-            <Menu className="h-3.5 w-3.5 shrink-0" />
-            <span className="truncate">{currentChapter?.title || 'Menú'}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleHud();
-            }}
-            className="font-mono text-[10px] py-1 px-2 -mr-2 text-current opacity-80 hover:opacity-100 cursor-pointer"
-            title="Abrir menú"
-          >
-            {currentChapterIndex + 1}/{totalChapters}
-          </button>
-        </header>
-      )}
 
       {/* Popover flotante al seleccionar texto */}
       {selectionRange && selectionRange.rect && (
