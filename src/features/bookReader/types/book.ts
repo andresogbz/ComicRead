@@ -90,6 +90,10 @@ export interface BookPreferences {
   readingMode: 'paged' | 'scroll';
   columnCount: 1 | 2;
   pageTransition?: BookPageTransition;
+  customBgColor?: string;
+  customTextColor?: string;
+  customHeadingColor?: string;
+  customAccentColor?: string;
 }
 
 export const DEFAULT_BOOK_PREFERENCES: BookPreferences = {

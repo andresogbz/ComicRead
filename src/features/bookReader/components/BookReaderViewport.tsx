@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
-import { Highlighter, Copy, Loader2, AlertCircle } from 'lucide-react';
+import { Highlighter, Copy, Loader2, AlertCircle, X } from 'lucide-react';
 import type { StoredComic } from '../../../infrastructure/database/ComicDatabase';
 import { statusBarService } from '../../../shared/services/statusBarService';
 import { useBookReader } from '../hooks/useBookReader';
@@ -7,6 +7,7 @@ import { BookReaderHUD } from './BookReaderHUD';
 import { BookTocModal } from './BookTocModal';
 import { BookHighlightsModal } from './BookHighlightsModal';
 import { BookSettingsModal } from './BookSettingsModal';
+import { BookReaderGuideModal } from './BookReaderGuideModal';
 import { BOOK_THEMES, HIGHLIGHT_COLORS } from '../types/book';
 
 interface BookReaderViewportProps {
@@ -35,6 +36,7 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
     isTocOpen,
     isHighlightsOpen,
     isSettingsOpen,
+    isGuideOpen,
     selectionRange,
     contentRef,
     nextChapter,
@@ -48,11 +50,28 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
     setIsTocOpen,
     setIsHighlightsOpen,
     setIsSettingsOpen,
+    setIsGuideOpen,
     setSelectionRange,
     handleTextSelection,
   } = useBookReader({ book, onClose });
 
-  const themeConfig = BOOK_THEMES[preferences.theme] || BOOK_THEMES.sepia;
+  // Configuración de tema combinada con personalización de colores del usuario
+  const themeConfig = useMemo(() => {
+    const base = BOOK_THEMES[preferences.theme] || BOOK_THEMES.sepia;
+    return {
+      ...base,
+      bg: preferences.customBgColor || base.bg,
+      text: preferences.customTextColor || base.text,
+      heading: preferences.customHeadingColor || preferences.customTextColor || base.text,
+      accent: preferences.customAccentColor || base.accent,
+    };
+  }, [
+    preferences.theme,
+    preferences.customBgColor,
+    preferences.customTextColor,
+    preferences.customHeadingColor,
+    preferences.customAccentColor,
+  ]);
 
   // Inmersión completa de pantalla: ocultar barra de estado nativa en Android
   useEffect(() => {
@@ -64,8 +83,21 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
 
   // Medición dinámica del contenedor del lector
   const [containerWidth, setContainerWidth] = useState<number>(0);
+  const [containerHeight, setContainerHeight] = useState<number>(0);
   const viewportWrapperRef = useRef<HTMLDivElement>(null);
   const lastWidthRef = useRef<number>(0);
+  const lastHeightRef = useRef<number>(0);
+
+  // Altura exacta calculada en múltiplos de línea para garantizar que la última línea nunca se corte
+  const snappedContentHeight = useMemo(() => {
+    if (containerHeight <= 0) return undefined;
+    const lineHeightPx = preferences.fontSize * preferences.lineHeight;
+    if (lineHeightPx <= 0) return undefined;
+
+    // Número entero de líneas completas que caben en la altura disponible
+    const fullLines = Math.max(1, Math.floor(containerHeight / lineHeightPx));
+    return Math.floor(fullLines * lineHeightPx);
+  }, [containerHeight, preferences.fontSize, preferences.lineHeight]);
 
   // Determinar si realmente se renderizan 2 columnas:
   // Solo si el usuario lo configuró explícitamente (columnCount === 2)
@@ -136,9 +168,14 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
     const updateSize = () => {
       if (viewportWrapperRef.current) {
         const w = viewportWrapperRef.current.clientWidth;
+        const h = viewportWrapperRef.current.clientHeight;
         if (w > 0 && Math.abs(w - lastWidthRef.current) > 2) {
           lastWidthRef.current = w;
           setContainerWidth(w);
+        }
+        if (h > 0 && Math.abs(h - lastHeightRef.current) > 2) {
+          lastHeightRef.current = h;
+          setContainerHeight(h);
         }
       }
     };
@@ -148,9 +185,14 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const w = entry.contentRect.width;
+        const h = entry.contentRect.height;
         if (w > 0 && Math.abs(w - lastWidthRef.current) > 2) {
           lastWidthRef.current = w;
           setContainerWidth(w);
+        }
+        if (h > 0 && Math.abs(h - lastHeightRef.current) > 2) {
+          lastHeightRef.current = h;
+          setContainerHeight(h);
         }
       }
     });
@@ -215,6 +257,8 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
     preferences.columnCount,
     preferences.marginSize,
     containerWidth,
+    containerHeight,
+    snappedContentHeight,
     recalculatePages,
   ]);
 
@@ -361,6 +405,7 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
     currentChapterIndex,
     transitionType,
     prevChapter,
+    syncScrollPosition,
   ]);
 
   // Toques en pantalla según zonas Huawei Books:
@@ -446,42 +491,42 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
       ? 'ui-monospace, SFMono-Regular, Menlo, monospace'
       : 'system-ui, -apple-system, sans-serif';
 
-  // Margen y ancho dinámicos según preferencias de lectura
+  // Margen y ancho dinámicos según preferencias de lectura (Estilo Huawei Books amplio)
   const marginWrapperClass = useMemo(() => {
     const isTwoCol = (preferences.columnCount ?? 1) === 2;
     if (isTwoCol) {
       switch (preferences.marginSize) {
         case 'compact':
-          return 'max-w-7xl px-3 sm:px-6';
+          return 'w-full max-w-none px-2 sm:px-4 md:px-6';
         case 'wide':
-          return 'max-w-5xl px-8 sm:px-14';
+          return 'w-full max-w-6xl px-6 sm:px-12 md:px-16';
         case 'normal':
         default:
-          return 'max-w-6xl px-5 sm:px-10';
+          return 'w-full max-w-none px-3 sm:px-6 md:px-8';
       }
     }
 
-    // 1 Columna (Default): Medida cómoda de lectura tipo libro
+    // 1 Columna (Default): Amplio para aprovechar casi todo el ancho de la tablet
     switch (preferences.marginSize) {
       case 'compact':
-        return 'max-w-4xl px-3 sm:px-6';
+        return 'w-full max-w-none px-2 sm:px-4 md:px-6';
       case 'wide':
-        return 'max-w-xl px-8 sm:px-14';
+        return 'w-full max-w-4xl px-6 sm:px-12 md:px-16';
       case 'normal':
       default:
-        return 'max-w-2xl lg:max-w-3xl px-5 sm:px-10';
+        return 'w-full max-w-none px-3.5 sm:px-7 md:px-10';
     }
   }, [preferences.marginSize, preferences.columnCount]);
 
   const scrollModeMarginClass = useMemo(() => {
     switch (preferences.marginSize) {
       case 'compact':
-        return 'max-w-4xl';
+        return 'w-full max-w-none px-2 sm:px-4 md:px-6';
       case 'wide':
-        return 'max-w-2xl';
+        return 'w-full max-w-4xl px-6 sm:px-12 md:px-16';
       case 'normal':
       default:
-        return 'max-w-3xl';
+        return 'w-full max-w-none px-3.5 sm:px-7 md:px-10';
     }
   }, [preferences.marginSize]);
 
@@ -504,6 +549,10 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
       style={{
         backgroundColor: themeConfig.bg,
         color: themeConfig.text,
+        ['--reader-bg' as string]: themeConfig.bg,
+        ['--reader-text' as string]: themeConfig.text,
+        ['--reader-heading' as string]: themeConfig.heading,
+        ['--reader-accent' as string]: themeConfig.accent,
       }}
     >
       {/* HUD de navegación estilo Huawei Books */}
@@ -526,47 +575,80 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
         onOpenToc={() => setIsTocOpen(true)}
         onOpenHighlights={() => setIsHighlightsOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenGuide={() => setIsGuideOpen(true)}
       />
 
-      {/* Popover flotante al seleccionar texto */}
-      {selectionRange && selectionRange.rect && (
+      {/* Barra de marcatextos adaptativa sin colisión con el menú nativo de Android en tablets */}
+      {selectionRange && (
         <div
           onClick={(e) => e.stopPropagation()}
-          className="fixed z-50 flex items-center gap-1.5 px-3 py-1.5 bg-zinc-950 text-white rounded-full border border-zinc-800 animate-in fade-in zoom-in-95 duration-100 select-none shadow-none"
-          style={{
-            top: `${Math.max(12, selectionRange.rect.top - 46)}px`,
-            left: `${Math.max(12, Math.min(window.innerWidth - 220, selectionRange.rect.left))}px`,
-          }}
+          onMouseDown={(e) => e.preventDefault()}
+          onTouchStart={(e) => e.stopPropagation()}
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-3.5 py-2 bg-zinc-950 text-white rounded-full border border-zinc-800 animate-in fade-in slide-in-from-bottom-2 duration-150 select-none shadow-none max-w-[92vw]"
         >
-          <div className="flex items-center gap-1.5 pr-2 border-r border-zinc-800">
-            {HIGHLIGHT_COLORS.map((hc) => (
-              <button
-                key={hc.id}
-                type="button"
-                onClick={() => handleApplyHighlight(hc.color)}
-                className="h-4 w-4 rounded-full transition-transform hover:scale-125 cursor-pointer"
-                style={{ backgroundColor: hc.color }}
-                title={hc.name}
-              />
-            ))}
+          {/* Muestra del texto seleccionado */}
+          <span className="text-[11px] text-zinc-400 font-mono pl-1 max-w-[100px] sm:max-w-[180px] truncate">
+            &ldquo;{selectionRange.text}&rdquo;
+          </span>
+
+          <div className="h-4 w-px bg-zinc-800 shrink-0" />
+
+          {/* Colores de resaltado rápido */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            {HIGHLIGHT_COLORS.map((hc) => {
+              const isSelected = selectedHighlightColor === hc.color;
+              return (
+                <button
+                  key={hc.id}
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => handleApplyHighlight(hc.color)}
+                  className={`h-5 w-5 rounded-full transition-transform hover:scale-125 cursor-pointer shrink-0 ${
+                    isSelected ? 'ring-2 ring-white ring-offset-1 ring-offset-zinc-950' : 'opacity-80 hover:opacity-100'
+                  }`}
+                  style={{ backgroundColor: hc.color }}
+                  title={`Resaltar en ${hc.name}`}
+                />
+              );
+            })}
           </div>
 
+          <div className="h-4 w-px bg-zinc-800 shrink-0" />
+
+          {/* Botón Resaltar */}
           <button
             type="button"
+            onMouseDown={(e) => e.preventDefault()}
             onClick={() => handleApplyHighlight()}
-            className="flex items-center gap-1 text-xs font-medium text-amber-400 hover:text-amber-300 px-1 transition-colors cursor-pointer"
+            className="flex items-center gap-1 text-xs font-semibold text-amber-400 hover:text-amber-300 px-1 cursor-pointer shrink-0"
           >
             <Highlighter className="h-3.5 w-3.5" />
             <span>Resaltar</span>
           </button>
 
+          {/* Botón Copiar */}
           <button
             type="button"
+            onMouseDown={(e) => e.preventDefault()}
             onClick={handleCopySelection}
-            className="p-1 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+            className="p-1 text-zinc-400 hover:text-white transition-colors cursor-pointer shrink-0"
             title="Copiar texto"
           >
-            <Copy className="h-3 w-3" />
+            <Copy className="h-3.5 w-3.5" />
+          </button>
+
+          {/* Botón Descartar selección */}
+          <button
+            type="button"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => {
+              setSelectionRange(null);
+              window.getSelection()?.removeAllRanges();
+            }}
+            className="p-1 text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer shrink-0"
+            title="Cancelar selección"
+          >
+            <X className="h-3.5 w-3.5" />
           </button>
         </div>
       )}
@@ -615,6 +697,10 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
                 fontFamily: fontFamilyStyle,
                 fontSize: `${preferences.fontSize}px`,
                 lineHeight: preferences.lineHeight,
+                ['--reader-line-height' as string]: preferences.lineHeight,
+                ['--reader-text' as string]: themeConfig.text,
+                ['--reader-heading' as string]: themeConfig.heading,
+                ['--reader-accent' as string]: themeConfig.accent,
               }}
               dangerouslySetInnerHTML={{ __html: renderedContent }}
             />
@@ -629,18 +715,21 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
           >
             <div
               ref={scrollContainerRef}
-              className={`w-full h-full overflow-hidden page-anim-container ${animationClass}`}
+              style={{
+                height: snappedContentHeight ? `${snappedContentHeight}px` : '100%',
+              }}
+              className={`w-full overflow-hidden page-anim-container ${animationClass}`}
             >
               <div
                 ref={contentRef}
                 onMouseUp={handleTextSelection}
                 onTouchEnd={handleTextSelection}
-                className="h-full w-full book-prose focus:outline-none"
+                className="w-full book-prose focus:outline-none"
                 style={{
                   fontFamily: fontFamilyStyle,
                   fontSize: `${preferences.fontSize}px`,
                   lineHeight: preferences.lineHeight,
-                  height: '100%',
+                  height: snappedContentHeight ? `${snappedContentHeight}px` : '100%',
                   columnFill: 'auto',
                   columnWidth:
                     isTwoColumns && containerWidth > 0
@@ -649,6 +738,10 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
                       ? `${containerWidth}px`
                       : '100%',
                   columnGap: `${columnGapPx}px`,
+                  ['--reader-line-height' as string]: preferences.lineHeight,
+                  ['--reader-text' as string]: themeConfig.text,
+                  ['--reader-heading' as string]: themeConfig.heading,
+                  ['--reader-accent' as string]: themeConfig.accent,
                 }}
                 dangerouslySetInnerHTML={{ __html: renderedContent }}
               />
@@ -690,6 +783,11 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
         onClose={() => setIsSettingsOpen(false)}
         preferences={preferences}
         onUpdatePreferences={updatePreferences}
+      />
+
+      <BookReaderGuideModal
+        isOpen={isGuideOpen}
+        onClose={() => setIsGuideOpen(false)}
       />
     </div>
   );

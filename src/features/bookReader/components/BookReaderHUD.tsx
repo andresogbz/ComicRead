@@ -7,6 +7,7 @@ import {
   Highlighter,
   ChevronLeft,
   ChevronRight,
+  HelpCircle,
 } from 'lucide-react';
 import { HIGHLIGHT_COLORS, type HighlightColorOption } from '../types/book';
 
@@ -29,6 +30,7 @@ interface BookReaderHUDProps {
   onOpenToc: () => void;
   onOpenHighlights: () => void;
   onOpenSettings: () => void;
+  onOpenGuide: () => void;
 }
 
 export const BookReaderHUD: React.FC<BookReaderHUDProps> = ({
@@ -50,6 +52,7 @@ export const BookReaderHUD: React.FC<BookReaderHUDProps> = ({
   onOpenToc,
   onOpenHighlights,
   onOpenSettings,
+  onOpenGuide,
 }) => {
   const progressPercent =
     totalChapters > 0
@@ -124,6 +127,16 @@ export const BookReaderHUD: React.FC<BookReaderHUDProps> = ({
             title="Resaltados y notas"
           >
             <Highlighter className="h-4 w-4" />
+          </button>
+
+          {/* Guía interactiva de lectura (Driver) */}
+          <button
+            type="button"
+            onClick={onOpenGuide}
+            className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors cursor-pointer"
+            title="Guía de uso y ayuda"
+          >
+            <HelpCircle className="h-4 w-4" />
           </button>
 
           {/* Ajustes tipográficos */}

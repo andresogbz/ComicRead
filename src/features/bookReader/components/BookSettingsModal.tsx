@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Minus, Plus, Scroll, Book } from 'lucide-react';
+import { X, Minus, Plus, Scroll, Book, RotateCcw } from 'lucide-react';
 import {
   type BookPreferences,
   type BookTheme,
@@ -29,6 +29,18 @@ export const BookSettingsModal: React.FC<BookSettingsModalProps> = ({
     { id: 'mono', label: 'Monospaciada' },
   ];
 
+  const activeThemeConfig = BOOK_THEMES[preferences.theme] || BOOK_THEMES.sepia;
+  const currentBg = preferences.customBgColor || activeThemeConfig.bg;
+  const currentText = preferences.customTextColor || activeThemeConfig.text;
+  const currentHeading = preferences.customHeadingColor || activeThemeConfig.text;
+  const currentAccent = preferences.customAccentColor || activeThemeConfig.accent;
+  const hasCustomColors = Boolean(
+    preferences.customBgColor ||
+    preferences.customTextColor ||
+    preferences.customHeadingColor ||
+    preferences.customAccentColor
+  );
+
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 bg-black/70 backdrop-blur-xs select-none animate-in fade-in duration-150">
       <div className="relative w-full max-w-lg bg-zinc-950 text-zinc-100 flex flex-col border-t sm:border-b border-zinc-800 pb-6 sm:pb-4">
@@ -50,17 +62,45 @@ export const BookSettingsModal: React.FC<BookSettingsModalProps> = ({
         <div className="flex flex-col gap-5 px-5 py-4 overflow-y-auto max-h-[75vh]">
           {/* 1. Temas de color (Google Play Books / Kindle) */}
           <div className="flex flex-col gap-2">
-            <span className="text-[11px] font-medium text-zinc-400">Tema de fondo</span>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-medium text-zinc-400">Tema de fondo</span>
+              {hasCustomColors && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    onUpdatePreferences({
+                      customBgColor: undefined,
+                      customTextColor: undefined,
+                      customHeadingColor: undefined,
+                      customAccentColor: undefined,
+                    })
+                  }
+                  className="flex items-center gap-1 text-[10px] text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                  title="Restablecer a valores del tema"
+                >
+                  <RotateCcw className="h-2.5 w-2.5" />
+                  <span>Restablecer</span>
+                </button>
+              )}
+            </div>
             <div className="grid grid-cols-5 gap-2">
               {themes.map((th) => {
                 const conf = BOOK_THEMES[th];
-                const isActive = preferences.theme === th;
+                const isActive = preferences.theme === th && !hasCustomColors;
 
                 return (
                   <button
                     key={th}
                     type="button"
-                    onClick={() => onUpdatePreferences({ theme: th })}
+                    onClick={() =>
+                      onUpdatePreferences({
+                        theme: th,
+                        customBgColor: undefined,
+                        customTextColor: undefined,
+                        customHeadingColor: undefined,
+                        customAccentColor: undefined,
+                      })
+                    }
                     className={`flex flex-col items-center justify-center py-2.5 px-1 rounded-sm transition-all cursor-pointer ${
                       isActive ? 'ring-2 ring-amber-400 ring-offset-2 ring-offset-zinc-950' : 'opacity-80 hover:opacity-100'
                     }`}
@@ -73,6 +113,177 @@ export const BookSettingsModal: React.FC<BookSettingsModalProps> = ({
                   </button>
                 );
               })}
+            </div>
+          </div>
+
+          {/* 1.1 Personalización de colores con Color Picker interactivo */}
+          <div className="flex flex-col gap-2.5 pt-2 border-t border-zinc-800/80">
+            <span className="text-[11px] font-medium text-zinc-400">
+              Personalizar colores del lector
+            </span>
+
+            {/* Fondo del lector */}
+            <div className="flex items-center justify-between py-1 border-b border-zinc-900">
+              <span className="text-xs text-zinc-300">Fondo del lienzo</span>
+              <div className="flex items-center gap-2">
+                <div
+                  className="relative w-6 h-6 rounded-full border border-zinc-700 overflow-hidden cursor-pointer shrink-0"
+                  style={{ backgroundColor: currentBg }}
+                >
+                  <input
+                    type="color"
+                    value={currentBg}
+                    onChange={(e) => onUpdatePreferences({ customBgColor: e.target.value })}
+                    className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+                    title="Seleccionar color de fondo"
+                  />
+                </div>
+                <input
+                  type="text"
+                  maxLength={7}
+                  value={currentBg.toUpperCase()}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val.startsWith('#') && val.length <= 7) {
+                      onUpdatePreferences({ customBgColor: val });
+                    }
+                  }}
+                  className="w-18 px-1.5 py-0.5 text-[11px] font-mono bg-zinc-900 text-zinc-200 border border-zinc-800 rounded text-center focus:border-zinc-500 outline-none"
+                />
+                {preferences.customBgColor && (
+                  <button
+                    type="button"
+                    onClick={() => onUpdatePreferences({ customBgColor: undefined })}
+                    className="text-[10px] text-zinc-500 hover:text-zinc-300 cursor-pointer"
+                    title="Restablecer fondo"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Texto normal */}
+            <div className="flex items-center justify-between py-1 border-b border-zinc-900">
+              <span className="text-xs text-zinc-300">Texto principal</span>
+              <div className="flex items-center gap-2">
+                <div
+                  className="relative w-6 h-6 rounded-full border border-zinc-700 overflow-hidden cursor-pointer shrink-0"
+                  style={{ backgroundColor: currentText }}
+                >
+                  <input
+                    type="color"
+                    value={currentText}
+                    onChange={(e) => onUpdatePreferences({ customTextColor: e.target.value })}
+                    className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+                    title="Seleccionar color de texto"
+                  />
+                </div>
+                <input
+                  type="text"
+                  maxLength={7}
+                  value={currentText.toUpperCase()}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val.startsWith('#') && val.length <= 7) {
+                      onUpdatePreferences({ customTextColor: val });
+                    }
+                  }}
+                  className="w-18 px-1.5 py-0.5 text-[11px] font-mono bg-zinc-900 text-zinc-200 border border-zinc-800 rounded text-center focus:border-zinc-500 outline-none"
+                />
+                {preferences.customTextColor && (
+                  <button
+                    type="button"
+                    onClick={() => onUpdatePreferences({ customTextColor: undefined })}
+                    className="text-[10px] text-zinc-500 hover:text-zinc-300 cursor-pointer"
+                    title="Restablecer texto"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Títulos y encabezados */}
+            <div className="flex items-center justify-between py-1 border-b border-zinc-900">
+              <span className="text-xs text-zinc-300">Títulos y encabezados</span>
+              <div className="flex items-center gap-2">
+                <div
+                  className="relative w-6 h-6 rounded-full border border-zinc-700 overflow-hidden cursor-pointer shrink-0"
+                  style={{ backgroundColor: currentHeading }}
+                >
+                  <input
+                    type="color"
+                    value={currentHeading}
+                    onChange={(e) => onUpdatePreferences({ customHeadingColor: e.target.value })}
+                    className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+                    title="Seleccionar color de títulos"
+                  />
+                </div>
+                <input
+                  type="text"
+                  maxLength={7}
+                  value={currentHeading.toUpperCase()}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val.startsWith('#') && val.length <= 7) {
+                      onUpdatePreferences({ customHeadingColor: val });
+                    }
+                  }}
+                  className="w-18 px-1.5 py-0.5 text-[11px] font-mono bg-zinc-900 text-zinc-200 border border-zinc-800 rounded text-center focus:border-zinc-500 outline-none"
+                />
+                {preferences.customHeadingColor && (
+                  <button
+                    type="button"
+                    onClick={() => onUpdatePreferences({ customHeadingColor: undefined })}
+                    className="text-[10px] text-zinc-500 hover:text-zinc-300 cursor-pointer"
+                    title="Restablecer títulos"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Acento y enlaces */}
+            <div className="flex items-center justify-between py-1">
+              <span className="text-xs text-zinc-300">Color de acento</span>
+              <div className="flex items-center gap-2">
+                <div
+                  className="relative w-6 h-6 rounded-full border border-zinc-700 overflow-hidden cursor-pointer shrink-0"
+                  style={{ backgroundColor: currentAccent }}
+                >
+                  <input
+                    type="color"
+                    value={currentAccent}
+                    onChange={(e) => onUpdatePreferences({ customAccentColor: e.target.value })}
+                    className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+                    title="Seleccionar color de acentuación"
+                  />
+                </div>
+                <input
+                  type="text"
+                  maxLength={7}
+                  value={currentAccent.toUpperCase()}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val.startsWith('#') && val.length <= 7) {
+                      onUpdatePreferences({ customAccentColor: val });
+                    }
+                  }}
+                  className="w-18 px-1.5 py-0.5 text-[11px] font-mono bg-zinc-900 text-zinc-200 border border-zinc-800 rounded text-center focus:border-zinc-500 outline-none"
+                />
+                {preferences.customAccentColor && (
+                  <button
+                    type="button"
+                    onClick={() => onUpdatePreferences({ customAccentColor: undefined })}
+                    className="text-[10px] text-zinc-500 hover:text-zinc-300 cursor-pointer"
+                    title="Restablecer acento"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 

@@ -48,6 +48,9 @@ export function useBookReader({ book, onClose }: UseBookReaderProps) {
   const [isTocOpen, setIsTocOpen] = useState(false);
   const [isHighlightsOpen, setIsHighlightsOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isGuideOpen, setIsGuideOpen] = useState(() => {
+    return !localStorage.getItem('comicread_book_guide_dismissed');
+  });
   const [bookmarkedChapters, setBookmarkedChapters] = useState<number[]>(
     book.bookmarks || []
   );
@@ -216,11 +219,13 @@ export function useBookReader({ book, onClose }: UseBookReaderProps) {
     }
 
     const text = sel.toString().trim();
-    if (text.length > 2 && contentRef.current?.contains(sel.anchorNode)) {
+    if (text.length >= 2 && contentRef.current?.contains(sel.anchorNode)) {
       try {
         const range = sel.getRangeAt(0);
         const rect = range.getBoundingClientRect();
-        setSelectionRange({ text, rect });
+        if (rect.width > 0 && rect.height > 0) {
+          setSelectionRange({ text, rect });
+        }
       } catch {
         setSelectionRange(null);
       }
@@ -228,6 +233,23 @@ export function useBookReader({ book, onClose }: UseBookReaderProps) {
       setSelectionRange(null);
     }
   }, []);
+
+  // Escuchar evento selectionchange nativo en document para tablets Android
+  useEffect(() => {
+    let timeoutId: any = null;
+    const onSelectionChange = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        handleTextSelection();
+      }, 70);
+    };
+
+    document.addEventListener('selectionchange', onSelectionChange);
+    return () => {
+      clearTimeout(timeoutId);
+      document.removeEventListener('selectionchange', onSelectionChange);
+    };
+  }, [handleTextSelection]);
 
   const toggleHud = useCallback(() => {
     setIsHudVisible((prev) => !prev);
@@ -250,6 +272,7 @@ export function useBookReader({ book, onClose }: UseBookReaderProps) {
     isTocOpen,
     isHighlightsOpen,
     isSettingsOpen,
+    isGuideOpen,
     selectionRange,
     contentRef,
     nextChapter,
@@ -263,6 +286,7 @@ export function useBookReader({ book, onClose }: UseBookReaderProps) {
     setIsTocOpen,
     setIsHighlightsOpen,
     setIsSettingsOpen,
+    setIsGuideOpen,
     setSelectionRange,
     handleTextSelection,
     onClose,
