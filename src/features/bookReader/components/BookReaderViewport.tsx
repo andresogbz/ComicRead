@@ -89,6 +89,7 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
   const lastHeightRef = useRef<number>(0);
 
   // Altura exacta calculada en múltiplos de línea para garantizar que la última línea nunca se corte
+  // y restando un margen de seguridad para absorber ascenders/tildes y eliminar los "puntitos" residuales
   const snappedContentHeight = useMemo(() => {
     if (containerHeight <= 0) return undefined;
     const lineHeightPx = preferences.fontSize * preferences.lineHeight;
@@ -96,7 +97,10 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
 
     // Número entero de líneas completas que caben en la altura disponible
     const fullLines = Math.max(1, Math.floor(containerHeight / lineHeightPx));
-    return Math.floor(fullLines * lineHeightPx);
+    // Margen de seguridad calibrado (8-12px) para que Chromium nunca intente
+    // asomar la cabeza (puntos de 'i', tildes) de la siguiente línea en la columna actual
+    const safetyMarginPx = Math.max(8, Math.round(preferences.fontSize * 0.45));
+    return Math.max(lineHeightPx, Math.floor(fullLines * lineHeightPx) - safetyMarginPx);
   }, [containerHeight, preferences.fontSize, preferences.lineHeight]);
 
   // Determinar si realmente se renderizan 2 columnas:
@@ -717,6 +721,7 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
               ref={scrollContainerRef}
               style={{
                 height: snappedContentHeight ? `${snappedContentHeight}px` : '100%',
+                maxHeight: snappedContentHeight ? `${snappedContentHeight}px` : '100%',
               }}
               className={`w-full overflow-hidden page-anim-container ${animationClass}`}
             >
@@ -730,6 +735,7 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
                   fontSize: `${preferences.fontSize}px`,
                   lineHeight: preferences.lineHeight,
                   height: snappedContentHeight ? `${snappedContentHeight}px` : '100%',
+                  maxHeight: snappedContentHeight ? `${snappedContentHeight}px` : '100%',
                   columnFill: 'auto',
                   columnWidth:
                     isTwoColumns && containerWidth > 0

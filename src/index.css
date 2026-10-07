@@ -46,6 +46,8 @@
 
   .book-prose {
     color: var(--reader-text, inherit);
+    contain: layout paint;
+    overflow: hidden;
   }
 
   .book-prose img {
@@ -68,6 +70,7 @@
     widows: 1;
     box-sizing: border-box;
     color: var(--reader-text, inherit);
+    break-inside: auto;
   }
 
   .book-prose h1, .book-prose h2, .book-prose h3 {
