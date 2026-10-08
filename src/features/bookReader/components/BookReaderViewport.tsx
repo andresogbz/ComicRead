@@ -53,6 +53,7 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
     setIsGuideOpen,
     setSelectionRange,
     handleTextSelection,
+    speech,
   } = useBookReader({ book, onClose });
 
   // Configuración de tema combinada con personalización de colores del usuario
@@ -570,6 +571,7 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
         totalPagesInChapter={totalPagesInChapter}
         isBookmarked={isBookmarked}
         activeHighlightColor={selectedHighlightColor}
+        speech={speech}
         onSelectHighlightColor={setSelectedHighlightColor}
         onClose={onClose}
         onPrevChapter={prevChapter}

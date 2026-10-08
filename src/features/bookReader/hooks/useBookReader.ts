@@ -7,9 +7,12 @@ import { backupService } from '../../settings/services/backupService';
 import {
   type BookData,
   type BookPreferences,
+  type BookReaderSpeech,
+  type SpeechStatus,
   DEFAULT_BOOK_PREFERENCES,
   HIGHLIGHT_COLORS,
 } from '../types/book';
+import { useSpeechReader } from './useSpeechReader';
 
 interface UseBookReaderProps {
   book: StoredComic;
@@ -63,6 +66,97 @@ export function useBookReader({ book, onClose }: UseBookReaderProps) {
   } | null>(null);
 
   const contentRef = useRef<HTMLDivElement>(null);
+
+  // Lector de voz (TTS) del capítulo actual
+  const {
+    status: speechStatus,
+    progress: speechProgress,
+    rate: speechRate,
+    isSupported: speechSupported,
+    errorMessage: speechError,
+    start: startSpeech,
+    pause: pauseSpeech,
+    resume: resumeSpeech,
+    stop: stopSpeech,
+    setRate: setSpeechRate,
+  } = useSpeechReader();
+
+  const bookDataRef = useRef<BookData | null>(null);
+  useEffect(() => {
+    bookDataRef.current = bookData;
+  }, [bookData]);
+
+  // Indica que el siguiente cambio de capítulo lo provocó el propio lector de voz.
+  const advanceViaSpeechRef = useRef(false);
+  const speechStatusRef = useRef<SpeechStatus>(speechStatus);
+  useEffect(() => {
+    speechStatusRef.current = speechStatus;
+  }, [speechStatus]);
+
+  const playChapterFromRef = useRef<(idx: number) => void>(() => {});
+
+  // Reproduce un capítulo y, al terminar, avanza automáticamente al siguiente.
+  const playChapterFrom = useCallback<(idx: number) => void>(
+    (idx) => {
+      const chapter = bookDataRef.current?.chapters[idx];
+      if (!chapter) {
+        void stopSpeech();
+        return;
+      }
+
+      void startSpeech(chapter.content, () => {
+        const nextIdx = idx + 1;
+        const nextChapter = bookDataRef.current?.chapters[nextIdx];
+        if (!nextChapter) {
+          // Fin del libro: detener la lectura.
+          void stopSpeech();
+          return;
+        }
+        advanceViaSpeechRef.current = true;
+        setCurrentChapterIndex(nextIdx);
+        if (contentRef.current) contentRef.current.scrollTop = 0;
+        playChapterFromRef.current(nextIdx);
+      });
+    },
+    [startSpeech, stopSpeech]
+  );
+
+  useEffect(() => {
+    playChapterFromRef.current = playChapterFrom;
+  }, [playChapterFrom]);
+
+  // Inicia, pausa o reanuda la lectura en voz alta del capítulo actual.
+  const toggleSpeech = useCallback(() => {
+    if (!speechSupported) return;
+
+    if (speechStatus === 'playing') {
+      void pauseSpeech();
+      return;
+    }
+    if (speechStatus === 'paused') {
+      resumeSpeech();
+      return;
+    }
+    playChapterFrom(currentChapterIndex);
+  }, [
+    speechSupported,
+    speechStatus,
+    pauseSpeech,
+    resumeSpeech,
+    playChapterFrom,
+    currentChapterIndex,
+  ]);
+
+  // Si el usuario cambia de capítulo manualmente, detener la lectura en voz alta.
+  useEffect(() => {
+    if (advanceViaSpeechRef.current) {
+      advanceViaSpeechRef.current = false;
+      return;
+    }
+    if (speechStatusRef.current !== 'idle') {
+      void stopSpeech();
+    }
+  }, [currentChapterIndex, stopSpeech]);
 
   // Cargar archivo original y parsear estructura de libro
   useEffect(() => {
@@ -255,6 +349,19 @@ export function useBookReader({ book, onClose }: UseBookReaderProps) {
     setIsHudVisible((prev) => !prev);
   }, []);
 
+  const speech: BookReaderSpeech = {
+    status: speechStatus,
+    progress: speechProgress,
+    rate: speechRate,
+    isSupported: speechSupported,
+    errorMessage: speechError,
+    toggle: toggleSpeech,
+    stop: () => {
+      void stopSpeech();
+    },
+    setRate: setSpeechRate,
+  };
+
   return {
     bookData,
     currentChapter: bookData?.chapters[currentChapterIndex] || null,
@@ -283,6 +390,7 @@ export function useBookReader({ book, onClose }: UseBookReaderProps) {
     deleteHighlight,
     updateHighlightNote,
     toggleHud,
+    speech,
     setIsTocOpen,
     setIsHighlightsOpen,
     setIsSettingsOpen,

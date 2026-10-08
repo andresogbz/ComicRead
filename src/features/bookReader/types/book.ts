@@ -107,6 +107,21 @@ export const DEFAULT_BOOK_PREFERENCES: BookPreferences = {
   pageTransition: 'slide',
 };
 
+export type SpeechStatus = 'idle' | 'playing' | 'paused';
+
+export const SPEECH_RATES = [0.75, 1, 1.25, 1.5, 2] as const;
+
+export interface BookReaderSpeech {
+  status: SpeechStatus;
+  progress: number;
+  rate: number;
+  isSupported: boolean;
+  errorMessage: string | null;
+  toggle: () => void;
+  stop: () => void;
+  setRate: (rate: number) => void;
+}
+
 export interface HighlightColorOption {
   id: string;
   name: string;

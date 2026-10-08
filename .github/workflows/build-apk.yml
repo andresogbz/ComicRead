@@ -75,7 +75,8 @@ jobs:
         run: |
           RELEASE_TAG="${GITHUB_REF_NAME:-v1.0.0}"
           if [[ "$RELEASE_TAG" == "main" || "$RELEASE_TAG" == "master" ]]; then
-            RELEASE_TAG="v1.0.0"
+            PACKAGE_VERSION="v$(node -p "require('./package.json').version")"
+            RELEASE_TAG="${PACKAGE_VERSION:-v1.0.0}"
           fi
 
           echo "Gestionando Release para tag: $RELEASE_TAG"

@@ -8,8 +8,17 @@ import {
   ChevronLeft,
   ChevronRight,
   HelpCircle,
+  Volume2,
+  Play,
+  Pause,
+  Square,
 } from 'lucide-react';
-import { HIGHLIGHT_COLORS, type HighlightColorOption } from '../types/book';
+import {
+  HIGHLIGHT_COLORS,
+  SPEECH_RATES,
+  type HighlightColorOption,
+  type BookReaderSpeech,
+} from '../types/book';
 
 interface BookReaderHUDProps {
   isVisible: boolean;
@@ -21,6 +30,7 @@ interface BookReaderHUDProps {
   totalPagesInChapter?: number;
   isBookmarked: boolean;
   activeHighlightColor: string;
+  speech: BookReaderSpeech;
   onSelectHighlightColor: (color: string) => void;
   onClose: () => void;
   onPrevChapter: () => void;
@@ -43,6 +53,7 @@ export const BookReaderHUD: React.FC<BookReaderHUDProps> = ({
   totalPagesInChapter,
   isBookmarked,
   activeHighlightColor,
+  speech,
   onSelectHighlightColor,
   onClose,
   onPrevChapter,
@@ -58,6 +69,13 @@ export const BookReaderHUD: React.FC<BookReaderHUDProps> = ({
     totalChapters > 0
       ? Math.round(((currentChapterIndex + 1) / totalChapters) * 100)
       : 0;
+
+  const speechButtonLabel =
+    speech.status === 'playing'
+      ? 'Pausar lectura en voz alta'
+      : speech.status === 'paused'
+        ? 'Reanudar lectura en voz alta'
+        : 'Leer capítulo en voz alta';
 
   return (
     <>
@@ -95,6 +113,29 @@ export const BookReaderHUD: React.FC<BookReaderHUDProps> = ({
 
         {/* Acciones superiores Huawei Books */}
         <div className="flex items-center gap-1 sm:gap-2">
+          {/* Lector de voz (TTS) del capítulo */}
+          {speech.isSupported && (
+            <button
+              type="button"
+              onClick={speech.toggle}
+              className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors cursor-pointer ${
+                speech.status === 'idle'
+                  ? 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800'
+                  : 'text-white'
+              }`}
+              aria-label={speechButtonLabel}
+              title={speechButtonLabel}
+            >
+              {speech.status === 'playing' ? (
+                <Pause className="h-4 w-4" />
+              ) : speech.status === 'paused' ? (
+                <Play className="h-4 w-4" />
+              ) : (
+                <Volume2 className="h-4 w-4" />
+              )}
+            </button>
+          )}
+
           {/* Marcador de lectura */}
           <button
             type="button"
@@ -159,6 +200,69 @@ export const BookReaderHUD: React.FC<BookReaderHUDProps> = ({
             : 'translate-y-full opacity-0 pointer-events-none'
         }`}
       >
+        {/* Controles del lector de voz (TTS) mientras está activo o con error */}
+        {speech.isSupported &&
+          (speech.status !== 'idle' || speech.errorMessage !== null) && (
+            <div className="flex items-center justify-between gap-3 pb-2 border-b border-zinc-800/50">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <button
+                  type="button"
+                  onClick={speech.toggle}
+                  className="flex h-7 w-7 items-center justify-center rounded-full text-zinc-200 hover:bg-zinc-800 transition-colors cursor-pointer"
+                  aria-label={speech.status === 'playing' ? 'Pausar lectura' : 'Reanudar lectura'}
+                  title={speech.status === 'playing' ? 'Pausar' : 'Reanudar'}
+                >
+                  {speech.status === 'playing' ? (
+                    <Pause className="h-3.5 w-3.5" />
+                  ) : (
+                    <Play className="h-3.5 w-3.5" />
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={speech.stop}
+                  className="flex h-7 w-7 items-center justify-center rounded-full text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors cursor-pointer"
+                  aria-label="Detener lectura"
+                  title="Detener"
+                >
+                  <Square className="h-3 w-3 fill-current" />
+                </button>
+
+                <span className="font-mono text-[10px] text-zinc-400">
+                  {Math.round(speech.progress * 100)}%
+                </span>
+
+                {speech.errorMessage && (
+                  <span className="text-[10px] text-red-400 truncate">
+                    {speech.errorMessage}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-1 shrink-0">
+                <span className="hidden sm:inline text-[10px] text-zinc-400 font-medium mr-1">
+                  Velocidad
+                </span>
+                {SPEECH_RATES.map((value) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => speech.setRate(value)}
+                    className={`rounded-full px-1.5 py-0.5 font-mono text-[10px] transition-colors cursor-pointer ${
+                      speech.rate === value
+                        ? 'bg-zinc-800 text-white'
+                        : 'text-zinc-500 hover:text-zinc-300'
+                    }`}
+                    title={`Velocidad ${value}x`}
+                  >
+                    {value}x
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
         {/* Selector rápido de marcatextos */}
         <div className="flex items-center justify-between pb-1 border-b border-zinc-800/50">
           <span className="text-[10px] text-zinc-400 font-medium">
