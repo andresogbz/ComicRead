@@ -12,6 +12,7 @@ interface BookSettingsModalProps {
   onClose: () => void;
   preferences: BookPreferences;
   onUpdatePreferences: (updates: Partial<BookPreferences>) => void;
+  onOpenVoiceSettings?: () => void;
 }
 
 export const BookSettingsModal: React.FC<BookSettingsModalProps> = ({
@@ -19,6 +20,7 @@ export const BookSettingsModal: React.FC<BookSettingsModalProps> = ({
   onClose,
   preferences,
   onUpdatePreferences,
+  onOpenVoiceSettings,
 }) => {
   if (!isOpen) return null;
 
@@ -520,6 +522,26 @@ export const BookSettingsModal: React.FC<BookSettingsModalProps> = ({
                   Ninguna
                 </button>
               </div>
+            </div>
+          )}
+
+          {/* Lectura en voz alta (TTS) */}
+          {onOpenVoiceSettings && (
+            <div className="flex items-center justify-between pt-3 border-t border-zinc-800">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[11px] font-medium text-zinc-300">Voz de lectura (TTS)</span>
+                <span className="text-[10px] text-zinc-500">Seleccionar voz HD y modular tono</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onOpenVoiceSettings();
+                }}
+                className="py-1 px-3 text-xs text-zinc-300 hover:text-white border border-zinc-800 hover:border-zinc-700 transition-colors cursor-pointer"
+              >
+                Configurar voz
+              </button>
             </div>
           )}
         </div>

@@ -7,6 +7,7 @@ import { BookReaderHUD } from './BookReaderHUD';
 import { BookTocModal } from './BookTocModal';
 import { BookHighlightsModal } from './BookHighlightsModal';
 import { BookSettingsModal } from './BookSettingsModal';
+import { BookSpeechSettingsModal } from './BookSpeechSettingsModal';
 import { BookReaderGuideModal } from './BookReaderGuideModal';
 import { BOOK_THEMES, HIGHLIGHT_COLORS } from '../types/book';
 
@@ -791,6 +792,13 @@ export const BookReaderViewport: React.FC<BookReaderViewportProps> = ({
         onClose={() => setIsSettingsOpen(false)}
         preferences={preferences}
         onUpdatePreferences={updatePreferences}
+        onOpenVoiceSettings={() => speech.setIsVoiceSettingsOpen(true)}
+      />
+
+      <BookSpeechSettingsModal
+        isOpen={speech.isVoiceSettingsOpen}
+        onClose={() => speech.setIsVoiceSettingsOpen(false)}
+        speech={speech}
       />
 
       <BookReaderGuideModal

@@ -98,3 +98,103 @@ function splitLongText(text: string, maxLen: number): string[] {
   if (current) parts.push(current);
   return parts;
 }
+
+export interface FormattedVoice {
+  index: number;
+  name: string;
+  lang: string;
+  label: string;
+  isHighQuality: boolean;
+  isDefault: boolean;
+}
+
+/**
+ * Convierte un objeto de voz crudo del sistema o navegador en una etiqueta
+ * limpia, legible y descriptiva, detectando variantes de alta definición (HD / Natural).
+ */
+export function formatVoiceLabel(
+  voice: { name: string; lang: string; default?: boolean; localService?: boolean },
+  index: number
+): FormattedVoice {
+  const name = voice.name || '';
+  const lang = voice.lang || '';
+  const isNetwork = !voice.localService || /network|neural|wavenet|hd|natural/i.test(name);
+
+  const langCode = lang.toLowerCase().replace('_', '-');
+  let country = '';
+  if (langCode.includes('mx')) country = 'México';
+  else if (langCode.includes('es-es') || langCode === 'es') country = 'España';
+  else if (langCode.includes('us')) country = 'EE. UU.';
+  else if (langCode.includes('co')) country = 'Colombia';
+  else if (langCode.includes('ar')) country = 'Argentina';
+  else if (langCode.includes('cl')) country = 'Chile';
+  else if (langCode.startsWith('es')) country = 'Español';
+  else if (langCode.startsWith('en')) country = 'Inglés';
+
+  // Si es un identificador de Google TTS: ej: es-es-x-eed-network o es-mx-x-sfc-local
+  const matchGoogle = name.match(/([a-z]{2}-[a-z]{2})-x-([a-z0-9]+)-(network|local)/i);
+  if (matchGoogle) {
+    const variantId = matchGoogle[2].toUpperCase();
+    const tag = isNetwork ? ' (HD)' : '';
+    return {
+      index,
+      name,
+      lang,
+      label: `${country || matchGoogle[1]} · Voz ${variantId}${tag}`,
+      isHighQuality: isNetwork,
+      isDefault: Boolean(voice.default),
+    };
+  }
+
+  // Si el nombre es descriptivo de Microsoft / Web
+  const cleanName = name
+    .replace(/^Microsoft /i, '')
+    .replace(/ Desktop/i, '')
+    .replace(/ Online \(Natural\)/i, ' (HD)')
+    .replace(/ \(Natural\)/i, ' (HD)')
+    .trim();
+
+  const finalLabel =
+    isNetwork && !cleanName.includes('(HD)') ? `${cleanName} (HD)` : cleanName;
+
+  return {
+    index,
+    name,
+    lang,
+    label: finalLabel || `Voz ${index + 1}`,
+    isHighQuality: isNetwork,
+    isDefault: Boolean(voice.default),
+  };
+}
+
+/**
+ * Filtra y ordena las voces del sistema priorizando el idioma objetivo (por defecto español)
+ * y colocando las voces HD / Naturales al principio.
+ */
+export function sortAndFilterVoices(
+  voices: { name: string; lang: string; default?: boolean; localService?: boolean }[],
+  targetLangPrefix: string = 'es'
+): FormattedVoice[] {
+  const formatted = voices.map((v, i) => formatVoiceLabel(v, i));
+
+  // Filtrar voces que coinciden con el idioma objetivo
+  const matching = formatted.filter((v) =>
+    v.lang.toLowerCase().replace('_', '-').startsWith(targetLangPrefix.toLowerCase())
+  );
+
+  const listToOrder = matching.length > 0 ? matching : formatted;
+
+  return [...listToOrder].sort((a, b) => {
+    // 1. Las voces HD / Naturales primero
+    if (a.isHighQuality !== b.isHighQuality) {
+      return a.isHighQuality ? -1 : 1;
+    }
+    // 2. La voz predeterminada del sistema
+    if (a.isDefault !== b.isDefault) {
+      return a.isDefault ? -1 : 1;
+    }
+    // 3. Orden alfabético por etiqueta
+    return a.label.localeCompare(b.label);
+  });
+}
+

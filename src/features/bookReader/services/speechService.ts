@@ -20,19 +20,68 @@ class SpeechService {
   }
 
   /**
+   * Obtiene la lista completa de voces soportadas por el motor nativo de Android
+   * o el sintetizador del navegador.
+   */
+  async getSupportedVoices(): Promise<{ name: string; lang: string; default: boolean; localService: boolean; voiceURI: string }[]> {
+    if (!this.isSupported()) return [];
+
+    try {
+      const result = await TextToSpeech.getSupportedVoices();
+      if (result.voices && result.voices.length > 0) {
+        return result.voices;
+      }
+    } catch (err) {
+      console.warn('[SpeechService] getSupportedVoices nativo falló:', err);
+    }
+
+    // Respaldo para entorno web si el plugin devolvió vacío antes de onvoiceschanged
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      const webVoices = window.speechSynthesis.getVoices();
+      if (webVoices.length > 0) {
+        return webVoices.map((v) => ({
+          name: v.name,
+          lang: v.lang,
+          default: v.default,
+          localService: v.localService,
+          voiceURI: v.voiceURI,
+        }));
+      }
+    }
+
+    return [];
+  }
+
+  /** Abre la configuración de instalación o datos de voz del sistema en Android. */
+  async openInstall(): Promise<void> {
+    if (Capacitor.isNativePlatform()) {
+      try {
+        await TextToSpeech.openInstall();
+      } catch (err) {
+        console.warn('[SpeechService] openInstall falló:', err);
+      }
+    }
+  }
+
+  /**
    * Habla un fragmento de texto y resuelve cuando termina de reproducirse.
    * Rechaza si el motor falla (para que el hook detenga la reproducción).
    */
-  async speakChunk(text: string, rate: number): Promise<void> {
+  async speakChunk(
+    text: string,
+    rate: number,
+    pitch: number = 1.0,
+    voiceIndex?: number | null
+  ): Promise<void> {
     const lang = await this.resolveLanguage();
 
     try {
-      await this.speak(text, lang, rate);
+      await this.speak(text, lang, rate, pitch, voiceIndex);
     } catch (err) {
       if (this.isEngineInitError(err)) {
         // El motor nativo aún se está inicializando: reintentar una vez.
         await delay(ENGINE_RETRY_DELAY_MS);
-        await this.speak(text, lang, rate);
+        await this.speak(text, lang, rate, pitch, voiceIndex);
         return;
       }
 
@@ -40,7 +89,7 @@ class SpeechService {
         // El idioma cacheado dejó de estar disponible: resolver de nuevo y reintentar.
         this.cachedLang = null;
         const retryLang = await this.resolveLanguage();
-        await this.speak(text, retryLang, rate);
+        await this.speak(text, retryLang, rate, pitch, voiceIndex);
         return;
       }
 
@@ -58,11 +107,19 @@ class SpeechService {
     }
   }
 
-  private speak(text: string, lang: string, rate: number): Promise<void> {
+  private speak(
+    text: string,
+    lang: string,
+    rate: number,
+    pitch: number,
+    voiceIndex?: number | null
+  ): Promise<void> {
     return TextToSpeech.speak({
       text,
       lang,
       rate,
+      pitch,
+      voice: voiceIndex !== null && voiceIndex !== undefined ? voiceIndex : undefined,
       volume: 1,
       queueStrategy: QueueStrategy.Flush,
     });

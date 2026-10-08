@@ -72,6 +72,11 @@ export function useBookReader({ book, onClose }: UseBookReaderProps) {
     status: speechStatus,
     progress: speechProgress,
     rate: speechRate,
+    pitch: speechPitch,
+    selectedVoiceIndex: speechSelectedVoiceIndex,
+    availableVoices: speechAvailableVoices,
+    isVoiceSettingsOpen: speechIsVoiceSettingsOpen,
+    isTestingVoice: speechIsTestingVoice,
     isSupported: speechSupported,
     errorMessage: speechError,
     start: startSpeech,
@@ -79,6 +84,12 @@ export function useBookReader({ book, onClose }: UseBookReaderProps) {
     resume: resumeSpeech,
     stop: stopSpeech,
     setRate: setSpeechRate,
+    setPitch: setSpeechPitch,
+    setVoiceIndex: setSpeechVoiceIndex,
+    setIsVoiceSettingsOpen: setSpeechIsVoiceSettingsOpen,
+    testVoice: speechTestVoice,
+    stopTest: speechStopTest,
+    openInstall: speechOpenInstall,
   } = useSpeechReader();
 
   const bookDataRef = useRef<BookData | null>(null);
@@ -353,6 +364,11 @@ export function useBookReader({ book, onClose }: UseBookReaderProps) {
     status: speechStatus,
     progress: speechProgress,
     rate: speechRate,
+    pitch: speechPitch,
+    selectedVoiceIndex: speechSelectedVoiceIndex,
+    availableVoices: speechAvailableVoices,
+    isVoiceSettingsOpen: speechIsVoiceSettingsOpen,
+    isTestingVoice: speechIsTestingVoice,
     isSupported: speechSupported,
     errorMessage: speechError,
     toggle: toggleSpeech,
@@ -360,6 +376,12 @@ export function useBookReader({ book, onClose }: UseBookReaderProps) {
       void stopSpeech();
     },
     setRate: setSpeechRate,
+    setPitch: setSpeechPitch,
+    setVoiceIndex: setSpeechVoiceIndex,
+    setIsVoiceSettingsOpen: setSpeechIsVoiceSettingsOpen,
+    testVoice: speechTestVoice,
+    stopTest: speechStopTest,
+    openInstall: speechOpenInstall,
   };
 
   return {

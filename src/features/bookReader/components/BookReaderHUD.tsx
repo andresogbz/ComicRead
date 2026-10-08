@@ -12,6 +12,7 @@ import {
   Play,
   Pause,
   Square,
+  SlidersHorizontal,
 } from 'lucide-react';
 import {
   HIGHLIGHT_COLORS,
@@ -259,6 +260,16 @@ export const BookReaderHUD: React.FC<BookReaderHUDProps> = ({
                     {value}x
                   </button>
                 ))}
+
+                <button
+                  type="button"
+                  onClick={() => speech.setIsVoiceSettingsOpen(true)}
+                  className="flex h-6 w-6 items-center justify-center rounded-full text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer ml-1"
+                  aria-label="Ajustes de voz y tono"
+                  title="Ajustes de voz y tono"
+                >
+                  <SlidersHorizontal className="h-3 w-3" />
+                </button>
               </div>
             </div>
           )}

@@ -111,15 +111,42 @@ export type SpeechStatus = 'idle' | 'playing' | 'paused';
 
 export const SPEECH_RATES = [0.75, 1, 1.25, 1.5, 2] as const;
 
+export const SPEECH_PITCHES = [
+  { value: 0.85, label: 'Grave' },
+  { value: 0.95, label: 'Cálido' },
+  { value: 1.0, label: 'Normal' },
+  { value: 1.1, label: 'Agudo' },
+] as const;
+
+export interface SpeechVoiceOption {
+  index: number;
+  name: string;
+  lang: string;
+  label: string;
+  isHighQuality: boolean;
+  isDefault: boolean;
+}
+
 export interface BookReaderSpeech {
   status: SpeechStatus;
   progress: number;
   rate: number;
+  pitch: number;
+  selectedVoiceIndex: number | null;
+  availableVoices: SpeechVoiceOption[];
+  isVoiceSettingsOpen: boolean;
+  isTestingVoice: boolean;
   isSupported: boolean;
   errorMessage: string | null;
   toggle: () => void;
   stop: () => void;
   setRate: (rate: number) => void;
+  setPitch: (pitch: number) => void;
+  setVoiceIndex: (voiceIndex: number | null) => void;
+  setIsVoiceSettingsOpen: (open: boolean) => void;
+  testVoice: (voiceIndex?: number) => Promise<void>;
+  stopTest: () => void;
+  openInstall: () => Promise<void>;
 }
 
 export interface HighlightColorOption {
