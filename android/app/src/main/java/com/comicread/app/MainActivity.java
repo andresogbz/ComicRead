@@ -22,6 +22,13 @@ public class MainActivity extends BridgeActivity {
         // Edge-to-Edge real (como Facebook): La app se dibuja de forma continua debajo de la barra de estado
         WindowCompat.setDecorFitsSystemWindows(window, false);
 
+        // Habilitar extensión completa alrededor de cámaras/recortes en tablets horizontales (Huawei MatePad, Android 9+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            WindowManager.LayoutParams lp = window.getAttributes();
+            lp.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+            window.setAttributes(lp);
+        }
+
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(Color.TRANSPARENT);

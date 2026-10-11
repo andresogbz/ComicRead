@@ -22,6 +22,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- Soporte oficial de recorte / pantalla completa en tablets Huawei (HarmonyOS / EMUI) -->
+            <meta-data android:name="android.notch_support" android:value="true" />
         </activity>
 
         <provider
